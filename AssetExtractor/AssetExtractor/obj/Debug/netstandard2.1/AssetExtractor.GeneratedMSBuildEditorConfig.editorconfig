@@ -1,8 +1,0 @@
-is_global = true
-build_property.RootNamespace = AssetExtractor
-build_property.ProjectDir = /run/media/icebrah/buh/github/code-mods/AssetExtractor/AssetExtractor/
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 
