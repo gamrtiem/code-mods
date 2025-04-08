@@ -6,7 +6,6 @@ using R2API;
 using RoR2;
 using UnityEngine;
 using Path = System.IO.Path;
-
 namespace AssetExtractor
 {
     // This is an example plugin that can be put in
@@ -220,7 +219,48 @@ namespace AssetExtractor
         public static void FormatSurvivor(ConCommandArgs args)
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SURVIVORS);
-            string f = "equipments[\u201C{0}\u201C] = {{\n\tRarity = \u201C{1}\u201C,\n\tQuote = \u201C{2}\u201C,\n\tDesc = \u201C{3}\u201C,\n\tUnlock = \u201C{4}\u201C,\n\t ID = ,\n\tLocalizationInternalName = \u201C{5}\u201C,\n\t}}";
+            /*string f = "survivors[\u201C{0}\u201C] = {{\n
+                \tName = \u201C{1}\u201C,\n
+                \tImage = \u201C{2}\u201C,\n
+                \tBaseHealth = {3},\n
+                \tScalingHealth = {4},\n
+                \tBaseDamage = {5},\n
+                \tScalingDamage = {6},\n
+                \tBaseHealthRegen = {7},\n
+                \tScalingHealthRegen = {8},\n
+                \tBaseSpeed = {9},\n
+                \tBaseArmor = {10},\n
+                \tDescription = \u201C{11}\u201C,\n
+                \tPhraseEscape = \u201C{12}\u201C,\n
+                \tPhraseVanish = \u201C{13}\u201C,\n
+                \tClass = \u201C \u201C,\n
+                \tMass = {14},\n
+                \tLocalizationInternalName = \u201C{5}\u201C,\n
+                \t}}";*/
+
+            string f = "survivors[\u201C{0}\u201C] = {{\n";
+            f += "\tName = \u201C{1}\u201C,\n";
+            f += "\tImage = \u201C{2}\u201C,\n";
+            f += "\tBaseHealth = {3},\n";
+            f += "\tScalingHealth = {4},\n";
+            f += "\tBaseDamage = {5},\n";
+            f += "\tScalingDamage = {6},\n";
+            f += "\tBaseHealthRegen = {7},\n";
+            f += "\tScalingHealthRegen = {8},\n";
+            f += "\tBaseSpeed = {9},\n";
+            f += "\tBaseArmor = {10},\n";
+            f += "\tDescription = \u201C{11}\u201C,\n";
+            f += "\tUnlock = \u201C{17}\u201C,\n";
+            f += "\tUmbra= \u201C{18}\u201C,\n";
+            f += "\tPhraseEscape = \u201C{12}\u201C,\n";
+            f += "\tPhraseVanish = \u201C{13}\u201C,\n";
+            f += "\tClass = \u201C \u201C,\n";
+            f += "\tMass = {14},\n";
+            f += "\tLocalizationInternalName = \u201C{15}\u201C,\n";
+            f += "\tColor = \u201C{16}\u201C,\n";
+            f += "\t}}";
+
+            //string f = "survivors[\u201C{0}\u201C] = {{\n\tColory = \u201C{1}\u201C,\n\tQuote = \u201C{2}\u201C,\n\tDesc = \u201C{3}\u201C,\n\tUnlock = \u201C{4}\u201C,\n\t Armor = ,\n\tLocalizationInternalName = \u201C{5}\u201C,\n\t}}";
             if (!Directory.Exists(WikiOutputPath))
             {
                 Directory.CreateDirectory(WikiOutputPath);
@@ -241,18 +281,37 @@ namespace AssetExtractor
                 }
 
                 string token = surv.displayNameToken.Remove(surv.displayNameToken.Length - 5); // remove _NAME
-
-                string format = Language.GetStringFormatted(f, survName, "", pickup, desc, unlock, token);
-                foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                 
+                if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
                 {
-                    format = format.Replace(kvp.Key, kvp.Value);
-                }
-                tw.WriteLine(format);
+                    var basehealth = body.baseMaxHealth;
+                    var scalinghealth = body.levelMaxHealth;
+                    var damage = body.baseDamage;
+                    var scalingdamage = body.levelDamage;
+                    var regen = body.baseRegen;
+                    var scalingregen = body.levelRegen;
+                    var speed = body.baseMoveSpeed;
+                    var armor = body.baseArmor;
+                    float mass = 0;
+                    if (surv.bodyPrefab.TryGetComponent(out CharacterMotor motor))
+                    {
+                        mass = motor.mass;
+                    }
+                    
+                    
+                    string format = Language.GetStringFormatted(f, survName, survName, survName.Replace(" ", "_") + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, Language.GetString(surv.outroFlavorToken), Language.GetString(surv.mainEndingEscapeFailureFlavorToken), mass, token, "#" + ColorUtility.ToHtmlStringRGB(surv.primaryColor), Language.GetString(body.subtitleNameToken), Language.GetString(surv.unlockableDef.nameToken));
+                    foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                    {
+                        format = format.Replace(kvp.Key, kvp.Value);
+                    }
+                    tw.WriteLine(format);
                 
-                if (!SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex)) continue;
-                var temp = WikiOutputPath + @"\survivors\";
-                Directory.CreateDirectory(temp);
-                exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, token + ".png"));
+                    if (!SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex)) continue;
+                    var temp = WikiOutputPath + @"\survivors\";
+                    Directory.CreateDirectory(temp);
+                    exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, token + ".png"));
+                
+                }
             }
             tw.Close();
         }
