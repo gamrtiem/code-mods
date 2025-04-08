@@ -8,62 +8,33 @@ using UnityEngine;
 using Path = System.IO.Path;
 namespace AssetExtractor
 {
-    // This is an example plugin that can be put in
-// BepInEx/plugins/AssetExtractor/AssetExtractor.dll to test out.
-// It's a small plugin that adds a relatively simple item to the game,
-// and gives you that item whenever you press F2.
-
-// This attribute specifies that we have a dependency on a given BepInEx Plugin,
-// We need the R2API ItemAPI dependency because we are using for adding our item to the game.
-// You don't need this if you're not using R2API in your plugin,
-// it's just to tell BepInEx to initialize R2API before this plugin so it's safe to use R2API.
     [BepInDependency(ItemAPI.PluginGUID)]
-
-// This one is because we use a .language file for language tokens
-// More info in https://risk-of-thunder.github.io/R2Wiki/Mod-Creation/Assets/Localization/
     [BepInDependency(LanguageAPI.PluginGUID)]
-
-// This attribute is required, and lists metadata for your plugin.
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-
-// This is the main declaration of our plugin class.
-// BepInEx searches for all classes inheriting from BaseUnityPlugin to initialize on startup.
-// BaseUnityPlugin itself inherits from MonoBehaviour,
-// so you can use this as a reference for what you can declare and use in your plugin class
-// More information in the Unity Docs: https://docs.unity3d.com/ScriptReference/MonoBehaviour.html
+    
     public class AssetExtractor : BaseUnityPlugin
     {
-        // The Plugin GUID should be a unique ID for this plugin,
-        // which is human readable (as it is used in places like the config).
-        // If we see this PluginGUID as it is on thunderstore,
-        // we will deprecate this mod.
-        // Change the PluginAuthor and the PluginName !
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "icebro";
         public const string PluginName = "assetextractor";
         public const string PluginVersion = "1.0.0";
         internal static AssetExtractor Instance { get; private set; }
-        // We need our item definition to persist through our functions, and therefore make it a class field.
 
-        // The Awake() method is run at the very start when the game is initialized.
         public void Awake()
         {
             Instance = this;
-            // Init our logging class so that we can properly log for debugging
             Log.Init(Logger);
         }
         
 
-        // The Update() method is run on every frame of the game.
         private void Update()
         {
-            // This if statement checks if the player has currently pressed F2.
             if (!Input.GetKeyDown(KeyCode.F2)) return;
             Log.Info("F2 pressed ,,. extracting !!!!");
 
-            WikiFormat.FormatItem(args: new ConCommandArgs());
-            WikiFormat.FormatEquipment(args: new ConCommandArgs());
-            WikiFormat.FormatSurvivor(args: new ConCommandArgs());
+            WikiFormat.FormatItem();
+            WikiFormat.FormatEquipment();
+            WikiFormat.FormatSurvivor();
         }
     }
 
@@ -88,10 +59,8 @@ namespace AssetExtractor
             { "<style=cIsLunar>", "{{Color|lunar|" },
             { "<style=cShrine>", "{{Color|boss|" }, // idk about this one
         };
-
-        [ConCommand(commandName = "wiki_item", flags = ConVarFlags.None,
-            helpText = "Print Starstorm 2 item information to a Wiki.GG format.")]
-        public static void FormatItem(ConCommandArgs args)
+        
+        public static void FormatItem()
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_ITEM);
             string f =
@@ -159,7 +128,6 @@ namespace AssetExtractor
                     format = format.Replace(kvp.Key, kvp.Value);
                 }
 
-                //if(item.cont)
                 tw.WriteLine(format);
 
                 if (!item.pickupIconTexture) continue;
@@ -171,8 +139,7 @@ namespace AssetExtractor
             tw.Close();
         }
 
-        [ConCommand(commandName = "wiki_equipment", flags = ConVarFlags.None, helpText = "Print Starstorm 2 equipment information to a Wiki.GG format.")]
-        public static void FormatEquipment(ConCommandArgs args)
+        public static void FormatEquipment()
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_EQUIPMENT);
             string f = "equipments[\u201C{0}\u201C] = {{\n\tRarity = \u201C{1}\u201C,\n\tQuote = \u201C{2}\u201C,\n\tDesc = \u201C{3}\u201C,\n\tUnlock = \u201C{4}\u201C,\n\t ID = ,\n\tLocalizationInternalName = \u201C{5}\u201C,\n\t}}";
@@ -215,28 +182,9 @@ namespace AssetExtractor
             tw.Close();
         }
         
-        [ConCommand(commandName = "wiki_equipment", flags = ConVarFlags.None, helpText = "Print Starstorm 2 equipment information to a Wiki.GG format.")]
-        public static void FormatSurvivor(ConCommandArgs args)
+        public static void FormatSurvivor()
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SURVIVORS);
-            /*string f = "survivors[\u201C{0}\u201C] = {{\n
-                \tName = \u201C{1}\u201C,\n
-                \tImage = \u201C{2}\u201C,\n
-                \tBaseHealth = {3},\n
-                \tScalingHealth = {4},\n
-                \tBaseDamage = {5},\n
-                \tScalingDamage = {6},\n
-                \tBaseHealthRegen = {7},\n
-                \tScalingHealthRegen = {8},\n
-                \tBaseSpeed = {9},\n
-                \tBaseArmor = {10},\n
-                \tDescription = \u201C{11}\u201C,\n
-                \tPhraseEscape = \u201C{12}\u201C,\n
-                \tPhraseVanish = \u201C{13}\u201C,\n
-                \tClass = \u201C \u201C,\n
-                \tMass = {14},\n
-                \tLocalizationInternalName = \u201C{5}\u201C,\n
-                \t}}";*/
 
             string f = "survivors[\u201C{0}\u201C] = {{\n";
             f += "\tName = \u201C{1}\u201C,\n";
@@ -260,7 +208,6 @@ namespace AssetExtractor
             f += "\tColor = \u201C{16}\u201C,\n";
             f += "\t}}";
 
-            //string f = "survivors[\u201C{0}\u201C] = {{\n\tColory = \u201C{1}\u201C,\n\tQuote = \u201C{2}\u201C,\n\tDesc = \u201C{3}\u201C,\n\tUnlock = \u201C{4}\u201C,\n\t Armor = ,\n\tLocalizationInternalName = \u201C{5}\u201C,\n\t}}";
             if (!Directory.Exists(WikiOutputPath))
             {
                 Directory.CreateDirectory(WikiOutputPath);
@@ -298,8 +245,15 @@ namespace AssetExtractor
                         mass = motor.mass;
                     }
                     
-                    
-                    string format = Language.GetStringFormatted(f, survName, survName, survName.Replace(" ", "_") + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, Language.GetString(surv.outroFlavorToken), Language.GetString(surv.mainEndingEscapeFailureFlavorToken), mass, token, "#" + ColorUtility.ToHtmlStringRGB(surv.primaryColor), Language.GetString(body.subtitleNameToken), Language.GetString(surv.unlockableDef.nameToken));
+                    var outroFlavor = Language.GetString(surv.outroFlavorToken);
+                    var mainendingescape = Language.GetString(surv.mainEndingEscapeFailureFlavorToken);
+                    var umbrasubtitle = "";//Language.GetString(surv.tok);
+                    var unlocktoken = "";
+                    if (surv.unlockableDef)
+                    {
+                        unlocktoken = Language.GetString(surv.unlockableDef.nameToken);
+                    }
+                    string format = Language.GetStringFormatted(f, survName, survName, survName.Replace(" ", "_") + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, outroFlavor, mainendingescape, mass, token, "#" + ColorUtility.ToHtmlStringRGB(surv.primaryColor), umbrasubtitle, unlocktoken);
                     foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
                     {
                         format = format.Replace(kvp.Key, kvp.Value);
