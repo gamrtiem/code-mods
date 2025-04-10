@@ -202,7 +202,7 @@ namespace AssetExtractor
             f += "\tUmbra= \u201C{18}\u201C,\n";
             f += "\tPhraseEscape = \u201C{12}\u201C,\n";
             f += "\tPhraseVanish = \u201C{13}\u201C,\n";
-            f += "\tClass = \u201C \u201C,\n";
+            f += "\tClass = \u201C\u201C,\n";
             f += "\tMass = {14},\n";
             f += "\tLocalizationInternalName = \u201C{15}\u201C,\n";
             f += "\tColor = \u201C{16}\u201C,\n";
@@ -248,12 +248,14 @@ namespace AssetExtractor
                     var outroFlavor = Language.GetString(surv.outroFlavorToken);
                     var mainendingescape = Language.GetString(surv.mainEndingEscapeFailureFlavorToken);
                     var umbrasubtitle = "";//Language.GetString(surv.tok);
+                    umbrasubtitle = Language.GetString(body.subtitleNameToken);
+
                     var unlocktoken = "";
                     if (surv.unlockableDef)
                     {
                         unlocktoken = Language.GetString(surv.unlockableDef.nameToken);
                     }
-                    string format = Language.GetStringFormatted(f, survName, survName, survName.Replace(" ", "_") + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, outroFlavor, mainendingescape, mass, token, "#" + ColorUtility.ToHtmlStringRGB(surv.primaryColor), umbrasubtitle, unlocktoken);
+                    string format = Language.GetStringFormatted(f, survName, survName, survName.Replace(" ", "_") + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, outroFlavor, mainendingescape, mass, token, "#" + ColorUtility.ToHtmlStringRGB(surv.primaryColor), unlocktoken, umbrasubtitle);
                     foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
                     {
                         format = format.Replace(kvp.Key, kvp.Value);
