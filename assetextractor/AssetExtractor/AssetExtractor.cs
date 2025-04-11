@@ -244,11 +244,17 @@ namespace AssetExtractor
                     {
                         mass = motor.mass;
                     }
+
+                    var mainendingescape = "";
+                    var outroFlavor = "";
+                    var umbrasubtitle = "";
                     
-                    var outroFlavor = Language.GetString(surv.outroFlavorToken);
-                    var mainendingescape = Language.GetString(surv.mainEndingEscapeFailureFlavorToken);
-                    var umbrasubtitle = "";//Language.GetString(surv.tok);
-                    umbrasubtitle = Language.GetString(body.subtitleNameToken);
+                    if (surv.mainEndingEscapeFailureFlavorToken != null)
+                        mainendingescape = Language.GetString(surv.mainEndingEscapeFailureFlavorToken);
+                    if(surv.outroFlavorToken != null)
+                        outroFlavor = Language.GetString(surv.outroFlavorToken);
+                    if(body.subtitleNameToken != null)
+                        umbrasubtitle = Language.GetString(body.subtitleNameToken);
 
                     var unlocktoken = "";
                     if (surv.unlockableDef)
