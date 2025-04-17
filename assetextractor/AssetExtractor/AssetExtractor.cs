@@ -4,6 +4,7 @@ using System.IO;
 using BepInEx;
 using R2API;
 using RoR2;
+using RoR2.Artifacts;
 using UnityEngine;
 using Path = System.IO.Path;
 namespace AssetExtractor
@@ -73,67 +74,100 @@ namespace AssetExtractor
             TextWriter tw = new StreamWriter(path, false);
             foreach (ItemIndex index in ItemCatalog.allItems)
             {
+                try{
+                    var item = ItemCatalog.GetItemDef(index);
+                    string itemName = "";
+                    string pickup = "";
+                    string desc = "";
+                    string tags = "";
+                    string token = "";
+                    
+                    if (item == null) continue;
 
-                var item = ItemCatalog.GetItemDef(index);
+                    if (item.nameToken != null)
+                    {
+                        itemName = Language.GetString(item.nameToken);
+                    }
 
-                if (item.nameToken == null)
-                    continue;
-                string itemName = Language.GetString(item.nameToken);
+                    ItemTier itemTier = item.tier; // will supposedly never = null
+                    string rarity = itemTier switch
+                    {
+                        ItemTier.Tier1 => "Common",
+                        ItemTier.Tier2 => "Uncommon",
+                        ItemTier.Tier3 => "Legendary",
+                        ItemTier.Lunar => "Lunar",
+                        ItemTier.Boss => "Boss",
+                        ItemTier.VoidTier1 => "Void",
+                        ItemTier.VoidTier2 => "Void",
+                        ItemTier.VoidTier3 => "Void",
+                        ItemTier.VoidBoss => "Void",
+                        ItemTier.NoTier => "Untiered",
+                        _ => "Untiered",
+                    };
+                    //if (itemTier == ItemTier.NoTier) continue;
 
-                ItemTier itemTier = item.tier;
-                string rarity = itemTier switch
-                {
-                    ItemTier.Tier1 => "Common",
-                    ItemTier.Tier2 => "Uncommon",
-                    ItemTier.Tier3 => "Legendary",
-                    ItemTier.Lunar => "Lunar",
-                    ItemTier.Boss => "Boss",
-                    ItemTier.VoidTier1 => "Void",
-                    ItemTier.VoidTier2 => "Void",
-                    ItemTier.VoidTier3 => "Void",
-                    ItemTier.VoidBoss => "Void",
-                    ItemTier.NoTier => "Untiered",
-                    _ => "Untiered",
-                };
-                if (itemTier == ItemTier.NoTier) continue;
-                if (item.pickupToken == null)
-                    continue;
-                if (item.descriptionToken == null)
-                    continue;
-                string pickup = Language.GetString(item.pickupToken);
-                string desc = Language.GetString(item.descriptionToken);
-                string tags = "";
-                for (int i = 0; i < item.tags.Length; i++)
-                {
-                    tags += "\u201C" + Enum.GetName(typeof(ItemTag), item.tags[i]) + "\u201C";
-                    if (i < item.tags.Length - 1) tags += ",";
+                    if (item.pickupToken != null)
+                    {
+                        pickup = Language.GetString(item.pickupToken);
+                    }
+
+                    if (item.descriptionToken != null)
+                    {
+                        desc = Language.GetString(item.descriptionToken);
+                    }
+                    
+                    
+                    for (int i = 0; i < item.tags.Length; i++)
+                    {
+                        tags += "\u201C" + Enum.GetName(typeof(ItemTag), item.tags[i]) + "\u201C";
+                        if (i < item.tags.Length - 1) tags += ",";
+                    }
+
+                    string unlock = "";
+                    if (item.unlockableDef)
+                    {
+                        AchievementDef achievement =
+                            AchievementManager.GetAchievementDefFromUnlockable(item.unlockableDef.cachedName);
+                        if (achievement != null && !string.IsNullOrEmpty(achievement.nameToken))
+                            unlock = Language.GetString(achievement.nameToken);
+
+                    }
+
+                    if (item.nameToken != null && item.nameToken.EndsWith("_NAME"))
+                    {
+                        token = item.nameToken.Remove(item.nameToken.Length - 5); // remove _NAME
+                    }
+                    else if (item.nameToken != null)
+                    {
+                        token = item.nameToken; 
+                    }
+
+                    string format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, tags, unlock, String.Empty, String.Empty, token);
+                    foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                    {
+                        format = format.Replace(kvp.Key, kvp.Value);
+                    }
+
+                    tw.WriteLine(format);
+
+                    if (!item.pickupIconTexture) continue;
+                    var temp = WikiOutputPath + @"\items\";
+                    Directory.CreateDirectory(temp);
+                    try
+                    {
+                        exportTexture(item.pickupIconSprite.texture, Path.Combine(temp, itemName.Replace(" ", "_") + ".png"));
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Debug(e);
+                        Log.Debug("erm ,,.,. failed to export equip icon with proper name ,,. trying with tokenm !!");
+                        exportTexture(item.pickupIconSprite.texture, Path.Combine(temp, token + ".png"));
+                    }
                 }
-
-                string unlock = "";
-                if (item.unlockableDef)
+                catch (Exception e)
                 {
-                    AchievementDef achievement =
-                        AchievementManager.GetAchievementDefFromUnlockable(item.unlockableDef.cachedName);
-                    if (achievement != null && !string.IsNullOrEmpty(achievement.nameToken))
-                        unlock = Language.GetString(achievement.nameToken);
-
+                    Log.Error("Error while exporting item: " + e);
                 }
-
-                string token = item.nameToken.Remove(item.nameToken.Length - 5); // remove _NAME
-
-                string format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, tags, unlock,
-                    String.Empty, String.Empty, token);
-                foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
-                {
-                    format = format.Replace(kvp.Key, kvp.Value);
-                }
-
-                tw.WriteLine(format);
-
-                if (!item.pickupIconTexture) continue;
-                var temp = WikiOutputPath + @"\items\";
-                Directory.CreateDirectory(temp);
-                exportTexture(item.pickupIconSprite.texture, Path.Combine(temp, token + ".png"));
             }
 
             tw.Close();
@@ -143,41 +177,86 @@ namespace AssetExtractor
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_EQUIPMENT);
             string f = "equipments[\u201C{0}\u201C] = {{\n\tRarity = \u201C{1}\u201C,\n\tQuote = \u201C{2}\u201C,\n\tDesc = \u201C{3}\u201C,\n\tUnlock = \u201C{4}\u201C,\n\t ID = ,\n\tLocalizationInternalName = \u201C{5}\u201C,\n\t}}";
-            if (!Directory.Exists(WikiOutputPath))
-            {
-                Directory.CreateDirectory(WikiOutputPath);
-            }
+            
             TextWriter tw = new StreamWriter(path, false);
+            
             foreach (EquipmentIndex index in EquipmentCatalog.allEquipment)
             {
+                try{
+                    var equip = EquipmentCatalog.GetEquipmentDef(index);
 
-                var equip = EquipmentCatalog.GetEquipmentDef(index);
-                string itemName = Language.GetString(equip.nameToken);
-                bool isLunar = equip.isLunar;
-                string rarity = isLunar ? "Lunar Equipment" : "Equipment";
-                string pickup = Language.GetString(equip.pickupToken);
-                string desc = Language.GetString(equip.descriptionToken);
-                string unlock = "";
-                if (equip.unlockableDef)
-                {
-                    var nameToken = AchievementManager.GetAchievementDefFromUnlockable(equip.unlockableDef.cachedName)?.nameToken;
-                    if (nameToken != null)
-                        unlock = Language.GetString(nameToken);
-                }
-
-                string token = equip.nameToken.Remove(equip.nameToken.Length - 5); // remove _NAME
-
-                string format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, unlock, token);
-                foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
-                {
-                    format = format.Replace(kvp.Key, kvp.Value);
-                }
-                tw.WriteLine(format);
+                    if (equip == null) continue; // you never know 
                     
-                if (!equip.pickupIconTexture) continue;
-                var temp = WikiOutputPath + @"\equips\";
-                Directory.CreateDirectory(temp);
-                exportTexture(equip.pickupIconSprite.texture, Path.Combine(temp, token + ".png"));
+                    string itemName = "";
+                    bool isLunar = equip.isLunar; // this should be fine and if it isnt ill cry 
+                    string rarity = isLunar ? "Lunar Equipment" : "Equipment";
+                    string pickup = "";
+                    string desc = "";
+                    string unlock = "";
+                    string token = "";
+                    
+                    if (equip.nameToken != null)
+                    {
+                        itemName = Language.GetString(equip.nameToken);
+                    }
+                    
+                    if (equip.nameToken != null)
+                    {
+                        itemName = Language.GetString(equip.nameToken);
+                        
+                        if (equip.nameToken != null && equip.nameToken.EndsWith("_NAME"))
+                        {
+                            token = equip.nameToken.Remove(equip.nameToken.Length - 5); // remove _NAME
+                        }
+                        else if (equip.nameToken != null)
+                        {
+                            token = equip.nameToken; 
+                        }
+                    }
+
+                    if (equip.pickupToken != null)
+                    {
+                        pickup = Language.GetString(equip.pickupToken);
+                    }
+
+                    if (equip.descriptionToken != null)
+                    {
+                        desc = Language.GetString(equip.descriptionToken);
+                    }
+                    
+                    if (equip.unlockableDef)
+                    {
+                        var nameToken = AchievementManager.GetAchievementDefFromUnlockable(equip.unlockableDef.cachedName)?.nameToken;
+                        if (nameToken != null)
+                            unlock = Language.GetString(nameToken);
+                    }
+
+                    string format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, unlock, token);
+
+                    foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                    {
+                        format = format.Replace(kvp.Key, kvp.Value);
+                    }
+                    tw.WriteLine(format);
+
+                    if (!equip.pickupIconTexture) continue;
+
+                    var temp = WikiOutputPath + @"\equips\";
+                    Directory.CreateDirectory(temp);
+                    try
+                    {
+                        exportTexture(equip.pickupIconSprite.texture, Path.Combine(temp, itemName.Replace(" ", "_") + ".png"));
+                    }
+                    catch
+                    {
+                        Log.Debug("erm ,,.,. failed to export equip icon with proper name ,,. trying with tokenm !!");
+                        exportTexture(equip.pickupIconSprite.texture, Path.Combine(temp, token + ".png"));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error while exporting equipment: " + e);
+                }
             }
             tw.Close();
         }
@@ -213,66 +292,121 @@ namespace AssetExtractor
                 Directory.CreateDirectory(WikiOutputPath);
             }
             TextWriter tw = new StreamWriter(path, false);
+            
             foreach (SurvivorDef surv in SurvivorCatalog.allSurvivorDefs)
             {
-
-                string survName = Language.GetString(surv.displayNameToken);
-                string pickup = Language.GetString(surv.descriptionToken);
-                string desc = Language.GetString(surv.descriptionToken);
-                string unlock = "";
-                if (surv.unlockableDef)
+                try
                 {
-                    var nameToken = AchievementManager.GetAchievementDefFromUnlockable(surv.unlockableDef.cachedName)?.nameToken;
-                    if (nameToken != null)
-                        unlock = Language.GetString(nameToken);
-                }
+                    string survName = "";
+                    string desc = "";
+                    string unlock = "";
+                    string token = "";
+                    string color = "";
+                    float basehealth = 99999999999999;
+                    float scalinghealth = 99999999999999;
+                    float damage = 99999999999999;
+                    float scalingdamage = 99999999999999;
+                    float regen = 99999999999999;
+                    float scalingregen = 99999999999999;
+                    float speed = 99999999999999;
+                    float armor = 99999999999999;
+                    float mass = 99999999999999;
+                    string mainendingescape = "";
+                    string outroFlavor = "";
+                    string umbrasubtitle = "";
+                    string unlocktoken = "";
+                    // I HEART NULL CHECKS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                string token = surv.displayNameToken.Remove(surv.displayNameToken.Length - 5); // remove _NAME
-                 
-                if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
-                {
-                    var basehealth = body.baseMaxHealth;
-                    var scalinghealth = body.levelMaxHealth;
-                    var damage = body.baseDamage;
-                    var scalingdamage = body.levelDamage;
-                    var regen = body.baseRegen;
-                    var scalingregen = body.levelRegen;
-                    var speed = body.baseMoveSpeed;
-                    var armor = body.baseArmor;
-                    float mass = 0;
+                    if (surv.displayNameToken != null)
+                    {
+                        survName = Language.GetString(surv.displayNameToken);
+                    }
+
+                    if (surv.descriptionToken != null)
+                    {
+                        desc = Language.GetString(surv.descriptionToken);
+                    }
+
+                    if (surv.primaryColor != null)
+                    {
+                        color = ColorUtility.ToHtmlStringRGB(surv.primaryColor);
+                    }
+
+                    if (surv.unlockableDef != null)
+                    {
+                        var nameToken = AchievementManager
+                            .GetAchievementDefFromUnlockable(surv.unlockableDef.cachedName)?.nameToken;
+                        if (nameToken != null)
+                            unlock = Language.GetString(nameToken);
+                    }
+
+                    if (surv.displayNameToken != null && surv.displayNameToken.EndsWith("_NAME"))
+                    {
+                        token = surv.displayNameToken.Remove(surv.displayNameToken.Length - 5); // remove _NAME
+                    }
+                    else if (surv.displayNameToken != null)
+                    {
+                        token = surv.displayNameToken;
+                    }
+
+                    if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
+                    {
+                        basehealth = body.baseMaxHealth;
+                        scalinghealth = body.levelMaxHealth;
+                        damage = body.baseDamage;
+                        scalingdamage = body.levelDamage;
+                        regen = body.baseRegen;
+                        scalingregen = body.levelRegen;
+                        speed = body.baseMoveSpeed;
+                        armor = body.baseArmor;
+                    }
+
                     if (surv.bodyPrefab.TryGetComponent(out CharacterMotor motor))
                     {
                         mass = motor.mass;
                     }
 
-                    var mainendingescape = "";
-                    var outroFlavor = "";
-                    var umbrasubtitle = "";
-                    
                     if (surv.mainEndingEscapeFailureFlavorToken != null)
                         mainendingescape = Language.GetString(surv.mainEndingEscapeFailureFlavorToken);
-                    if(surv.outroFlavorToken != null)
+                    if (surv.outroFlavorToken != null)
                         outroFlavor = Language.GetString(surv.outroFlavorToken);
-                    if(body.subtitleNameToken != null)
+                    if (body.subtitleNameToken != null)
                         umbrasubtitle = Language.GetString(body.subtitleNameToken);
 
-                    var unlocktoken = "";
                     if (surv.unlockableDef)
                     {
                         unlocktoken = Language.GetString(surv.unlockableDef.nameToken);
                     }
-                    string format = Language.GetStringFormatted(f, survName, survName, survName.Replace(" ", "_") + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, outroFlavor, mainendingescape, mass, token, "#" + ColorUtility.ToHtmlStringRGB(surv.primaryColor), unlocktoken, umbrasubtitle);
+
+                    string format = Language.GetStringFormatted(f, survName, survName,
+                        survName.Replace(" ", "_") + ".png", basehealth, scalinghealth, damage, scalingdamage, regen,
+                        scalingregen, speed, armor, desc, outroFlavor, mainendingescape, mass, token, "#" + color,
+                        unlocktoken, umbrasubtitle);
+
                     foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
                     {
                         format = format.Replace(kvp.Key, kvp.Value);
                     }
+
                     tw.WriteLine(format);
-                
+
                     if (!SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex)) continue;
+
                     var temp = WikiOutputPath + @"\survivors\";
                     Directory.CreateDirectory(temp);
-                    exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, token + ".png"));
-                
+                    try
+                    {
+                        exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, survName.Replace(" ", "_") + ".png"));
+                    }
+                    catch
+                    {
+                        Log.Debug("erm ,,.,. failed to export surv icon with proper name ,,. trying with tokenm !!");
+                        exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, token + ".png"));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error while exporting survivor: " + e);
                 }
             }
             tw.Close();
