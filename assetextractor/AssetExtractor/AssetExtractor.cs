@@ -5,6 +5,7 @@ using BepInEx;
 using R2API;
 using RoR2;
 using RoR2.Artifacts;
+using RoR2.Skills;
 using UnityEngine;
 using Path = System.IO.Path;
 namespace AssetExtractor
@@ -36,6 +37,10 @@ namespace AssetExtractor
             WikiFormat.FormatItem();
             WikiFormat.FormatEquipment();
             WikiFormat.FormatSurvivor();
+            WikiFormat.FormatSkill();
+            WikiFormat.FormatChallenges();
+            
+            Log.Info("complete !!!!");
         }
     }
 
@@ -46,6 +51,9 @@ namespace AssetExtractor
         const string WIKI_OUTPUT_ITEM = "Items.txt";
         const string WIKI_OUTPUT_EQUIPMENT = "Equipments.txt";
         const string WIKI_OUTPUT_SURVIVORS = "Survivors.txt";
+        const string WIKI_OUTPUT_SKILLS = "Skills.txt";
+        const string WIKI_OUTPUT_CHALLENGES = "Challenges.txt";
+        
         static string WikiOutputPath = Path.Combine(Path.GetDirectoryName(AssetExtractor.Instance.Info.Location) ?? throw new InvalidOperationException(), WIKI_OUTPUT_FOLDER);
         static Dictionary<string, string> FormatR2ToWiki = new Dictionary<string, string>()
         {
@@ -65,7 +73,7 @@ namespace AssetExtractor
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_ITEM);
             string f =
-                "items[\u201C{0}\u201C] = {{\n\tRarity = \u201C{1}\u201C,\n\tQuote = \u201C{2}\u201C,\n\tDesc = \u201C{3}\u201C,\n\tCategory = {{ {4} }},\n\tUnlock = \u201C{5}\u201C,\n\tCorrupt = \u201C{6}\u201C, \n\tUncorrupt = \u201C{7}\u201C,\n\tID = ,\n\tStats = {{\n\t\t {{\n\t\t\tStat = \u201C\u201C,\n\t\t\tValue = \u201C\u201C,\n\t\t\tStack = \u201C\u201C,\n\t\t\tAdd = \u201C\u201C\n\t\t}}\n\t}},\n\tLocalizationInternalName = \u201C{8}\u201C,\n\t}}";
+                "items[\u0022{0}\u0022] = {{\n\tRarity = \u0022{1}\u0022,\n\tQuote = \u0022{2}\u0022,\n\tDesc = \u0022{3}\u0022,\n\tCategory = {{ {4} }},\n\tUnlock = \u0022{5}\u0022,\n\tCorrupt = \u0022{6}\u0022, \n\tUncorrupt = \u0022{7}\u0022,\n\tID = ,\n\tStats = {{\n\t\t {{\n\t\t\tStat = \u0022\u0022,\n\t\t\tValue = \u0022\u0022,\n\t\t\tStack = \u0022\u0022,\n\t\t\tAdd = \u0022\u0022\n\t\t}}\n\t}},\n\tLocalizationInternalName = \u0022{8}\u0022,\n\t}}";
             if (!Directory.Exists(WikiOutputPath))
             {
                 Directory.CreateDirectory(WikiOutputPath);
@@ -119,7 +127,7 @@ namespace AssetExtractor
                     
                     for (int i = 0; i < item.tags.Length; i++)
                     {
-                        tags += "\u201C" + Enum.GetName(typeof(ItemTag), item.tags[i]) + "\u201C";
+                        tags += "\u0022" + Enum.GetName(typeof(ItemTag), item.tags[i]) + "\u0022";
                         if (i < item.tags.Length - 1) tags += ",";
                     }
 
@@ -155,7 +163,15 @@ namespace AssetExtractor
                     Directory.CreateDirectory(temp);
                     try
                     {
-                        exportTexture(item.pickupIconSprite.texture, Path.Combine(temp, itemName.Replace(" ", "_") + ".png"));
+                        if (itemName == "")
+                        {
+                            Log.Debug("item name is blank ! using toke n");
+                            exportTexture(item.pickupIconSprite.texture, Path.Combine(temp, token + ".png"));
+                        }
+                        else
+                        {
+                            exportTexture(item.pickupIconSprite.texture, Path.Combine(temp, itemName.Replace(" ", "_") + ".png"));
+                        }
                     }
                     catch (Exception e)
                     {
@@ -176,7 +192,7 @@ namespace AssetExtractor
         public static void FormatEquipment()
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_EQUIPMENT);
-            string f = "equipments[\u201C{0}\u201C] = {{\n\tRarity = \u201C{1}\u201C,\n\tQuote = \u201C{2}\u201C,\n\tDesc = \u201C{3}\u201C,\n\tUnlock = \u201C{4}\u201C,\n\t ID = ,\n\tLocalizationInternalName = \u201C{5}\u201C,\n\t}}";
+            string f = "equipments[\u0022{0}\u0022] = {{\n\tRarity = \u0022{1}\u0022,\n\tQuote = \u0022{2}\u0022,\n\tDesc = \u0022{3}\u0022,\n\tUnlock = \u0022{4}\u0022,\n\t ID = ,\n\tLocalizationInternalName = \u0022{5}\u0022,\n\t}}";
             
             TextWriter tw = new StreamWriter(path, false);
             
@@ -245,7 +261,15 @@ namespace AssetExtractor
                     Directory.CreateDirectory(temp);
                     try
                     {
-                        exportTexture(equip.pickupIconSprite.texture, Path.Combine(temp, itemName.Replace(" ", "_") + ".png"));
+                        if (itemName == "")
+                        {
+                            Log.Debug("equip name is blank ! using toke n");
+                            exportTexture(equip.pickupIconSprite.texture, Path.Combine(temp, token + ".png"));
+                        }
+                        else
+                        {
+                            exportTexture(equip.pickupIconSprite.texture, Path.Combine(temp, itemName.Replace(" ", "_") + ".png"));
+                        }
                     }
                     catch
                     {
@@ -265,9 +289,9 @@ namespace AssetExtractor
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SURVIVORS);
 
-            string f = "survivors[\u201C{0}\u201C] = {{\n";
-            f += "\tName = \u201C{1}\u201C,\n";
-            f += "\tImage = \u201C{2}\u201C,\n";
+            string f = "survivors[\u0022{0}\u0022] = {{\n";
+            f += "\tName = \u0022{1}\u0022,\n";
+            f += "\tImage = \u0022{2}\u0022,\n";
             f += "\tBaseHealth = {3},\n";
             f += "\tScalingHealth = {4},\n";
             f += "\tBaseDamage = {5},\n";
@@ -276,15 +300,15 @@ namespace AssetExtractor
             f += "\tScalingHealthRegen = {8},\n";
             f += "\tBaseSpeed = {9},\n";
             f += "\tBaseArmor = {10},\n";
-            f += "\tDescription = \u201C{11}\u201C,\n";
-            f += "\tUnlock = \u201C{17}\u201C,\n";
-            f += "\tUmbra= \u201C{18}\u201C,\n";
-            f += "\tPhraseEscape = \u201C{12}\u201C,\n";
-            f += "\tPhraseVanish = \u201C{13}\u201C,\n";
-            f += "\tClass = \u201C\u201C,\n";
+            f += "\tDescription = \u0022{11}\u0022,\n";
+            f += "\tUnlock = \u0022{17}\u0022,\n";
+            f += "\tUmbra= \u0022{18}\u0022,\n";
+            f += "\tPhraseEscape = \u0022{12}\u0022,\n";
+            f += "\tPhraseVanish = \u0022{13}\u0022,\n";
+            f += "\tClass = \u0022\u0022,\n";
             f += "\tMass = {14},\n";
-            f += "\tLocalizationInternalName = \u201C{15}\u201C,\n";
-            f += "\tColor = \u201C{16}\u201C,\n";
+            f += "\tLocalizationInternalName = \u0022{15}\u0022,\n";
+            f += "\tColor = \u0022{16}\u0022,\n";
             f += "\t}}";
 
             if (!Directory.Exists(WikiOutputPath))
@@ -396,18 +420,244 @@ namespace AssetExtractor
                     Directory.CreateDirectory(temp);
                     try
                     {
-                        exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, survName.Replace(" ", "_") + ".png"));
+                        if (survName == "")
+                        {
+                            Log.Debug("surv name is blank ! using toke n");
+                            exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, token + ".png"));
+                        }
+                        else
+                        {
+                            exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, survName.Replace(" ", "_") + ".png"));
+                        }
                     }
                     catch
                     {
                         Log.Debug("erm ,,.,. failed to export surv icon with proper name ,,. trying with tokenm !!");
                         exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, token + ".png"));
                     }
+                    
                 }
                 catch (Exception e)
                 {
                     Log.Error("Error while exporting survivor: " + e);
                 }
+            }
+            tw.Close();
+        }
+
+        public static void FormatSkill()
+        {
+            string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SKILLS);
+
+            string f = "skills[\u0022{0}\u0022] = {{\n";
+            f += "\tName = \u0022{1}\u0022,\n";
+            f += "\tDesc = \u0022{2}\u0022,\n";
+            f += "\tSurvivor = \u0022{3}\u0022,\n";
+            f += "\tType = \u0022{4}\u0022,\n";
+            f += "\tUnlock = \u0022{5}\u0022,\n";
+            f += "\t}}";
+
+            if (!Directory.Exists(WikiOutputPath))
+            {
+                Directory.CreateDirectory(WikiOutputPath);
+            }
+            TextWriter tw = new StreamWriter(path, false);
+            
+            foreach (SurvivorDef surv in SurvivorCatalog.allSurvivorDefs)
+            {
+                string type = "";
+                string name = "";
+                string survivor = "";
+                string desc = "";
+                string unlock = "";
+                try
+                {
+                    if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
+                    {
+                        var scripts = body.GetComponents<GenericSkill>();
+                        var skilllocator = body.GetComponent<SkillLocator>();
+                        foreach (var skill in scripts)
+                        {
+                            Log.Debug(skill.skillFamily.ToString());
+                            survivor = Language.GetString(surv.displayNameToken);
+                             
+                            foreach (var variant in skill.skillFamily.variants)
+                            {
+
+                                if (variant.skillDef.skillNameToken != null)
+                                {
+                                    name = Language.GetString(variant.skillDef.skillNameToken);
+                                    Log.Debug(variant.skillDef.skillNameToken);
+                                }
+
+                                if (skill == skilllocator.primary)
+                                {
+                                    type = "Primary";
+                                } else if (skill == skilllocator.secondary)
+                                {
+                                    type = "Secondary";
+                                } else if (skill == skilllocator.utility)
+                                {
+                                    type = "Utility";
+                                } else if (skill == skilllocator.special)
+                                {
+                                    type = "Special";
+                                }
+                                
+                                if (variant.skillDef.skillDescriptionToken != null)
+                                {
+                                    desc = Language.GetString(variant.skillDef.skillDescriptionToken);
+                                }
+                                if (variant.unlockableDef != null)
+                                {
+                                    var unlockable = AchievementManager.GetAchievementDefFromUnlockable(variant.unlockableDef.cachedName);
+                                    if (unlockable != null)
+                                    {
+                                        unlock = Language.GetString(unlockable.nameToken);
+                                    
+                                        Log.Debug(unlockable.nameToken);
+                                    }
+                                }
+                                
+                                if (!variant.skillDef.icon.texture) continue;
+                                
+                                var temp = WikiOutputPath + @"\skills\";
+                                Directory.CreateDirectory(temp);
+                                try
+                                {
+                                    if (name == "")
+                                    {
+                                        Log.Debug("skill name is blank ! using toke n");
+                                        exportTexture(variant.skillDef.icon, Path.Combine(temp, variant.skillDef.skillNameToken + ".png"));
+                                    }
+                                    else
+                                    {
+                                        exportTexture(variant.skillDef.icon, Path.Combine(temp, name.Replace(" ", "_") + ".png"));
+                                    }
+                                }
+                                catch
+                                {
+                                    Log.Debug("erm ,,.,. failed to export skill icon with proper name ,,. trying with tokenm !!");
+                                    exportTexture(variant.skillDef.icon, Path.Combine(temp, variant.skillDef.skillNameToken + ".png"));
+                                }
+                            }
+                            string format = Language.GetStringFormatted(f, name, name, desc, survivor, type, unlock);
+
+                            foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                            {
+                                format = format.Replace(kvp.Key, kvp.Value);
+                            }
+                            tw.WriteLine(format);
+
+                            
+                        }
+                    }
+                    
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error while exporting skill: " + e);
+                }
+            }
+            tw.Close();
+        }
+        
+        public static void FormatChallenges()
+        {
+            string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_CHALLENGES);
+
+            string f = "challenges[\u0022{0}\u0022] = {{\n";
+            f += "\tType = \u0022{1}\u0022,\n";
+            f += "\tUnlock = \u0022{2}\u0022,\n";
+            f += "\tDesc = \u0022{3}\u0022,\n";
+            f += "\t}}";
+
+            if (!Directory.Exists(WikiOutputPath))
+            {
+                Directory.CreateDirectory(WikiOutputPath);
+            }
+            TextWriter tw = new StreamWriter(path, false);
+
+            foreach (var achievement in AchievementManager.achievementDefs)
+            {
+                string name = "";
+                string type = "";
+                string unlock = "";
+                string desc = "";
+                if (achievement.nameToken != null)
+                {
+                    name = Language.GetString(achievement.nameToken);
+                    Log.Debug(name);
+                }
+                if (achievement.unlockableRewardIdentifier != null)
+                {
+                    var unlockdef = UnlockableCatalog.GetUnlockableDef(achievement.unlockableRewardIdentifier);
+                    Log.Debug(unlockdef);
+                    
+                    foreach (var item in ItemCatalog.allItemDefs)
+                    {
+                        if (item.unlockableDef != unlockdef) continue;
+                        unlock = Language.GetString(item.nameToken);
+                        type = "Items";
+                        break;
+                    }
+                    foreach (var surv in SurvivorCatalog.allSurvivorDefs)
+                    {
+                        if(unlock != "") break;
+                        if (surv.unlockableDef != unlockdef) continue;
+                        unlock = Language.GetString(surv.displayNameToken);
+                        type = "Survivors";
+                        break;
+                    }
+                    foreach (var equip in EquipmentCatalog.equipmentDefs)
+                    {
+                        if(unlock != "") break;
+                        if (equip.unlockableDef != unlockdef) continue;
+                        unlock = Language.GetString(equip.nameToken);
+                        type = "Equipment";
+                        break;
+                    }
+                    foreach (var skin in SkinCatalog.allSkinDefs)
+                    {
+                        if(unlock != "") break;
+                        if (skin.unlockableDef != unlockdef) continue;
+                        unlock = Language.GetString(skin.nameToken);
+                        type = "Skins";
+                        break;
+                    }
+                    foreach (var artifact in ArtifactCatalog.artifactDefs)
+                    {
+                        if(unlock != "") break;
+                        if (artifact.unlockableDef != unlockdef) continue;
+                        unlock = Language.GetString(artifact.nameToken);
+                        type = "Artifacts";
+                        break;
+                    }
+                    foreach (var skill in SkillCatalog._allSkillFamilies)
+                    {
+                        if(unlock != "") break;
+                        foreach (var variant in skill.variants)
+                        {
+                            if (variant.unlockableDef != unlockdef) continue;
+                            unlock = Language.GetString(variant.skillDef.skillNameToken);
+                            type = "Skills";
+                            break;
+                        }
+                    }
+
+                }
+                if (achievement.descriptionToken != null)
+                {
+                    desc = Language.GetString(achievement.descriptionToken);
+                }
+                    
+                string format = Language.GetStringFormatted(f, name, type, unlock, desc);
+
+                foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                {
+                    format = format.Replace(kvp.Key, kvp.Value);
+                }
+                tw.WriteLine(format);
             }
             tw.Close();
         }
@@ -439,10 +689,51 @@ namespace AssetExtractor
             RenderTexture.active = previous;
                 
             // Release the temporary RenderTexture
-            RenderTexture.ReleaseTemporary(tmp);
+            //RenderTexture.ReleaseTemporary(tmp);
             System.IO.File.WriteAllBytes(path, myTexture2D.EncodeToPNG());
-            
-            
         }
+        
+        public static void exportTexture(Sprite sprite, String path)
+        {
+            RenderTexture tmp = new RenderTexture(sprite.texture.width, sprite.texture.height, 32);
+            tmp.name = "Whatever";
+            tmp.enableRandomWrite = true;
+            tmp.Create();
+
+            // Blit the pixels on texture to the RenderTexture
+            Graphics.Blit(sprite.texture, tmp);
+                
+            // Backup the currently set RenderTexture
+            RenderTexture previous = RenderTexture.active;
+                
+            // Set the current RenderTexture to the temporary one we created
+            RenderTexture.active = tmp;
+                
+            // Create a new readable Texture2D to copy the pixels to it
+            Texture2D myTexture2D = new Texture2D(sprite.texture.width, sprite.texture.height);
+                
+            // Copy the pixels from the RenderTexture to the new Texture
+            myTexture2D.ReadPixels(new Rect(0, 0, tmp.width, tmp.height), 0, 0);
+            myTexture2D.Apply();
+                
+            // Reset the active RenderTexture
+            RenderTexture.active = previous;
+                
+            // Release the temporary RenderTexture
+           // RenderTexture.ReleaseTemporary(tmp);
+            
+            var croppedTexture = new Texture2D( (int)sprite.rect.width, (int)sprite.rect.height );
+            var pixels = myTexture2D.GetPixels(  (int)sprite.textureRect.x, 
+                (int)sprite.textureRect.y, 
+                (int)sprite.textureRect.width, 
+                (int)sprite.textureRect.height );
+            croppedTexture.SetPixels( pixels );
+            croppedTexture.Apply();
+            
+            System.IO.File.WriteAllBytes(path, croppedTexture.EncodeToPNG());
+        }
+        
     }
+    
+    
 }
