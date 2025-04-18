@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using BepInEx;
 using R2API;
+using R2API.ContentManagement;
 using RoR2;
 using RoR2.Artifacts;
+using RoR2.ContentManagement;
+using RoR2.Projectile;
 using RoR2.Skills;
 using UnityEngine;
+using UnityEngine.Networking;
+using Object = UnityEngine.Object;
 using Path = System.IO.Path;
 namespace AssetExtractor
 {
@@ -61,11 +66,12 @@ namespace AssetExtractor
             { "<style=cStack>", "{{Stack|" },
             { "<style=cIsDamage>", "{{Color|d|" },
             { "<style=cIsHealing>", "{{Color|h|" },
-            { "<style=cIsUtility>", "{{{Color|u|" },
+            { "<style=cIsUtility>", "{{Color|u|" },
             { "<style=cIsHealth>", "{{Color|hp|" },
             { "<style=cDeath>", "{{Color|hp|" },
             { "<style=cIsVoid>", "{{Color|v|" },
             { "<style=cIsLunar>", "{{Color|lunar|" },
+            { "<style=cHumanObjective>", "{{Color|human|"},
             { "<style=cShrine>", "{{Color|boss|" }, // idk about this one
         };
         
@@ -435,6 +441,40 @@ namespace AssetExtractor
                         Log.Debug("erm ,,.,. failed to export surv icon with proper name ,,. trying with tokenm !!");
                         exportTexture(SurvivorCatalog.GetSurvivorPortrait(surv.survivorIndex), Path.Combine(temp, token + ".png"));
                     }
+
+                    foreach (var skin in SkinCatalog.allSkinDefs)
+                    {
+                        var temp2 = WikiOutputPath + @"\skins\";
+                        Directory.CreateDirectory(temp2);
+                        Log.Debug(surv.bodyPrefab);
+                        if (surv.bodyPrefab.TryGetComponent(out ModelLocator modellocator))
+                        {
+                            if (modellocator.modelTransform.name == skin.rootObject.name)
+                            {
+                                try
+                                {
+                                    string filename = "";
+                                    var skinlang = Language.GetString(skin.nameToken);
+                                    if (skinlang == "Default")
+                                    {
+                                        filename = "Default " + survName;
+                                    }
+                                    else
+                                    {
+                                        filename = Language.GetString(skin.nameToken);
+                                    }
+
+                                    exportTexture(skin.icon, Path.Combine(temp2, filename.Replace(" ", "_") + ".png"));
+                                }
+                                catch
+                                {
+                                    Log.Debug(
+                                        "erm ,,.,. failed to export surv icon with proper name ,,. trying with tokenm !!");
+                                    exportTexture(skin.icon, Path.Combine(temp2, skin.nameToken + ".png"));
+                                }
+                            }
+                        }
+                    }
                     
                 }
                 catch (Exception e)
@@ -444,9 +484,46 @@ namespace AssetExtractor
             }
             tw.Close();
         }
+        
 
         public static void FormatSkill()
         {
+
+            On.RoR2.BlastAttack.Fire += (orig, self) =>
+            {
+                Log.Debug("Firing blast proc " + self.procCoefficient);
+                return orig(self);
+            };
+            On.RoR2.Projectile.ProjectileManager.FireProjectileClient += (orig, self, info, client, time) =>
+            {
+                Log.Debug("Firing projectile" + info.projectilePrefab);
+                if(info.projectilePrefab.TryGetComponent<ProjectileController>(out var controller))
+                {
+                    Log.Debug("Firing projectile proc " + controller.procCoefficient);
+                }
+                else
+                {
+                    Log.Error("could not get projectile controller out of prefab ! ");
+                }
+                orig(self, info, client, time);
+            };
+            On.EntityStates.GenericBulletBaseState.GenerateBulletAttack += (orig, self, ray) =>
+            {
+                Log.Debug("Firing bullet proc " + self.procCoefficient);
+
+                return orig(self, ray);
+            };
+            On.RoR2.BulletAttack.Fire += (orig, self) =>
+            {
+                Log.Debug("Firing bullet proc " + self.procCoefficient);
+                orig(self);
+            };
+            On.RoR2.GlobalEventManager.OnHitAll += (orig, self, damageInfo, hit) =>
+            {
+                Log.Debug("hit by proc " + damageInfo.procCoefficient);
+                orig(self, damageInfo, hit);
+            };
+
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SKILLS);
 
             string f = "skills[\u0022{0}\u0022] = {{\n";
@@ -454,8 +531,9 @@ namespace AssetExtractor
             f += "\tDesc = \u0022{2}\u0022,\n";
             f += "\tSurvivor = \u0022{3}\u0022,\n";
             f += "\tType = \u0022{4}\u0022,\n";
-            f += "\tUnlock = \u0022{5}\u0022,\n";
-            f += "\t}}";
+            f += "\tCooldown = \u0022{5}\u0022,\n";
+            f += "\tUnlock = \u0022{6}\u0022,\n";
+            
 
             if (!Directory.Exists(WikiOutputPath))
             {
@@ -465,25 +543,28 @@ namespace AssetExtractor
             
             foreach (SurvivorDef surv in SurvivorCatalog.allSurvivorDefs)
             {
-                string type = "";
-                string name = "";
-                string survivor = "";
-                string desc = "";
-                string unlock = "";
+                
                 try
                 {
                     if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
                     {
+                        
                         var scripts = body.GetComponents<GenericSkill>();
                         var skilllocator = body.GetComponent<SkillLocator>();
                         foreach (var skill in scripts)
                         {
+                            string type = "Passive";
+                            string name = "";
+                            string survivor = "";
+                            string desc = "";
+                            string unlock = "";
+                            float cooldown = 0;
+                            float proc = 0;
                             Log.Debug(skill.skillFamily.ToString());
                             survivor = Language.GetString(surv.displayNameToken);
                              
                             foreach (var variant in skill.skillFamily.variants)
                             {
-
                                 if (variant.skillDef.skillNameToken != null)
                                 {
                                     name = Language.GetString(variant.skillDef.skillNameToken);
@@ -503,7 +584,15 @@ namespace AssetExtractor
                                 {
                                     type = "Special";
                                 }
+                                else
+                                {
+                                    type = "Passive";
+                                }
                                 
+                                if(variant.skillDef.baseRechargeInterval != 0)
+                                {
+                                    cooldown = variant.skillDef.baseRechargeInterval;
+                                }
                                 if (variant.skillDef.skillDescriptionToken != null)
                                 {
                                     desc = Language.GetString(variant.skillDef.skillDescriptionToken);
@@ -516,6 +605,90 @@ namespace AssetExtractor
                                         unlock = Language.GetString(unlockable.nameToken);
                                     
                                         Log.Debug(unlockable.nameToken);
+                                    }
+                                }
+
+                                if (variant.skillDef.activationState.stateType != null) // must be passive then
+                                {
+                                    Log.Debug(variant.skillDef.activationState.stateType);
+                                    var entitystate = EntityStateCatalog.InstantiateState(EntityStateCatalog.stateTypeToIndex[variant.skillDef.activationState.stateType]);
+                                    if (entitystate != null)
+                                    {
+                                        Log.Debug(entitystate);
+                                        foreach (var config in ContentManager._entityStateConfigurations) // this only works for vanilla ones
+                                        {
+                                            if (!config.name.Contains(variant.skillDef.activationState.stateType.ToString())) continue;
+                                            Log.Warning("found config ! " + config.name);
+                                            foreach (var field in config.serializedFieldsCollection.serializedFields)
+                                            {
+                                                if(field.fieldName.ToLower().Contains("proccoefficient")) // wowie ! proc was just sitting there !
+                                                {
+                                                    proc = float.Parse(field.fieldValue.stringValue);
+                                                    Log.Debug("proc coefficient is " + proc);
+                                                    break;
+                                                } else if (field.fieldName.ToLower().Contains("projectile") && proc == 0) // check inside projectile for its proc
+                                                {
+                                                    if(field.fieldValue.objectValue != null)
+                                                    {
+                                                        GameObject projectile = Object.Instantiate(field.fieldValue.objectValue) as GameObject;
+                                                        
+                                                        if (projectile.TryGetComponent<ProjectileController>(out var controller))
+                                                        {
+                                                            proc = controller.procCoefficient;
+                                                            Log.Debug("proc coefficient is " + proc);
+                                                        }
+                                                        else
+                                                        {
+                                                            Log.Error("could not get projectile controller out of prefab ! ");
+                                                        }
+                                                    }
+                                                } else if (field.fieldName.ToLower().Contains("damage") && proc == 0) // no proc specified, default 1 
+                                                {
+                                                    proc = 1;
+                                                    Log.Debug("no proc found ! defaulting to 1 ,., ");
+                                                }
+                                            }
+                                            break;
+                                        }
+                                        if(proc == 0) // still didnt find in vanilla configs,,. looking through modded ones !
+                                            foreach (var readOnlyContentPack in R2APIContentManager.ManagedContentPacks)
+                                            {
+                                                foreach (var config in readOnlyContentPack.ContentPack.entityStateConfigurations)
+                                                {
+                                                    if (!config.name.Contains(variant.skillDef.activationState.stateType.ToString())) continue;
+                                                    Log.Warning("found config ! " + config.name);
+                                                    foreach (var field in config.serializedFieldsCollection.serializedFields)
+                                                    {
+                                                        if(field.fieldName.ToLower().Contains("proc")) // wowie ! proc was just sitting there !
+                                                        {
+                                                            proc = float.Parse(field.fieldValue.stringValue);
+                                                            Log.Debug("proc coefficient is " + proc);
+                                                            break;
+                                                        } else if (field.fieldName.ToLower().Contains("projectile") && proc == 0) // check inside projectile for its proc
+                                                        {
+                                                            if(field.fieldValue.objectValue != null)
+                                                            {
+                                                                GameObject projectile = Object.Instantiate(field.fieldValue.objectValue) as GameObject;
+                                                                
+                                                                if (projectile.TryGetComponent<ProjectileController>(out var controller))
+                                                                {
+                                                                    proc = controller.procCoefficient;
+                                                                    Log.Debug("proc coefficient is " + proc);
+                                                                    break;
+                                                                }
+                                                                else
+                                                                {
+                                                                    Log.Error("could not get projectile controller out of prefab ! ");
+                                                                }
+                                                            }
+                                                        } else if (field.fieldName.ToLower().Contains("damage") && proc == 0) // default proc, but still has
+                                                        {
+                                                            proc = 1;
+                                                            Log.Debug("no proc found ! defaulting to 1 ,., ");
+                                                        }
+                                                    }
+                                                }
+                                            }
                                     }
                                 }
                                 
@@ -540,19 +713,29 @@ namespace AssetExtractor
                                     Log.Debug("erm ,,.,. failed to export skill icon with proper name ,,. trying with tokenm !!");
                                     exportTexture(variant.skillDef.icon, Path.Combine(temp, variant.skillDef.skillNameToken + ".png"));
                                 }
-                            }
-                            string format = Language.GetStringFormatted(f, name, name, desc, survivor, type, unlock);
+                                
+                                string format = "";
+                                string tempformat = f;
+                                if(proc == 0) // no proc found, dont add 
+                                {
+                                    tempformat += "\t}},";
+                                    format = Language.GetStringFormatted(tempformat, name, name, desc, survivor, type, cooldown, unlock);
+                                }
+                                else
+                                {
+                                    tempformat += "\tProc = \u0022{7}\u0022,\n";
+                                    tempformat += "\t}},";
+                                    format = Language.GetStringFormatted(tempformat, name, name, desc, survivor, type, cooldown, unlock, proc);
+                                }
 
-                            foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
-                            {
-                                format = format.Replace(kvp.Key, kvp.Value);
+                                foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                                {
+                                    format = format.Replace(kvp.Key, kvp.Value);
+                                }
+                                tw.WriteLine(format);
                             }
-                            tw.WriteLine(format);
-
-                            
                         }
                     }
-                    
                 }
                 catch (Exception e)
                 {
@@ -568,7 +751,7 @@ namespace AssetExtractor
 
             string f = "challenges[\u0022{0}\u0022] = {{\n";
             f += "\tType = \u0022{1}\u0022,\n";
-            f += "\tUnlock = \u0022{2}\u0022,\n";
+            f += "\tUnlock = { \u0022{2}\u0022 } ,\n";
             f += "\tDesc = \u0022{3}\u0022,\n";
             f += "\t}}";
 
