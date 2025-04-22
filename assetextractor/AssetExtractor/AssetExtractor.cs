@@ -635,12 +635,10 @@ namespace AssetExtractor
 
                                 if (variant.skillDef.activationState.stateType != null) // must be passive then
                                 {
-                                    Log.Debug(variant.skillDef.activationState.stateType);
                                     try{
                                         var entitystate = EntityStateCatalog.InstantiateState(EntityStateCatalog.stateTypeToIndex[variant.skillDef.activationState.stateType]);
                                         if (entitystate != null)
                                         {
-                                            Log.Debug(entitystate);
                                             foreach (var readOnlyContentPack2 in ContentManager.allLoadedContentPacks)
                                             {
                                                 Log.Warning("lookin through ,., " + readOnlyContentPack2.identifier);
@@ -775,8 +773,6 @@ namespace AssetExtractor
                 }
                 if (achievement.unlockableRewardIdentifier != null)
                 {
-                    Log.Debug(unlockdef);
-                    
                     foreach (var item in ItemCatalog.allItemDefs)
                     {
                         if (item.unlockableDef != unlockdef) continue;
@@ -833,12 +829,7 @@ namespace AssetExtractor
                 {
                     desc = Language.GetString(achievement.descriptionToken);
                 }
-
-                Log.Debug(name);
-                Log.Debug(type);
-                Log.Debug(unlock);
-                Log.Debug(desc);
-                Log.Debug(f);
+                
                 try
                 {
                     string format = string.Format(f, name, type, unlock, desc);
