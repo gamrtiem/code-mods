@@ -856,7 +856,7 @@ namespace AssetExtractor
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_BODIES);
 
             string f = "monsters[\u0022{0}\u0022] = {{\n";
-            f += "\tBaseArmor = \u0022{1}\u0022,\n";
+            f += "\tName = \u0022{1}\u0022,\n";
             f += "\tBaseDamage = \u0022{2}\u0022,\n";
             f += "\tBaseHealth = {3},\n";
             f += "\tBaseHealthRegen = {4},\n";
