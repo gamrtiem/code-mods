@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BepInEx;
+using BepInEx.Configuration;
 using Newtonsoft.Json.Utilities;
 using R2API;
 using R2API.ContentManagement;
@@ -27,12 +28,16 @@ namespace AssetExtractor
         public const string PluginAuthor = "icebro";
         public const string PluginName = "assetextractor";
         public const string PluginVersion = "1.0.0";
+        public ConfigEntry<bool> useModnameInFile;
+        public ConfigEntry<bool> useModnameInDirectory;
         internal static AssetExtractor Instance { get; private set; }
 
         public void Awake()
         {
             Instance = this;
             Log.Init(Logger);
+            useModnameInFile = Config.Bind("export options", "use mod name", true);
+            useModnameInDirectory = Config.Bind("export options", "use mod dir", true);
         }
         
 
@@ -43,8 +48,19 @@ namespace AssetExtractor
             
             foreach (var readOnlyContentPack in ContentManager.allLoadedContentPacks)
             {
-                WikiFormat.WikiOutputPath = Path.Combine(Path.Combine(Path.GetDirectoryName(AssetExtractor.Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki"), readOnlyContentPack.identifier);
-                
+                if(useModnameInDirectory.Value)
+                    WikiFormat.WikiOutputPath = Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki"));
+                else
+                {
+                    WikiFormat.WikiOutputPath = Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki"), readOnlyContentPack.identifier);
+
+                }
+                if(useModnameInFile.Value)
+                    WikiFormat.WikiModname = readOnlyContentPack.identifier;
+                else
+                {
+                    WikiFormat.WikiModname = "";
+                }
                 WikiFormat.FormatItem(readOnlyContentPack);
                 WikiFormat.FormatEquipment(readOnlyContentPack);
                 WikiFormat.FormatSurvivor(readOnlyContentPack);
@@ -72,6 +88,7 @@ namespace AssetExtractor
         const string WIKI_OUTPUT_BODIES = "Bodies.txt";
         
         public static string WikiOutputPath = Path.Combine(Path.GetDirectoryName(AssetExtractor.Instance.Info.Location) ?? throw new InvalidOperationException(), WIKI_OUTPUT_FOLDER);
+        public static string WikiModname = "";
         static Dictionary<string, string> FormatR2ToWiki = new Dictionary<string, string>()
         {
             { "</style>", "}}"},
