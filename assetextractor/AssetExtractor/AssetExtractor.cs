@@ -150,9 +150,15 @@ namespace AssetExtractor
                 timer.Restart();
                 
                 timer.Stop();
-                
-                //int fCount = Directory.GetFiles(WikiFormat.WikiOutputPath, "*", SearchOption.TopDirectoryOnly).Length;
-                //if(fCount <= 0) Directory.Delete(WikiFormat.WikiOutputPath);
+
+                try
+                {
+                    int fCount = Directory.GetFiles(WikiFormat.WikiOutputPath, "*", SearchOption.TopDirectoryOnly).Length;
+                    if (fCount == 0) Directory.Delete(WikiFormat.WikiOutputPath);
+                } catch (Exception e)
+                {
+                    Log.Debug(e);
+                }
             }
             
             Log.Info("Exported items in " + (itemTime) + "ms");
@@ -165,7 +171,7 @@ namespace AssetExtractor
             Log.Info("complete !!!!");
             
             Process.Start(new ProcessStartInfo() {
-                FileName = WikiFormat.WikiOutputPath,
+                FileName = Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki")),
                 UseShellExecute = true,
                 Verb = "open"
             });
@@ -1102,7 +1108,8 @@ namespace AssetExtractor
 
         public static void exportTexture(Texture texture, String path)
         {
-            RenderTexture tmp = new RenderTexture(texture.width, texture.height, 32);
+            //RenderTexture tmp = new RenderTexture(texture.width, texture.height, 32);
+            var tmp = RenderTexture.GetTemporary(texture.width, texture.height, 32);
             tmp.name = "Whatever";
             tmp.enableRandomWrite = true;
             tmp.Create();
@@ -1127,13 +1134,16 @@ namespace AssetExtractor
             RenderTexture.active = previous;
                 
             // Release the temporary RenderTexture
-            //RenderTexture.ReleaseTemporary(tmp);
+            RenderTexture.ReleaseTemporary(tmp);
             System.IO.File.WriteAllBytes(path, myTexture2D.EncodeToPNG());
+            
+            Object.Destroy(myTexture2D);
         }
         
         public static void exportTexture(Sprite sprite, String path)
         {
-            RenderTexture tmp = new RenderTexture(sprite.texture.width, sprite.texture.height, 32);
+            //RenderTexture tmp = new RenderTexture(sprite.texture.width, sprite.texture.height, 32);
+            var tmp = RenderTexture.GetTemporary(sprite.texture.width, sprite.texture.height, 32);
             tmp.name = "Whatever";
             tmp.enableRandomWrite = true;
             tmp.Create();
@@ -1158,7 +1168,7 @@ namespace AssetExtractor
             RenderTexture.active = previous;
                 
             // Release the temporary RenderTexture
-           // RenderTexture.ReleaseTemporary(tmp);
+            RenderTexture.ReleaseTemporary(tmp);
             
             var croppedTexture = new Texture2D( (int)sprite.rect.width, (int)sprite.rect.height );
             var pixels = myTexture2D.GetPixels(  (int)sprite.textureRect.x, 
@@ -1169,6 +1179,8 @@ namespace AssetExtractor
             croppedTexture.Apply();
             
             System.IO.File.WriteAllBytes(path, croppedTexture.EncodeToPNG());
+            
+            Object.Destroy(myTexture2D);
         }
         
     }

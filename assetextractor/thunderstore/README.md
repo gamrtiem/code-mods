@@ -1,7 +1,7 @@
-
-
 # Asset Extractor 
 whgat it says on the tin !!!!!!!!!!!!!!!!! extract game/mod assets from contentpacks by pressing f5 ...,.,,. exports both as png files and lua table datasets (meant for use with starstorm2.wiki.gg or riskofrain2.wiki.gg ( !!!!!!!!!
+
+will eat up a little bit of ram while exporting depending on how many mods you have ,..,., should clear when loading a new unity scene like character select screen though !!
 
 currently supported ,..,.,
 - items and equipments
@@ -11,12 +11,14 @@ currently supported ,..,.,
 - challenges (only lua datasheet export)
 - bodies (monsters)
 
-also logs attack procs to add in skills (configurable.,.,,.
+also logs attack procs !!(configurable.,.,,.
 
 example of exported mod contentpack.,.,
+
 ![paladin contentpack screenshot](https://files.catbox.moe/shvkft.png)
 
 example of wiki folder ,.,,.
+
 ![wiki folder screenshot](https://files.catbox.moe/i82trm.png)
 
 ## todo .,,
@@ -30,9 +32,13 @@ example of wiki folder ,.,,.
 - configurable formatting 
 
 ## credits !!!!!!!!!!!!!!!
+
 ss2 team - original item extraction code !!
+
 hifu - hi hifu !!!!!!!!!!!!!
+
 anartoast - was in the mod icon !!
+
 
 
 
