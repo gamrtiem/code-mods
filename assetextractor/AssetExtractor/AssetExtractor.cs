@@ -170,11 +170,11 @@ namespace AssetExtractor
             
             Log.Info("complete !!!!");
             
-            Process.Start(new ProcessStartInfo() {
-                FileName = Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki")),
-                UseShellExecute = true,
-                Verb = "open"
-            });
+            // Process.Start(new ProcessStartInfo() {
+            //     FileName = Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki")),
+            //     UseShellExecute = true,
+            //     Verb = "open"
+            // });
 
         }
     }
