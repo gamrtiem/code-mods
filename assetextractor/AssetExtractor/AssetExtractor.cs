@@ -28,7 +28,7 @@ namespace AssetExtractor
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "icebro";
         public const string PluginName = "assetextractor";
-        public const string PluginVersion = "0.4.0";
+        public const string PluginVersion = "0.4.1";
         public ConfigEntry<bool> useModnameInFile;
         public ConfigEntry<bool> useModnameInDirectory;
         public ConfigEntry<bool> trygettingprocs;
@@ -168,7 +168,7 @@ namespace AssetExtractor
             Log.Info("Exported challenges in " + (challengeTime) + "ms");
             Log.Info("Exported bodies in " + (bodyTime) + "ms");
             
-            Log.Info("complete !!!!");
+            Log.Info("complete !!!! located at: " + Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location))));
             
             // Process.Start(new ProcessStartInfo() {
             //     FileName = Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki")),
@@ -1135,7 +1135,7 @@ namespace AssetExtractor
                 
             // Release the temporary RenderTexture
             RenderTexture.ReleaseTemporary(tmp);
-            System.IO.File.WriteAllBytes(path, myTexture2D.EncodeToPNG());
+            File.WriteAllBytes(path, myTexture2D.EncodeToPNG());
             
             Object.Destroy(myTexture2D);
         }
@@ -1170,6 +1170,7 @@ namespace AssetExtractor
             // Release the temporary RenderTexture
             RenderTexture.ReleaseTemporary(tmp);
             
+            //convert sprite to texture
             var croppedTexture = new Texture2D( (int)sprite.rect.width, (int)sprite.rect.height );
             var pixels = myTexture2D.GetPixels(  (int)sprite.textureRect.x, 
                 (int)sprite.textureRect.y, 
@@ -1178,7 +1179,7 @@ namespace AssetExtractor
             croppedTexture.SetPixels( pixels );
             croppedTexture.Apply();
             
-            System.IO.File.WriteAllBytes(path, croppedTexture.EncodeToPNG());
+            File.WriteAllBytes(path, croppedTexture.EncodeToPNG());
             
             Object.Destroy(myTexture2D);
         }

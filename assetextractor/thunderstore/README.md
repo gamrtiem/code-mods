@@ -1,7 +1,9 @@
 # Asset Extractor 
 whgat it says on the tin !!!!!!!!!!!!!!!!! extract game/mod assets from contentpacks by pressing f5 ...,.,,. exports both as png files and lua table datasets (meant for use with starstorm2.wiki.gg or riskofrain2.wiki.gg ( !!!!!!!!!
 
-will eat up a little bit of ram while exporting depending on how many mods you have ,..,., should clear when loading a new unity scene like character select screen though !!
+once finished you'll be able to find them in the mod's folder under a "wiki" folder (will also be logged so like ,.,.. )
+
+also will eat up a little bit of ram while exporting depending on how many mods you have ,..,., should clear when loading a new unity scene like character select screen though !!
 
 currently supported ,..,.,
 - items and equipments

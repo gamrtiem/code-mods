@@ -1,6 +1,6 @@
 {
     "name": "asset_extractor",
-    "version_number": "0.4.0",
+    "version_number": "0.4.1",
     "website_url": "https://github.com/gamrtiem/code-mods/tree/main/assetextractor",
     "description": "extract assets from game/mods with f5 !!!!!!! meant for use with wiki creation but gives icons in png if you want those., .,.,",
     "dependencies": [
