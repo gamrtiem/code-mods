@@ -49,7 +49,7 @@ namespace NewtoPoloPlugin
                             z = vector.z
                         }.normalized;
                         string text = "";
-                        text = ((vector.magnitude > 350f) ? (text + "that sounded like it came from very far away") : ((!(vector.magnitude > 75f)) ? (text + "that sounded like it was very nearby") : (text + "that sounded like it was in the distance")));
+                        text = ((vector.magnitude > 350f) ? (text + "that sounded like it came from very far away") : ((!(vector.magnitude > 75f)) ? (text + "that sounded like it was nearby") : (text + "that sounded like it was in the distance")));
                         if (vector.y > 75f)
                         {
                             text += ", up above the clouds";
