@@ -24,18 +24,20 @@ namespace NewtoPoloPlugin
         {
             Log.Init(Logger);
             
-            Chat.UserChatMessage.ConstructChatString += UserChatMessageOnConstructChatString;
+            Chat.UserChatMessage.OnProcessed += UserChatMessageOnProcessed;
         }
 
-        private string UserChatMessageOnConstructChatString(Chat.UserChatMessage.orig_ConstructChatString orig, RoR2.Chat.UserChatMessage self)
+        private void UserChatMessageOnProcessed(Chat.UserChatMessage.orig_OnProcessed orig, RoR2.Chat.UserChatMessage self)
         {
-            string result = orig.Invoke(self);
-            if (self.sender && self.sender.GetComponent<NetworkUser>() && self.text.ToLower().Contains("newto"))
+            Log.Debug("AAAAAAAAAAA");
+            var newt = self.text.ToLower().Contains("newto");
+            var ethereal = self.text.ToLower().Contains("saplo");
+            if (self.sender && self.sender.GetComponent<NetworkUser>() && (newt || ethereal))
             {
                 int num = 0;
                 foreach (PurchaseInteraction instances in InstanceTracker.GetInstancesList<PurchaseInteraction>())
                 {
-                    if ((instances.displayNameToken.ToUpper() == "NEWT_STATUE_NAME" || instances.displayNameToken.ToUpper().Contains("NEWT")) && instances.Networkavailable)
+                    if ((instances.displayNameToken.ToUpper() == "NEWT_STATUE_NAME" && newt || instances.displayNameToken.ToUpper().Contains("SS2_SHRINE_ETHEREAL") && ethereal) && instances.Networkavailable)
                     {
                         CharacterBody playerBody = self.sender.GetComponent<NetworkUser>().GetCurrentBody();
                         Transform transform = playerBody.transform;
@@ -56,7 +58,15 @@ namespace NewtoPoloPlugin
                         {
                             text += ", in dark depths of the world";
                         }
-                        string chatMessage = "<color=#02f7e7>" + instances.GetDisplayName() + "</color>: POLO (" + text + ")";
+
+                        var color = "#02f7e7";
+                        var polo = "POLO";
+                        if (instances.displayNameToken.ToUpper().Contains("SS2_SHRINE_ETHEREAL"))
+                        {
+                            color = "#02f77d";
+                            polo = "SAPOLO";
+                        }
+                        string chatMessage = "<color=" + color + ">" + instances.GetDisplayName() + "</color>: " + polo + " (" + text + ")";
                         this.Invoke(delegate
                         {
                             announceAltar(chatMessage, instances, effectSpawn, playerBody);
@@ -72,7 +82,6 @@ namespace NewtoPoloPlugin
                     });
                 }
             }
-            return result;
         }
 
         public void announceAltar(string chatMessage, PurchaseInteraction altar, Vector3 effectSpawn, CharacterBody player)
