@@ -15,11 +15,11 @@ namespace ExamplePlugin
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
 
-    public class DevotionSilly : BaseUnityPlugin
+    public class CrackedEggmoji : BaseUnityPlugin
     {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "icebro";
-        public const string PluginName = "devotionsilly";
+        public const string PluginName = "CrackedEggmoji";
         public const string PluginVersion = "1.0.0";
         
         enum interactable 
@@ -32,7 +32,6 @@ namespace ExamplePlugin
         public void Awake()
         {
             Log.Init(Logger);
-            
             
             //lemurian egg director card stuff
             var iscard = Addressables.LoadAssetAsync<InteractableSpawnCard>(RoR2BepInExPack.GameAssetPaths.RoR2_CU8_LemurianEgg.iscLemurianEgg_asset).WaitForCompletion();
