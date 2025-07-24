@@ -12,7 +12,10 @@ using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using EquipmentSlot = On.RoR2.EquipmentSlot;
+using MasterSummon = On.RoR2.MasterSummon;
+using PurchaseInteraction = On.RoR2.PurchaseInteraction;
 using Random = UnityEngine.Random;
+using SummonMasterBehavior = On.RoR2.SummonMasterBehavior;
 
 namespace EquipdroneStrikelings
 {
@@ -34,6 +37,7 @@ namespace EquipdroneStrikelings
             
             //On.RoR2.EquipmentSlot.PerformEquipmentAction += EquipmentSlotOnPerformEquipmentAction;
             On.RoR2.EquipmentSlot.FireDroneBackup += EquipmentSlotOnFireDroneBackup;
+            //On.RoR2.MasterSummon.Perform += MasterSummonOnPerform;
             
             IL.RoR2.EquipmentSlot.FireDroneBackup += il => 
             {
@@ -62,8 +66,68 @@ namespace EquipdroneStrikelings
                     Log.Error(il.Method.Name + " IL Hook failed!");
                 }
             };
+            
+            On.RoR2.PurchaseInteraction.GetInteractability += PurchaseInteraction_GetInteractability; 
+        }
+
+        private Interactability PurchaseInteraction_GetInteractability(PurchaseInteraction.orig_GetInteractability orig, RoR2.PurchaseInteraction self, Interactor activator) //https://discord.com/channels/562704639141740588/562704639569428506/808109930913202217
+        {
+            var summonMasterBehavior = self.gameObject.GetComponent<RoR2.SummonMasterBehavior>();
+            if (!summonMasterBehavior || !summonMasterBehavior.callOnEquipmentSpentOnPurchase)
+                return orig(self, activator);
+            
+            CharacterBody characterBody = activator.GetComponent<CharacterBody>();
+            if (!characterBody || !characterBody.inventory) return orig(self, activator);
+            
+            Log.Debug($"awesome epic {EquipmentCatalog.GetEquipmentDef(characterBody.inventory.currentEquipmentIndex).name}");
+            if (EquipmentCatalog.GetEquipmentDef(characterBody.inventory.currentEquipmentIndex).name == ("DroneBackup"))
+            {
+                self.gameObject.AddComponent<MinionTracker>();
+            }
+            return orig(self, activator);
+        }
+
+
+        private CharacterMaster MasterSummonOnPerform(MasterSummon.orig_Perform orig, RoR2.MasterSummon self)
+        {
+            /*if (!summon.name.Contains("EquipmentDrone")) return summon;
+            
+            var summonname = summon.name;
+            Log.Debug(summonname);
+            var inventory = summon.GetComponent<Inventory>();
+            var equipmentDef = EquipmentCatalog.GetEquipmentDef(inventory.currentEquipmentIndex);
+            if (self.inventoryToCopy)
+            {
+                var buyerequip = EquipmentCatalog.GetEquipmentDef(self.inventoryToCopy.currentEquipmentIndex);
+                Log.Debug($"buyer equip index {self.inventoryToCopy.currentEquipmentIndex}");
+                Log.Debug($"buyerequip {buyerequip.name}");
+                
+            } else 
+                Log.Debug("no buyerequip found");
+
+            if (self.masterPrefab.GetComponent<Inventory>())
+            {
+                
+                Log.Debug($"master equip {self.masterPrefab.GetComponent<Inventory>().currentEquipmentIndex}");
+                    
+            }
+            else
+            {
+                Log.Debug("no master prefab found");
+            }
+
+
+            Log.Debug(equipmentDef ? equipmentDef.name : "null equip def ~!");
+            Log.Debug($"summon equip index {inventory.currentEquipmentIndex}");
+            Log.Debug(inventory ? inventory : "null inventroy def ~!");
+
+            return summon;*/
+            
+            //Log.Debug(EquipmentCatalog.GetEquipmentDef(self.masterPrefab.GetComponent<Inventory>().currentEquipmentIndex).name);
+            return orig(self);
         }
         
+
         public static void EquipmentDroneCheck(RoR2.EquipmentSlot equipslot, CharacterMaster master)
         {
             //Log.Debug(master.name);
@@ -105,6 +169,7 @@ namespace EquipdroneStrikelings
 public class MinionTracker : MonoBehaviour
 {
     public List <CharacterMaster> StrikeDrones = [];
+    private float count = 0;
     
     public bool HasStrikeDrone()
     {
@@ -121,5 +186,14 @@ public class MinionTracker : MonoBehaviour
         // Log.Debug(StrikeDrones.Count);
 
         return StrikeDrones.Count > 0;
+    }
+
+    private void FixedUpdate()
+    {
+        count += Time.fixedDeltaTime;
+        if (count <= 1f) return; 
+        Log.Debug($"count is {count}");
+        count = 0;
+        this.GetComponent<RoR2.EquipmentSlot>().PerformEquipmentAction(RoR2Content.Equipment.DroneBackup);
     }
 }
