@@ -1,6 +1,6 @@
 ﻿using BepInEx.Logging;
 
-namespace equipdrone
+namespace EquipdroneStrikelings
 {
     internal static class Log
     {

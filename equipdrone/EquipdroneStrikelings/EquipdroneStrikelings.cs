@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using BepInEx;
-using equipdrone;
+using EquipdroneStrikelings;
 using IL.EntityStates.FalseSonBoss;
 using Mono.Cecil;
 using MonoMod.Cil;
@@ -14,18 +14,18 @@ using UnityEngine.AddressableAssets;
 using EquipmentSlot = On.RoR2.EquipmentSlot;
 using Random = UnityEngine.Random;
 
-namespace equipdrone
+namespace EquipdroneStrikelings
 {
     [BepInDependency(ItemAPI.PluginGUID)]
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
 
-    public class equipdrone : BaseUnityPlugin
+    public class EquipdroneStrikelings : BaseUnityPlugin
     {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "icebro";
-        public const string PluginName = "equipdrone";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginName = "EquipdroneStrikelings";
+        public const string PluginVersion = "0.9.0";
         
 
         public void Awake()
@@ -54,7 +54,7 @@ namespace equipdrone
                     //pass through the equipslot and charactermaster of strike drone to equip drone check
                     c.Emit(Mono.Cecil.Cil.OpCodes.Ldarg_0);
                     c.Emit(Mono.Cecil.Cil.OpCodes.Ldloc_S, c.Method.Body.Variables[12]); 
-                    c.Emit(Mono.Cecil.Cil.OpCodes.Call, typeof(equipdrone).GetMethod("EquipmentDroneCheck"));
+                    c.Emit(Mono.Cecil.Cil.OpCodes.Call, typeof(EquipdroneStrikelings).GetMethod("EquipmentDroneCheck"));
 
                     //Log.Debug(il.ToString());
                 } else 
