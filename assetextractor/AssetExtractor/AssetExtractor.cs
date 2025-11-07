@@ -189,6 +189,7 @@ namespace AssetExtractor
         const string WIKI_OUTPUT_SKILLS = "Skills.txt";
         const string WIKI_OUTPUT_CHALLENGES = "Challenges.txt";
         const string WIKI_OUTPUT_BODIES = "Bodies.txt";
+        const string WIKI_OUTPUT_BUFFS = "Buffs.txt";
         
         public static string WikiOutputPath = Path.Combine(Path.GetDirectoryName(AssetExtractor.Instance.Info.Location) ?? throw new InvalidOperationException(), WIKI_OUTPUT_FOLDER);
         public static string WikiModname = "";
@@ -949,12 +950,12 @@ namespace AssetExtractor
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_BODIES);
 
             string f = "monsters[\u0022{0}\u0022] = {{\n";
-            f += "\tName = \u0022{1}\u0022,\n";
-            f += "\tBaseDamage = \u0022{2}\u0022,\n";
+            f += "\tInternalName = \u0022{1}\u0022,\n"; // todo look into how to get internalname !!
+            f += "\tImage = \u0022{2}\u0022,\n";
             f += "\tBaseHealth = {3},\n";
-            f += "\tBaseHealthRegen = {4},\n";
-            f += "\tBaseSpeed = {5},\n";
-            f += "\tBaseHealth = {6},\n";
+            f += "\tScalingHealth = {4},\n";
+            f += "\tBaseDamage = {5},\n";
+            f += "\tScalingDamage = {6},\n";
             f += "\tBaseHealthRegen = {7},\n";
             f += "\tScalingHealthRegen = {8},\n";
             f += "\tBaseSpeed = {9},\n";
@@ -964,11 +965,11 @@ namespace AssetExtractor
             //f += "\tUmbra= \u0022{18}\u0022,\n";
             //f += "\tPhraseEscape = \u0022{12}\u0022,\n";
             //f += "\tPhraseVanish = \u0022{13}\u0022,\n";
-            f += "\tClass = \u0022\u0022,\n";
+            //f += "\tClass = \u0022\u0022,\n";
             f += "\tMass = {12},\n";
             f += "\tLocalizationInternalName = \u0022{13}\u0022,\n";
             f += "\tColor = \u0022{14}\u0022,\n";
-            f += "\t}}";
+            f += "\t}}"; // todo look into flags and isboss
 
             if (!Directory.Exists(WikiOutputPath))
             {
@@ -1011,8 +1012,9 @@ namespace AssetExtractor
                     {
                         if (charbody.baseNameToken != null)
                         {
-                            bodyName = Language.GetString(charbody.baseNameToken);
+                            bodyName = charbody.GetDisplayName();
                         }
+                        
 
                         if (charbody.subtitleNameToken != null)
                         {
@@ -1058,8 +1060,7 @@ namespace AssetExtractor
                             mass = motor.mass;
                         }
 
-                        string format = Language.GetStringFormatted(f, bodyName, bodyName,
-                            bodyName.Replace(" ", "_") + WikiModname + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, mass, token, "#" + color);
+                        string format = Language.GetStringFormatted(f, bodyName, bodyName, bodyName.Replace(" ", "_") + WikiModname + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, mass, token, "#" + color);
 
                         foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
                         {
@@ -1105,6 +1106,99 @@ namespace AssetExtractor
             long length = new FileInfo(path).Length;
             if (length <= 0) File.Delete(path);
         }
+        
+        public static void FormatBuffs(ReadOnlyContentPack readOnlyContentPack)
+        {
+            string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_BUFFS);
+
+            string f = "StatusEffects[\u0022{0}\u0022] = {{\n";
+            f += "\tName = \u0022{1}\u0022,\n";
+            f += "\tInternalName = {{ \u0022{2}\u0022 }} ,\n";
+            f += "\tImage = \u0022{3}\u0022,\n";
+            f += "\tEffectShort = \u0022{}\u0022,\n";
+            f += "\tEffect = \u0022{}\u0022,\n";
+            f += "\tSource = {\n\n},\n";
+            f += "\tType = \u0022{4}\u0022,\n"; // buff or affix buff or debuff or cooldown buff
+            f += "\tStackable = \u0022{5}\u0022,\n";
+            f += "\tDOT = \u0022{6}\u0022,\n";
+            f += "\tColor = \u0022{7}\u0022,\n";
+            f += "\tHidden = \u0022{8}\u0022,\n";
+            f += "\t}}"; // todo incorperate flags in here 
+
+            if (!Directory.Exists(WikiOutputPath))
+            {
+                Directory.CreateDirectory(WikiOutputPath);
+            }
+            TextWriter tw = new StreamWriter(path, WikiAppend);
+
+            foreach (var buffdef in readOnlyContentPack.buffDefs)
+            {
+                string name = "";
+                string type = "";
+                string stackable = "";
+                string dot = "";
+                string color = "";
+                string hidden = "";
+                string image = "Status ";
+                
+                if (buffdef == null) continue;
+
+                if (buffdef.isDebuff)
+                {
+                    type = "Debuff";
+                } 
+                else if(buffdef.isElite)
+                {
+                    type = "Affix Buff";
+                }
+                else if (buffdef.isCooldown)
+                {
+                    type = "Cooldown Buff";
+                }
+                else
+                {
+                    type = "Buff";
+                }
+                
+                dot = buffdef.isDOT ? "True" : "False";
+                stackable = buffdef.canStack ? "True" : "False";
+                hidden = buffdef.isHidden ? "True" : "False";
+                color = $"#{ColorUtility.ToHtmlStringRGB(buffdef.buffColor)}";
+                name = Language.GetString(buffdef.name); // todo check if this is a name token or not 
+                image += name;
+                
+                var temp = WikiOutputPath + @"\buffs\";
+                Directory.CreateDirectory(temp);
+                try
+                {
+                    exportTexture(buffdef.iconSprite, Path.Combine(temp, name.Replace(" ", "_") + WikiModname + ".png"));
+                }
+                catch
+                {
+                    Log.Debug($"erm ,,.,. failed to export buff icon {buffdef.name} ,,. ");
+                }
+                
+                try
+                {
+                    string format = string.Format(f, name, name, name, image, type, stackable, dot, color, hidden);
+
+                    foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                    {
+                        format = format.Replace(kvp.Key, kvp.Value);
+                    }
+                    tw.WriteLine(format);
+                } catch (Exception e)
+                {
+                    Log.Error("Error while exporting buff: " + e);
+                }
+                
+            }
+            tw.Close();
+            
+            long length = new FileInfo(path).Length;
+            if (length <= 0) File.Delete(path);
+        }
+        
 
         public static void exportTexture(Texture texture, String path)
         {
@@ -1185,6 +1279,8 @@ namespace AssetExtractor
         }
         
     }
+    
+    
     
     
 }
