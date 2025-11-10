@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using BepInEx;
 using BepInEx.Configuration;
 using Newtonsoft.Json.Utilities;
@@ -14,9 +16,13 @@ using RoR2.ExpansionManagement;
 using RoR2.Projectile;
 using RoR2.Skills;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 using Path = System.IO.Path;
+using DebugToolkit;
+
 namespace AssetExtractor
 {
     [BepInDependency(ItemAPI.PluginGUID)]
@@ -104,6 +110,7 @@ namespace AssetExtractor
             long skillTime = 0;
             long challengeTime = 0;
             long bodyTime = 0;
+            long buffTime = 0;
 
             WikiFormat.WikiTryGetProcs = trygettingprocs.Value; 
             foreach (var readOnlyContentPack in ContentManager.allLoadedContentPacks)
@@ -124,7 +131,8 @@ namespace AssetExtractor
                     WikiFormat.WikiModname = "";
                 }
                 timer.Start();
-
+                WikiFormat.loredefs = [];
+                
                 WikiFormat.FormatItem(readOnlyContentPack);
                 itemTime += timer.ElapsedMilliseconds;
                 timer.Restart();
@@ -149,6 +157,12 @@ namespace AssetExtractor
                 bodyTime += timer.ElapsedMilliseconds;
                 timer.Restart();
                 
+                WikiFormat.FormatBuffs(readOnlyContentPack);
+                buffTime += timer.ElapsedMilliseconds;
+                timer.Restart();
+
+                WikiFormat.FormatLore(readOnlyContentPack);
+                
                 timer.Stop();
 
                 try
@@ -167,6 +181,7 @@ namespace AssetExtractor
             Log.Info("Exported skills in " + (skillTime) + "ms");
             Log.Info("Exported challenges in " + (challengeTime) + "ms");
             Log.Info("Exported bodies in " + (bodyTime) + "ms");
+            Log.Info("Exported buffs in " + (buffTime) + "ms");
             
             Log.Info("complete !!!! located at: " + Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location))));
             
@@ -190,11 +205,13 @@ namespace AssetExtractor
         const string WIKI_OUTPUT_CHALLENGES = "Challenges.txt";
         const string WIKI_OUTPUT_BODIES = "Bodies.txt";
         const string WIKI_OUTPUT_BUFFS = "Buffs.txt";
+        const string WIKI_OUTPUT_LORE = "Lore.txt";
         
         public static string WikiOutputPath = Path.Combine(Path.GetDirectoryName(AssetExtractor.Instance.Info.Location) ?? throw new InvalidOperationException(), WIKI_OUTPUT_FOLDER);
         public static string WikiModname = "";
         public static bool WikiTryGetProcs = false;
         public static bool WikiAppend = false;
+        public static List<String> loredefs = new();
         
         static Dictionary<string, string> FormatR2ToWiki = new Dictionary<string, string>()
         {
@@ -242,6 +259,11 @@ namespace AssetExtractor
                     if (item.nameToken != null)
                     {
                         itemName = Language.GetString(item.nameToken);
+                        
+                        if (Language.english.TokenIsRegistered(item.nameToken.Replace("_NAME", "_LORE")))
+                        {
+                            loredefs.Add("Items " + item.nameToken + " " + item.nameToken.Replace("_NAME", "_LORE"));
+                        }
                     }
 
                     ItemTier itemTier = item.tier; // will supposedly never = null
@@ -361,15 +383,15 @@ namespace AssetExtractor
                     string desc = "";
                     string unlock = "";
                     string token = "";
-                    
+
                     if (equip.nameToken != null)
                     {
                         itemName = Language.GetString(equip.nameToken);
-                    }
-                    
-                    if (equip.nameToken != null)
-                    {
-                        itemName = Language.GetString(equip.nameToken);
+                        
+                        if (Language.english.TokenIsRegistered(equip.nameToken.Replace("_NAME", "_LORE")))
+                        {
+                            loredefs.Add("Equipment " + equip.nameToken + " " + equip.nameToken.Replace("_NAME", "_LORE"));
+                        }
                         
                         if (equip.nameToken != null && equip.nameToken.EndsWith("_NAME"))
                         {
@@ -530,6 +552,11 @@ namespace AssetExtractor
                     else if (surv.displayNameToken != null)
                     {
                         token = surv.displayNameToken;
+                    }
+                    
+                    if (Language.english.TokenIsRegistered(surv.displayNameToken.Replace("_NAME", "_LORE")))
+                    {
+                        loredefs.Add("Survivor " + surv.displayNameToken + " " + surv.displayNameToken.Replace("_NAME", "_LORE"));
                     }
 
                     if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
@@ -949,38 +976,37 @@ namespace AssetExtractor
         {
             string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_BODIES);
 
-            string f = "monsters[\u0022{0}\u0022] = {{\n";
-            f += "\tInternalName = \u0022{1}\u0022,\n"; // todo look into how to get internalname !!
-            f += "\tImage = \u0022{2}\u0022,\n";
-            f += "\tBaseHealth = {3},\n";
-            f += "\tScalingHealth = {4},\n";
-            f += "\tBaseDamage = {5},\n";
-            f += "\tScalingDamage = {6},\n";
-            f += "\tBaseHealthRegen = {7},\n";
-            f += "\tScalingHealthRegen = {8},\n";
-            f += "\tBaseSpeed = {9},\n";
-            f += "\tBaseArmor = {10},\n";
-            f += "\tDescription = \u0022{11}\u0022,\n";
-            //f += "\tUnlock = \u0022{17}\u0022,\n";
-            //f += "\tUmbra= \u0022{18}\u0022,\n";
-            //f += "\tPhraseEscape = \u0022{12}\u0022,\n";
-            //f += "\tPhraseVanish = \u0022{13}\u0022,\n";
-            //f += "\tClass = \u0022\u0022,\n";
-            f += "\tMass = {12},\n";
-            f += "\tLocalizationInternalName = \u0022{13}\u0022,\n";
-            f += "\tColor = \u0022{14}\u0022,\n";
-            f += "\t}}"; // todo look into flags and isboss
-
             if (!Directory.Exists(WikiOutputPath))
             {
                 Directory.CreateDirectory(WikiOutputPath);
             }
             TextWriter tw = new StreamWriter(path, WikiAppend);
             
+            StringBuilder sb = new StringBuilder();
+            var arg = "";
+            var cards = new HashSet<DirectorCard>(StringFinder.Instance.GetDirectorCardsFromPartial(arg));
+            
             foreach (var bodyprefab in readOnlyContentPack.bodyPrefabs)
             {
                 try
                 {
+                    string f = "monsters[\u0022{0}\u0022] = {{\n";
+                    f += "\tInternalName = \u0022{1}\u0022,\n"; // todo look into how to get internalname !!
+                    f += "\tImage = \u0022{2}\u0022,\n";
+                    f += "\tBaseHealth = {3},\n";
+                    f += "\tScalingHealth = {4},\n";
+                    f += "\tBaseDamage = {5},\n";
+                    f += "\tScalingDamage = {6},\n";
+                    f += "\tBaseHealthRegen = {7},\n";
+                    f += "\tScalingHealthRegen = {8},\n";
+                    f += "\tBaseSpeed = {9},\n";
+                    f += "\tBaseArmor = {10},\n";
+                    f += "\tMass = {11},\n";
+                    f += "\tLocalizationInternalName = \u0022{12}\u0022,\n";
+                    f += "\tColor = \u0022{13}\u0022,\n";
+                    // todo look into flags and isboss
+                    
+                    
                     string bodyName = "";
                     string desc = "";
                     string unlock = "";
@@ -1005,95 +1031,207 @@ namespace AssetExtractor
                             break;
                         }
                     }
-
                     if (breakout) continue;
+
+                    if (!bodyprefab.TryGetComponent(out CharacterBody charbody)) continue;
                     
-                    if (bodyprefab.TryGetComponent(out CharacterBody charbody))
+                    if (charbody.baseNameToken != null)
                     {
-                        if (charbody.baseNameToken != null)
+                        bodyName = charbody.GetDisplayName();
+                        f += $"\tName = \u0022{Language.GetString(charbody.baseNameToken)}\u0022,\n";
+                        f += $"\tLink = \u0022{Language.GetString(charbody.baseNameToken)}\u0022,\n";
+                    }
+
+                    if (!Language.english.TokenIsRegistered(charbody.baseNameToken.Replace("_NAME", "_LORE")))
+                    {
+                        f += $"\tNoLogbook = true,\n";
+                    }
+                    else
+                    {
+                        loredefs.Add("Monsters " + charbody.baseNameToken + " " + charbody.baseNameToken.Replace("_NAME", "_LORE"));
+                    }
+
+                    DeathRewards deathRewards = charbody.gameObject.GetComponent<DeathRewards>();
+                    if (deathRewards != null && deathRewards.bossDropTable)
+                    {
+                        f += "\tType = \u0022Boss\u0022,\n";
+                    }
+                    else
+                    {
+                        f += "\tType = \u0022Normal\u0022,\n";
+                    }
+
+                    f += $"\tExpansion = \u0022{readOnlyContentPack.identifier}\u0022,\n";
+                    
+                    foreach (var card in StringFinder.Instance.DirectorCards)
+                    {
+                        if (!cards.Contains(card)) continue;
+                        if (!card.spawnCard.prefab.GetComponent<CharacterMaster>().bodyPrefab.name.Equals(bodyprefab.name)) continue;
+                        
+                        f += $"\tCreditsCost = {card.cost},\n";
+                        f += $"\tStartingStage = {card.minimumStageCompletions},\n";
+                        break;
+                    }
+
+                    String flags = "\tCategory = {{ ";
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.Devotion) != 0)
+                    {
+                        flags += $"\u0022Devotion\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.HasBackstabImmunity) != 0)
+                    {
+                        flags += $"\u0022HasBackstabImmunity\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.HasBackstabPassive) != 0)
+                    {
+                        flags += $"\u0022HasBackstabPassive\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.IgnoreFallDamage) != 0)
+                    {
+                        flags += $"\u0022IgnoreFallDamage\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.IgnoreItemUpdates) != 0)
+                    {
+                        flags += $"\u0022IgnoreItemUpdates\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.IgnoreKnockback) != 0)
+                    {
+                        flags += $"\u0022IgnoreKnockback\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.ImmuneToExecutes) != 0)
+                    {
+                        flags += $"\u0022ImmuneToExecutes\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.ImmuneToGoo) != 0)
+                    {
+                        flags += $"\u0022ImmuneToGoo\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.ImmuneToLava) != 0)
+                    {
+                        flags += $"\u0022ImmuneToLava\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.ImmuneToVoidDeath) != 0)
+                    {
+                        flags += $"\u0022ImmuneToVoidDeath\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.Masterless) != 0)
+                    {
+                        flags += $"\u0022Masterless\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.Mechanical) != 0)
+                    {
+                        flags += $"\u0022Mechanical\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.OverheatImmune) != 0)
+                    {
+                        flags += $"\u0022OverheatImmune\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.ResistantToAOE) != 0)
+                    {
+                        flags += $"\u0022ResistantToAOE\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.SprintAnyDirection) != 0)
+                    {
+                        flags += $"\u0022SprintAnyDirection\u0022, ";
+                    }
+                    if ((charbody.bodyFlags & CharacterBody.BodyFlags.Void) != 0)
+                    {
+                        flags += $"\u0022Void\u0022, ";
+                    }
+                    if (flags != "\tCategory = {{ ")
+                    {
+                        f += flags.Substring(0, flags.Length - 2) + " }},\n";
+                    }
+                    
+                    if (charbody.subtitleNameToken != null)
+                    {
+                        desc = Language.GetString(charbody.subtitleNameToken);
+                        if (!desc.EndsWith("SUBTITLE") && desc != "")
                         {
-                            bodyName = charbody.GetDisplayName();
+                            f += $"\tBossName = \u0022{desc}\u0022,\n";
                         }
+                    }
+
+                    if (charbody.bodyColor != null)
+                    {
+                        color = ColorUtility.ToHtmlStringRGB(charbody.bodyColor);
+                    }
+
+                    if (charbody.TryGetComponent(out ExpansionRequirementComponent expansion))
+                    {
+                        if (expansion != null)
+                        {
+                            unlock = Language.GetString(expansion.name);
+                        }
+                    }
                         
 
-                        if (charbody.subtitleNameToken != null)
-                        {
-                            desc = Language.GetString(charbody.subtitleNameToken);
-                        }
-
-                        if (charbody.bodyColor != null)
-                        {
-                            color = ColorUtility.ToHtmlStringRGB(charbody.bodyColor);
-                        }
-
-                        if (charbody.TryGetComponent(out ExpansionRequirementComponent expansion))
-                        {
-                            if (expansion != null)
-                            {
-                                unlock = Language.GetString(expansion.name);
-                            }
-                        }
-                        
-
-                        if (charbody.baseNameToken != null && charbody.baseNameToken.EndsWith("_NAME"))
-                        {
-                            token = charbody.baseNameToken.Remove(charbody.baseNameToken.Length - 5); // remove _NAME
-                        }
-                        else if (charbody.baseNameToken != null)
-                        {
-                            token = charbody.baseNameToken;
-                        }
+                    if (charbody.baseNameToken != null && charbody.baseNameToken.EndsWith("_NAME"))
+                    {
+                        token = charbody.baseNameToken.Remove(charbody.baseNameToken.Length - 5); // remove _NAME
+                    }
+                    else if (charbody.baseNameToken != null)
+                    {
+                        token = charbody.baseNameToken;
+                    }
 
 
-                        basehealth = charbody.baseMaxHealth;
-                        scalinghealth = charbody.levelMaxHealth;
-                        damage = charbody.baseDamage;
-                        scalingdamage = charbody.levelDamage;
-                        regen = charbody.baseRegen;
-                        scalingregen = charbody.levelRegen;
-                        speed = charbody.baseMoveSpeed;
-                        armor = charbody.baseArmor;
-                        
+                    basehealth = charbody.baseMaxHealth;
+                    scalinghealth = charbody.levelMaxHealth;
+                    damage = charbody.baseDamage;
+                    scalingdamage = charbody.levelDamage;
+                    regen = charbody.baseRegen;
+                    scalingregen = charbody.levelRegen;
+                    speed = charbody.baseMoveSpeed;
+                    armor = charbody.baseArmor;
 
-                        if (charbody.TryGetComponent(out CharacterMotor motor))
+                    if (charbody.TryGetComponent(out CharacterMotor motor))
+                    {
+                        if (motor.mass.ToString() != "1E+14")
                         {
                             mass = motor.mass;
                         }
-
-                        string format = Language.GetStringFormatted(f, bodyName, bodyName, bodyName.Replace(" ", "_") + WikiModname + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, desc, mass, token, "#" + color);
-
-                        foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                        else
                         {
-                            format = format.Replace(kvp.Key, kvp.Value);
+                            mass = 0;
                         }
+                    }
+                        
+                    f += "\t}}";
+                    Log.Debug(f);
+                    string format = Language.GetStringFormatted(f, bodyName, bodyName, bodyName.Replace(" ", "_") + WikiModname + ".png", basehealth, scalinghealth, damage, scalingdamage, regen, scalingregen, speed, armor, mass, token, "#" + color);
 
-                        tw.WriteLine(format);
+                    foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                    {
+                        format = format.Replace(kvp.Key, kvp.Value);
+                    }
 
-                        if (!charbody.portraitIcon) continue;
+                    tw.WriteLine(format);
 
-                        var temp = WikiOutputPath + @"\bodies\";
-                        Directory.CreateDirectory(temp);
-                        try
+                    if (!charbody.portraitIcon) continue;
+
+                    var temp = WikiOutputPath + @"\bodies\";
+                    Directory.CreateDirectory(temp);
+                    try
+                    {
+                        if (bodyName == "")
                         {
-                            if (bodyName == "")
-                            {
-                                Log.Debug("body name is blank ! using toke n");
-                                exportTexture(charbody.portraitIcon,
-                                    Path.Combine(temp, token + WikiModname + ".png"));
-                            }
-                            else
-                            {
-                                exportTexture(charbody.portraitIcon,
-                                    Path.Combine(temp, bodyName.Replace(" ", "_") + WikiModname + ".png"));
-                            }
-                        }
-                        catch
-                        {
-                            Log.Debug(
-                                "erm ,,.,. failed to export body icon with proper name ,,. trying with tokenm !! " + bodyName);
+                            Log.Debug("body name is blank ! using toke n");
                             exportTexture(charbody.portraitIcon,
                                 Path.Combine(temp, token + WikiModname + ".png"));
                         }
+                        else
+                        {
+                            exportTexture(charbody.portraitIcon,
+                                Path.Combine(temp, bodyName.Replace(" ", "_") + WikiModname + ".png"));
+                        }
+                    }
+                    catch
+                    {
+                        Log.Debug(
+                            "erm ,,.,. failed to export body icon with proper name ,,. trying with tokenm !! " + bodyName);
+                        exportTexture(charbody.portraitIcon,
+                            Path.Combine(temp, token + WikiModname + ".png"));
                     }
                 }
                 catch (Exception e)
@@ -1113,17 +1251,17 @@ namespace AssetExtractor
 
             string f = "StatusEffects[\u0022{0}\u0022] = {{\n";
             f += "\tName = \u0022{1}\u0022,\n";
-            f += "\tInternalName = {{ \u0022{2}\u0022 }} ,\n";
+            f += "\tInternalName = \u0022{2}\u0022,\n";
             f += "\tImage = \u0022{3}\u0022,\n";
-            f += "\tEffectShort = \u0022{}\u0022,\n";
-            f += "\tEffect = \u0022{}\u0022,\n";
-            f += "\tSource = {\n\n},\n";
+            f += "\tEffectShort = \u0022\u0022,\n";
+            f += "\tEffect = \u0022\u0022,\n";
+            f += "\tSource = {{}},\n";
             f += "\tType = \u0022{4}\u0022,\n"; // buff or affix buff or debuff or cooldown buff
             f += "\tStackable = \u0022{5}\u0022,\n";
             f += "\tDOT = \u0022{6}\u0022,\n";
             f += "\tColor = \u0022{7}\u0022,\n";
             f += "\tHidden = \u0022{8}\u0022,\n";
-            f += "\t}}"; // todo incorperate flags in here 
+            f += "\t}}";  
 
             if (!Directory.Exists(WikiOutputPath))
             {
@@ -1133,63 +1271,114 @@ namespace AssetExtractor
 
             foreach (var buffdef in readOnlyContentPack.buffDefs)
             {
-                string name = "";
-                string type = "";
-                string stackable = "";
-                string dot = "";
-                string color = "";
-                string hidden = "";
-                string image = "Status ";
-                
-                if (buffdef == null) continue;
+                try
+                {
+                    string name = "";
+                    string type = "";
+                    string stackable = "";
+                    string dot = "";
+                    string color = "";
+                    string hidden = "";
+                    string image = "Status ";
+                    string flags = "";
 
-                if (buffdef.isDebuff)
-                {
-                    type = "Debuff";
-                } 
-                else if(buffdef.isElite)
-                {
-                    type = "Affix Buff";
-                }
-                else if (buffdef.isCooldown)
-                {
-                    type = "Cooldown Buff";
-                }
-                else
-                {
-                    type = "Buff";
-                }
-                
-                dot = buffdef.isDOT ? "True" : "False";
-                stackable = buffdef.canStack ? "True" : "False";
-                hidden = buffdef.isHidden ? "True" : "False";
-                color = $"#{ColorUtility.ToHtmlStringRGB(buffdef.buffColor)}";
-                name = Language.GetString(buffdef.name); // todo check if this is a name token or not 
-                image += name;
-                
-                var temp = WikiOutputPath + @"\buffs\";
-                Directory.CreateDirectory(temp);
-                try
-                {
-                    exportTexture(buffdef.iconSprite, Path.Combine(temp, name.Replace(" ", "_") + WikiModname + ".png"));
-                }
-                catch
-                {
-                    Log.Debug($"erm ,,.,. failed to export buff icon {buffdef.name} ,,. ");
-                }
-                
-                try
-                {
+                    if (buffdef == null) continue;
+
+                    if (buffdef.isDebuff)
+                    {
+                        type = "Debuff";
+                    }
+                    else if (buffdef.isElite)
+                    {
+                        type = "Affix Buff";
+                    }
+                    else if (buffdef.isCooldown)
+                    {
+                        type = "Cooldown Buff";
+                    }
+                    else
+                    {
+                        type = "Buff";
+                    }
+
+                    dot = buffdef.isDOT ? "True" : "False";
+                    stackable = buffdef.canStack ? "True" : "False";
+                    hidden = buffdef.isHidden ? "True" : "False";
+                    color = $"#{ColorUtility.ToHtmlStringRGB(buffdef.buffColor)}";
+                    name = buffdef.name;
+                    if (name.StartsWith("bd"))
+                    {
+                        name = name[2..];
+                    }
+                    image += name;
+
+                    var temp = WikiOutputPath + @"\buffs\";
+                    Directory.CreateDirectory(temp);
+                    try
+                    {
+                        exportTexture(buffdef.iconSprite,
+                            Path.Combine(temp, name.Replace(" ", "_") + WikiModname + ".png"));
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Debug($"erm ,,.,. failed to export buff icon {buffdef.name} ,,. {e}");
+                    }
+
+                    
                     string format = string.Format(f, name, name, name, image, type, stackable, dot, color, hidden);
 
                     foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
                     {
                         format = format.Replace(kvp.Key, kvp.Value);
                     }
+
                     tw.WriteLine(format);
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     Log.Error("Error while exporting buff: " + e);
+                }
+                
+            }
+            tw.Close();
+            
+            long length = new FileInfo(path).Length;
+            if (length <= 0) File.Delete(path);
+        }
+
+        public static void FormatLore(ReadOnlyContentPack readOnlyContentPack)
+        {
+            string path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_LORE);
+
+            string f = "lore[\u0022{0}\u0022] = {{\n";
+            f += "\tType = \u0022{1}\u0022,\n";
+            f += "\tDesc = \u0022{2}\u0022,\n";
+            f += "\t}}";  
+
+            if (!Directory.Exists(WikiOutputPath))
+            {
+                Directory.CreateDirectory(WikiOutputPath);
+            }
+            TextWriter tw = new StreamWriter(path, WikiAppend);
+
+            foreach (var lore in loredefs)
+            {
+                try
+                {
+                    string[] loresplit = lore.Split(" ");
+                    
+                    string format = string.Format(f, loresplit[0], Language.GetString(loresplit[1]), Language.GetString(loresplit[2]).Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t").Replace("\"", "\\\""));
+
+                    foreach (KeyValuePair<string, string> kvp in FormatR2ToWiki)
+                    {
+                        format = format.Replace(kvp.Key, kvp.Value);
+                    }
+
+                    tw.WriteLine(format);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error while exporting lore: " + e);
                 }
                 
             }
@@ -1265,11 +1454,12 @@ namespace AssetExtractor
             RenderTexture.ReleaseTemporary(tmp);
             
             //convert sprite to texture
-            var croppedTexture = new Texture2D( (int)sprite.rect.width, (int)sprite.rect.height );
+            var croppedTexture = new Texture2D( (int)sprite.texture.width, (int)sprite.texture.height );
             var pixels = myTexture2D.GetPixels(  (int)sprite.textureRect.x, 
                 (int)sprite.textureRect.y, 
                 (int)sprite.textureRect.width, 
                 (int)sprite.textureRect.height );
+            
             croppedTexture.SetPixels( pixels );
             croppedTexture.Apply();
             
@@ -1277,10 +1467,5 @@ namespace AssetExtractor
             
             Object.Destroy(myTexture2D);
         }
-        
     }
-    
-    
-    
-    
 }
