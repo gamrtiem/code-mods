@@ -5,27 +5,29 @@
 		<LangVersion>preview</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<RootNamespace>AssetExtractor</RootNamespace>
+		<ImplicitUsings>disable</ImplicitUsings>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-
-		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
 
 		<PackageReference Include="R2API" Version="5.0.5" />
 
-		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
-		<PackageReference Include="RiskOfRain2.GameLibs" Version="1.3.5.0-r.0" />
-		<PackageReference Include="MMHOOK.RoR2" Version="2025.6.3" NoWarn="NU1701" />
+		<PackageReference Include="R2API.Core" Version="5.1.7" />
+
+		<PackageReference Include="UnityEngine.Modules" Version="6000.2.12" IncludeAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Reference Include="DebugToolkit">
 	    <HintPath>..\DebugToolkit.dll</HintPath>
 	  </Reference>
+	  <Reference Include="UnityHotReload">
+	    <HintPath>..\UnityHotReload.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="rm -rf /run/media/icebrah/buh/gale/riskofrain2/profiles/debug/BepInEx/plugins/icebro-asset_extractor/&#xA;cp -r /run/media/icebrah/buh/github/code-mods/assetextractor/AssetExtractor/bin/Debug/netstandard2.1/ /run/media/icebrah/buh/gale/riskofrain2/profiles/debug/BepInEx/plugins/icebro-asset_extractor/&#xA;steam &quot;-applaunch&quot; &quot;632360&quot; &quot;--doorstop-enabled&quot; &quot;true&quot; &quot;--doorstop-target-assembly&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug/BepInEx/core/BepInEx.Preloader.dll&quot;" />
+	</Target>
 
 </Project>
