@@ -177,6 +177,8 @@ namespace AssetExtractor
                 timer.Restart();
 
                 WikiFormat.FormatLore(readOnlyContentPack);
+                WikiFormat.exportExpansions(readOnlyContentPack);
+                WikiFormat.exportArtifacts(readOnlyContentPack);
                 
                 timer.Stop();
 

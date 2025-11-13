@@ -26,8 +26,7 @@ public static partial class WikiFormat
                 var loresplit = lore.Split(" ");
 
                 var format = string.Format(f, loresplit[0], Language.GetString(loresplit[1]),
-                    Language.GetString(loresplit[2]).Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\r", "\\r")
-                        .Replace("\t", "\\t").Replace("\"", "\\\""));
+                    Language.GetString(loresplit[2]).Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t").Replace("\"", "\\\""));
 
                 foreach (var kvp in FormatR2ToWiki) format = format.Replace(kvp.Key, kvp.Value);
 

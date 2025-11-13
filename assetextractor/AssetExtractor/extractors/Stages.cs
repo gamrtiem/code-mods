@@ -34,15 +34,9 @@ public static partial class WikiFormat
                 f += "\tInteractableCredits = \"{7}\",\n";
                 f += "\tMonsterCredits = \"{8}\",\n";
                 f += "\tDescription = \"{9}\",\n";
-                //if (!sceneDef.shouldIncludeInLogbook)
-                //{
-                //    Log.Warning($"not loading {sceneDef.baseSceneName} since isnt in logbook !!"); 
-                //    continue;
-                //}
                 
                 Log.Debug(sceneDef.nameToken);
                 Log.Debug(sceneDef.sceneAddress.AssetGUID);
-                //Scene scene = Addressables.LoadAssetAsync<Scene>(sceneDef.sceneAddress.AssetGUID).WaitForCompletion();
                 if (sceneDef.nameToken == "") continue;
                 
                 var loadedscene = Addressables.LoadSceneAsync(sceneDef.sceneAddress.AssetGUID).WaitForCompletion();
@@ -86,7 +80,7 @@ public static partial class WikiFormat
                                     string nameToken = processNameToken(interactableCard.spawnCard.prefab);
                                     int selectionWeight = interactableCard.selectionWeight;
 
-                                    string awesomeaddstring = nameToken + "," + selectionWeight + "," + acronymHelper(Language.GetString(poolEntry.requiredExpansions[0].nameToken));
+                                    string awesomeaddstring = nameToken + "," + selectionWeight + "," + acronymHelper(Language.GetString(poolEntry.requiredExpansions[0].nameToken), true);
                                     
                                     bool contains = false;
                                     foreach (var awesomestring in awesome)
@@ -183,7 +177,7 @@ public static partial class WikiFormat
                                         int selectionWeight = monsterCard.selectionWeight;
                                         int minimumStage = monsterCard.minimumStageCompletions;
                                         string categoryName = monsterCategory.name;
-                                        string awesomeaddstring = nameToken + "," + selectionWeight + "," + minimumStage + "," + categoryName + "," + acronymHelper(Language.GetString(poolEntry.requiredExpansions[0].nameToken));
+                                        string awesomeaddstring = nameToken + "," + selectionWeight + "," + minimumStage + "," + categoryName + "," + acronymHelper(Language.GetString(poolEntry.requiredExpansions[0].nameToken), true);
                                         
                                         bool contains = false;
                                         foreach (var awesomestring in awesome2)
@@ -295,9 +289,11 @@ public static partial class WikiFormat
                         f += "\tHidden Realm = true,\n";
                         name = name.Replace("Hidden Realm: ", "");
                     }
+                    
+                    loredefs.Add("Environments " + sceneDef.nameToken + " " + sceneDef.loreToken);
 
                     f += "}}";
-                    var format = Language.GetStringFormatted(f, 
+                    string format = Language.GetStringFormatted(f, 
                         name, 
                         name, 
                         loadedscene.Scene.name,
@@ -315,7 +311,7 @@ public static partial class WikiFormat
                     tw.WriteLine(format);
 
                     Texture preview = Addressables.LoadAssetAsync<Texture>(sceneDef.previewTextureReference).WaitForCompletion();
-                    var temp = WikiOutputPath + @"\stages\";
+                    string temp = WikiOutputPath + @"\stages\";
                     Directory.CreateDirectory(temp);
                     try
                     {
@@ -332,10 +328,6 @@ public static partial class WikiFormat
                 }
                 Addressables.UnloadSceneAsync(loadedscene).WaitForCompletion();
                 Log.Debug("unlaoded scene !! ");
-
-
-                 
-
             }
             catch (Exception e)
             {
@@ -343,9 +335,6 @@ public static partial class WikiFormat
             }
 
         tw.Close();
-
-        //var length = new FileInfo(path).Length;
-        //if (length <= 0) File.Delete(path);
     }
 
     public static string processNameToken(GameObject prefab)

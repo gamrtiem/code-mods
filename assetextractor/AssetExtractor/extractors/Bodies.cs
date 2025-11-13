@@ -83,15 +83,18 @@ public static partial class WikiFormat
                 foreach (var card in StringFinder.Instance.DirectorCards)
                 {
                     if (!cards.Contains(card)) continue;
-                    if (!card.spawnCard.prefab.GetComponent<CharacterMaster>().bodyPrefab.name
-                            .Equals(bodyprefab.name)) continue;
+                    if (!card.spawnCard.prefab.GetComponent<CharacterMaster>().bodyPrefab.name.Equals(bodyprefab.name)) continue;
 
                     f += $"\tCreditsCost = {card.cost},\n";
-                    f += $"\tStartingStage = {card.minimumStageCompletions},\n";
+                    if (card.minimumStageCompletions != 0)
+                    {
+                        f += $"\tStartingStage = {card.minimumStageCompletions},\n";
+                    }
                     break;
                 }
 
-                var flags = "\tCategory = {{ ";
+                //yeah ,.,..,
+                string flags = "\tCategory = {{ ";
                 if ((charbody.bodyFlags & CharacterBody.BodyFlags.Devotion) != 0) flags += "\"Devotion\", ";
                 if ((charbody.bodyFlags & CharacterBody.BodyFlags.HasBackstabImmunity) != 0)
                     flags += "\"HasBackstabImmunity\", ";
@@ -124,7 +127,7 @@ public static partial class WikiFormat
 
                 if (charbody.subtitleNameToken != null)
                 {
-                    var desc = Language.GetString(charbody.subtitleNameToken);
+                    string desc = Language.GetString(charbody.subtitleNameToken);
                     if (!desc.EndsWith("SUBTITLE") && desc != "") f += $"\tBossName = \"{desc}\",\n";
                 }
 
@@ -161,7 +164,7 @@ public static partial class WikiFormat
 
                 if (!charbody.portraitIcon) continue;
 
-                var temp = WikiOutputPath + @"\bodies\";
+                string temp = WikiOutputPath + @"\bodies\";
                 Directory.CreateDirectory(temp);
                 try
                 {
@@ -192,7 +195,7 @@ public static partial class WikiFormat
 
         tw.Close();
 
-        var length = new FileInfo(path).Length;
+        long length = new FileInfo(path).Length;
         if (length <= 0) File.Delete(path);
     }
 }
