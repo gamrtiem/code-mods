@@ -120,13 +120,21 @@ public static partial class WikiFormat
             Object.Destroy(myTexture2D);
         }
 
-        public static string acronymHelper(string expansion)
+
+        public static string acronymHelper(string expansion, bool forceCaps)
         {
             string[] expansionName = expansion.Split(" ");
             string acronym = "";
-            foreach (var word in expansionName)
+            foreach (string word in expansionName)
             {
-                acronym += word.ToUpper()[0];
+                if (forceCaps)
+                {
+                    acronym += word.ToUpper()[0];
+                }
+                else
+                {
+                    acronym += word[0];
+                }
             }
             return acronym;
         }

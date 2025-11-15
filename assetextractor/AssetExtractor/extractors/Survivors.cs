@@ -13,34 +13,33 @@ public static partial class WikiFormat
     {
         var path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SURVIVORS);
 
-        var f = "survivors[\"{0}\"] = {{\n";
-        f += "\tName = \"{1}\",\n";
-        f += "\tImage = \"{2}\",\n";
-        f += "\tBaseHealth = {3},\n";
-        f += "\tScalingHealth = {4},\n";
-        f += "\tBaseDamage = {5},\n";
-        f += "\tScalingDamage = {6},\n";
-        f += "\tBaseHealthRegen = {7},\n";
-        f += "\tScalingHealthRegen = {8},\n";
-        f += "\tBaseSpeed = {9},\n";
-        f += "\tBaseArmor = {10},\n";
-        f += "\tDescription = \"{11}\",\n";
-        f += "\tUnlock = \"{17}\",\n";
-        f += "\tUmbra = \"{18}\",\n";
-        f += "\tPhraseEscape = \"{12}\",\n";
-        f += "\tPhraseVanish = \"{13}\",\n";
-        f += "\tClass = \"\",\n";
-        f += "\tMass = {14},\n";
-        f += "\tLocalizationInternalName = \"{15}\",\n";
-        f += "\tColor = \"{16}\",\n";
-        f += "\t}}";
-
         if (!Directory.Exists(WikiOutputPath)) Directory.CreateDirectory(WikiOutputPath);
         TextWriter tw = new StreamWriter(path, WikiAppend);
 
-        foreach (var surv in readOnlyContentPack.survivorDefs)
+        foreach (SurvivorDef surv in readOnlyContentPack.survivorDefs)
             try
             {
+                string f = "survivors[\"{0}\"] = {{\n";
+                f += "\tName = \"{1}\",\n";
+                f += "\tImage = \"{2}\",\n";
+                f += "\tBaseHealth = {3},\n";
+                f += "\tScalingHealth = {4},\n";
+                f += "\tBaseDamage = {5},\n";
+                f += "\tScalingDamage = {6},\n";
+                f += "\tBaseHealthRegen = {7},\n";
+                f += "\tScalingHealthRegen = {8},\n";
+                f += "\tBaseSpeed = {9},\n";
+                f += "\tBaseArmor = {10},\n";
+                f += "\tDescription = \"{11}\",\n";
+                f += "\tUnlock = \"{17}\",\n";
+                f += "\tUmbra = \"{18}\",\n";
+                f += "\tPhraseEscape = \"{12}\",\n";
+                f += "\tPhraseVanish = \"{13}\",\n";
+                f += "\tClass = \"\",\n";
+                f += "\tMass = {14},\n";
+                f += "\tLocalizationInternalName = \"{15}\",\n";
+                f += "\tColor = \"{16}\",\n";
+                
                 var survName = "";
                 var desc = "";
                 var unlock = "";
@@ -69,7 +68,7 @@ public static partial class WikiFormat
 
                 if (surv.unlockableDef != null)
                 {
-                    var nameToken = AchievementManager
+                    string nameToken = AchievementManager
                         .GetAchievementDefFromUnlockable(surv.unlockableDef.cachedName)?.nameToken;
                     if (nameToken != null)
                         unlock = Language.GetString(nameToken);
@@ -110,6 +109,12 @@ public static partial class WikiFormat
                     unlocktoken = Language.GetString(achievement.nameToken);
                 }
 
+                if (surv.GetRequiredExpansion() != null)
+                {
+                    f += "\tExpansion = \"" + acronymHelper(Language.GetString(surv.GetRequiredExpansion().nameToken), false) + "\",\n";
+                }
+                
+                f += "\t}}";
                 var format = Language.GetStringFormatted(f, survName, survName,
                     survName.Replace(" ", "_") + WikiModname + ".png", basehealth, scalinghealth, damage, scalingdamage,
                     regen,
@@ -152,29 +157,30 @@ public static partial class WikiFormat
                     var temp2 = WikiOutputPath + @"\skins\";
                     Directory.CreateDirectory(temp2);
                     //Log.Debug(surv.bodyPrefab);
-                    if (surv.bodyPrefab.TryGetComponent(out ModelLocator modellocator))
-                        if (modellocator.modelTransform.name != null && skin.rootObject != null)
-                            if (modellocator.modelTransform.name == skin.rootObject.name)
-                                try
-                                {
-                                    var filename = "";
-                                    var skinlang = Language.GetString(skin.nameToken);
-                                    if (skinlang == "Default")
-                                        filename = "Default " + survName;
-                                    else
-                                        filename = Language.GetString(skin.nameToken);
+                    if (!surv.bodyPrefab.TryGetComponent(out ModelLocator modellocator)) continue;
+                    if (modellocator.modelTransform.name == null || skin.rootObject == null) continue;
+                    if (modellocator.modelTransform.name != skin.rootObject.name) continue;
+                    
+                    try
+                    {
+                        string filename;
+                        string skinlang = Language.GetString(skin.nameToken);
+                        if (skinlang == "Default")
+                        {
+                            filename = "Default " + survName;
+                        }
+                        else
+                        {
+                            filename = Language.GetString(skin.nameToken);
+                        }
 
-                                    exportTexture(skin.icon,
-                                        Path.Combine(temp2, filename.Replace(" ", "_") + WikiModname + ".png"));
-                                }
-                                catch
-                                {
-                                    Log.Debug(
-                                        "erm ,,.,. failed to export skin icon with proper name ,,. trying with tokenm !! " +
-                                        Language.GetString(skin.nameToken));
-                                    exportTexture(skin.icon,
-                                        Path.Combine(temp2, skin.nameToken + WikiModname + ".png"));
-                                }
+                        exportTexture(skin.icon, Path.Combine(temp2, filename.Replace(" ", "_") + WikiModname + ".png"));
+                    }
+                    catch
+                    {
+                        Log.Debug("erm ,,.,. failed to export skin icon with proper name ,,. trying with tokenm !! " + Language.GetString(skin.nameToken)); 
+                        exportTexture(skin.icon, Path.Combine(temp2, skin.nameToken + WikiModname + ".png"));
+                    }
                 }
             }
             catch (Exception e)
