@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
+
+		<PackageReference Include="R2API" Version="5.0.5" />
+		<PackageReference Include="R2API.Language" Version="1.0.1" />
+
+		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
+		<PackageReference Include="MMHOOK.RoR2" Version="2025.6.3" NoWarn="NU1701" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="Hex3Mod">
+	    <HintPath>..\..\..\..\..\..\..\..\home\icebrah\.local\share\com.kesomannen.gale\riskofrain2\profiles\i am the angery pumplin\BepInEx\plugins\prodzpod-RealerHex3Mod\Hex3Mod.dll</HintPath>
+	  </Reference>
+	  <Reference Include="MiscModpackUtils">
+	    <HintPath>..\MiscModpackUtils.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityHotReload">
+	    <HintPath>..\..\assetextractor\UnityHotReload.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="rm -rf /run/media/icebrah/buh/gale/riskofrain2/profiles/debug/BepInEx/plugins/testmod/&#xA;cp -r /run/media/icebrah/buh/github/code-mods/template3/ExamplePlugin/bin/Debug/netstandard2.1/ /run/media/icebrah/buh/gale/riskofrain2/profiles/debug/BepInEx/plugins/testmod/" />
+	</Target>
+
+</Project>

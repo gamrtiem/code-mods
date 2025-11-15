@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<RootNamespace>ExamplePlugin</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
+
+		<PackageReference Include="R2API" Version="5.0.5" />
+		<PackageReference Include="R2API.Language" Version="1.0.1" />
+		<PackageReference Include="Rune580.Mods.RiskOfRain2.RiskOfOptions" Version="2.8.3" />
+
+		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
+		<PackageReference Include="MMHOOK.RoR2" Version="2025.6.3" NoWarn="NU1701" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="CoolerEclipse">
+	    <HintPath>..\CoolerEclipse-nstrip.dll</HintPath>
+	  </Reference>
+	  <Reference Include="GoldenCoastPlusRevived">
+	    <HintPath>..\GoldenCoastPlusRevived-nstrip.dll</HintPath>
+	  </Reference>
+	  <Reference Include="LittleGameplayTweaks">
+	    <HintPath>..\LittleGameplayTweaks-nstrip.dll</HintPath>
+	  </Reference>
+	  <Reference Include="MiscModpackUtils">
+	    <HintPath>..\MiscModpackUtils-nstrip.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Starstorm2">
+	    <HintPath>..\Starstorm2-nstrip.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+</Project>
