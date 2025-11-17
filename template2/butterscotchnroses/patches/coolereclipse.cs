@@ -1,5 +1,10 @@
+using BepInEx.Configuration;
+using BNR.patches;
 using static BNR.butterscotchnroses;
 using HarmonyLib;
+using RiskOfOptions;
+using RiskOfOptions.OptionConfigs;
+using RiskOfOptions.Options;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -7,7 +12,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.PostProcessing;
 namespace BNR;
 
-public class coolereclipse
+public class coolereclipse : PatchBase<coolereclipse>
 {
     [HarmonyPatch]
     public class CoolerEclipseChanges
@@ -16,7 +21,6 @@ public class coolereclipse
         [HarmonyPrefix]
         public static bool CoolerEclipseAddSkyboxPreFix(On.RoR2.SceneDirector.orig_Start orig, SceneDirector self)
         {
-            //__result = "test";
             CoolerEclipse.CoolerEclipse.shouldBeChance.Value = false;
             string sceneName = SceneManager.GetActiveScene().name;
             int rng = Run.instance.runRNG.RangeInt(0, 100);
@@ -57,7 +61,27 @@ public class coolereclipse
         [HarmonyPostfix]
         public static void CoolerEclipseAddSkyboxPostFix(On.RoR2.SceneDirector.orig_Start orig, SceneDirector self)
         {
+            int rng = Run.instance.runRNG.RangeInt(0, 100);
+            Log.Debug($"pink eclipse ? rng {rng} umm {(rng < pinkEclipseChance.Value)}");
+            if (!GameObject.Find("Eclipse")) return;
+
+            //bascially ramp fog stays pink even after ?? shouldnt but reapplying here if we got another eclipse ,.,. 
             GameObject pp = GameObject.Find("PP + Amb");
+            if (pp && pp.GetComponent<PostProcessVolume>())
+            {
+                PostProcessVolume ppv = pp.GetComponent<PostProcessVolume>();
+                PostProcessProfile ppf = Object.Instantiate(ppv.sharedProfile);
+                
+                RampFog rf = ppf.GetSetting<RampFog>();
+                rf.fogColorStart.value = new Color32(55, 87, 82, 15); 
+                rf.fogColorMid.value = new Color32(54, 74, 89, 100); 
+                rf.fogColorEnd.value = new Color32(47, 63, 82, 200);
+                
+                ppv.sharedProfile = ppf;
+            }
+            
+            if (!(rng < pinkEclipseChance.Value)) return;
+            
             if (pp && pp.GetComponent<SetAmbientLight>())
             {
                 SetAmbientLight amb = pp.GetComponent<SetAmbientLight>();
@@ -73,7 +97,7 @@ public class coolereclipse
                 
                 RampFog rf = ppf.GetSetting<RampFog>();
 
-                //Log.Debug($"start {rf.fogColorStart.value.r * 255} {rf.fogColorStart.value.g * 255} {rf.fogColorStart.value.b * 255} {rf.fogColorStart.value.a * 255}");
+               // Log.Debug($"start {rf.fogColorStart.value.r * 255} {rf.fogColorStart.value.g * 255} {rf.fogColorStart.value.b * 255} {rf.fogColorStart.value.a * 255}");
                 //Log.Debug($"mid {rf.fogColorMid.value.r * 255} {rf.fogColorMid.value.g * 255} {rf.fogColorMid.value.b * 255} {rf.fogColorMid.value.a * 255}");
                 //Log.Debug($"end {rf.fogColorEnd.value.r * 255} {rf.fogColorEnd.value.g * 255} {rf.fogColorEnd.value.b * 255} {rf.fogColorEnd.value.a * 255}");
                 //coolerstages auterburn
@@ -167,4 +191,51 @@ public class coolereclipse
             
         }
     }
+
+    public override void Init(Harmony harmony)
+    {
+        if (!applyCE.Value) return;
+        harmony.CreateClassProcessor(typeof(CoolerEclipseChanges)).Patch();
+    }
+
+    public override void Config(ConfigFile config)
+    {
+        applyCE = config.Bind("apply patches",
+            "try to apply cooler eclipse patches !!",
+            true,
+            "");
+        BNRUtils.CheckboxConfig(applyCE);
+        
+        eclipseChance = config.Bind("coolerEclipse", 
+                "chance for eclipse", 
+                15f, 
+                "bwaa,  (0-100 !!!");
+        BNRUtils.SliderConfig(0, 100, eclipseChance);
+        
+        pinkEclipseChance = config.Bind("coolerEclipse", 
+            "chance for pink eclipse if enabled !", 
+            50f, 
+            "bwaa,  (0-100 !!! if regular eclipse is rolled rolls this percent chance on top .,,. set to 0 to disable !!");
+        BNRUtils.SliderConfig(0, 100, pinkEclipseChance);
+        
+        
+        blacklistStages = config.Bind("coolerEclipse", 
+            "stage blacklist", 
+            "", 
+            "eclipse stage blacklist (seperate by , !! (eg golemplains,blackbeach!!");
+        BNRUtils.StringConfig(blacklistStages);
+        
+        
+        whitelistStages = config.Bind("coolerEclipse", 
+            "stage whitelist", 
+            "titanicplains", 
+            "what stages to force eclipses on (seperate by , !! (eg golemplains,blackbeach!! will not work with moon2, ,..");
+        BNRUtils.StringConfig(whitelistStages);
+    }
+    
+    public static ConfigEntry<bool> applyCE;
+    public static ConfigEntry<float> eclipseChance;
+    public static ConfigEntry<float> pinkEclipseChance;
+    public static ConfigEntry<string> blacklistStages;
+    public static ConfigEntry<string> whitelistStages;
 }

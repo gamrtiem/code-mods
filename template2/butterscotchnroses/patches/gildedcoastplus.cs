@@ -1,9 +1,11 @@
+using BepInEx.Configuration;
+using BNR.patches;
 using static BNR.butterscotchnroses;
 using HarmonyLib;
 
 namespace BNR;
 
-public class gildedcoastplus
+public class gildedcoastplus : PatchBase<gildedcoastplus>
 {
     [HarmonyPatch]
     public class GoldenCoastChanges
@@ -16,4 +18,28 @@ public class gildedcoastplus
             return !skipGoldenRewards.Value; 
         }
     }
+
+    public override void Init(Harmony harmony)
+    {
+        if (!applyGCP.Value) return;
+        harmony.CreateClassProcessor(typeof(GoldenCoastChanges)).Patch();
+    }
+
+    public override void Config(ConfigFile config)
+    {
+        applyGCP = config.Bind("apply patches",
+            "try to apply gilded coast plus reival patches !!",
+            true,
+            "");
+        BNRUtils.CheckboxConfig(applyGCP);
+        
+        skipGoldenRewards = config.Bind("golden coast plus", 
+            "skip hidden buff", 
+            true, 
+            "");
+        BNRUtils.CheckboxConfig(skipGoldenRewards);
+    }
+    
+    public static ConfigEntry<bool> skipGoldenRewards;
+    public static ConfigEntry<bool> applyGCP;
 }

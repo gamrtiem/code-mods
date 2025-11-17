@@ -1,3 +1,12 @@
+using BepInEx.Configuration;
+using BNR.patches;
+using On.RoR2.Navigation;
+using R2API;
+using RiskOfOptions;
+using RiskOfOptions.OptionConfigs;
+using RiskOfOptions.Options;
+using SS2;
+using UnityEngine.Networking;
 using static BNR.butterscotchnroses;
 
 namespace BNR;
@@ -10,8 +19,9 @@ using MonoMod.Cil;
 using RoR2;
 using UnityEngine;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
-public class starstorm
+public class starstorm : PatchBase<starstorm>
 {
+    
     [HarmonyPatch]
     public class Starstorm2ExeChanges
     {
@@ -195,6 +205,163 @@ public class starstorm
             }
         }
     }
+    
+    public override void Init(Harmony harmony)
+    {
+        if (!applySS2.Value) return;
+        harmony.CreateClassProcessor(typeof(Starstorm2ExeChanges)).Patch();
+        LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC", $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
+        LanguageAPI.Add("SS2_ITEM_ICETOOL_DESC", $"While <style=cIsUtility>touching a wall</style>, gain <style=cIsUtility>+1</style> <style=cStack>(+1 per stack)</style> extra jump and a <style=\"cIsUtility\">{iceToolFreezeChance.Value}%</style> <style=\"cStack\">(+{iceToolFreezeChanceStack.Value}% per stack)</style> chance to <style=\"cIsUtility\">freeze enemies</style> for <style=\"cIsUtility\">{iceToolFreezeTime.Value} seconds</style> <style=\"cStack\">(+{iceToolFreezeTimeStack.Value} per stack)</style>. ");
+        
+        Hooks();
+    }
+
+    public override void Hooks()
+    {
+        On.RoR2.HealthComponent.TakeDamageProcess += (orig, self, info) =>
+        {
+            orig(self, info);
+            CharacterBody attackerbody = info.attacker.GetComponent<CharacterBody>();
+            
+            if (!attackerbody.inventory) return;
+            
+            int stacks = attackerbody.inventory.GetItemCount(SS2Content.Items.IceTool._itemIndex);
+            if (stacks <= 0) return;
+            
+            if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
+            if (!NetworkServer.active) return;
+            
+            SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
+            if (frozenState)
+            {
+                frozenState.SetFrozen(iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1));
+            }
+        };
+    }
+
+    public override void Config(ConfigFile config)
+    {
+        applySS2 = config.Bind("apply patches",
+            "try to apply ss2 patches !!",
+            true,
+            "");
+        BNRUtils.CheckboxConfig(applySS2);
+        
+        #region iceTool
+
+        iceToolFreezeChance = config.Bind("SS2",
+            "ice tool freeze chance",
+            5f,
+            "percent chance for icetool to freeze enemies !!");
+        BNRUtils.SliderConfig(0, 100, iceToolFreezeChance);
+        
+        iceToolFreezeTime = config.Bind("SS2",
+            "ice tool freeze time",
+            0.5f,
+            "how long icetool should freeze enemies !!");
+        BNRUtils.SliderConfig(0, 30, iceToolFreezeTime);
+        
+        iceToolFreezeChanceStack = config.Bind("SS2",
+            "ice tool freeze chance stack",
+            2.5f,
+            "percent chance for icetool to freeze enemies stack !!");
+        BNRUtils.SliderConfig(0, 100, iceToolFreezeChanceStack);
+        
+        iceToolFreezeTimeStack = config.Bind("SS2",
+            "ice tool freeze time stack",
+            0.25f,
+            "how long icetool should freeze enemies !!");
+        BNRUtils.SliderConfig(0, 30, iceToolFreezeTimeStack);
+
+        iceToolFreezeChance.SettingChanged += IceToolFreezeChanceOnSettingChanged;
+        iceToolFreezeTime.SettingChanged += IceToolFreezeChanceOnSettingChanged;
+        iceToolFreezeChanceStack.SettingChanged += IceToolFreezeChanceOnSettingChanged;
+        iceToolFreezeTimeStack.SettingChanged += IceToolFreezeChanceOnSettingChanged;
+        
+        void IceToolFreezeChanceOnSettingChanged(object sender, EventArgs e)
+        {
+            if (applySS2.Value)
+            {
+                LanguageAPI.Add("SS2_ITEM_ICETOOL_DESC", $"While <style=cIsUtility>touching a wall</style>, gain <style=cIsUtility>+1</style> <style=cStack>(+1 per stack)</style> extra jump and a <style=\"cIsUtility\">{iceToolFreezeChance.Value}%</style> <style=\"cStack\">(+{iceToolFreezeChanceStack.Value}% per stack)</style> chance to <style=\"cIsUtility\">freeze enemies</style> for <style=\"cIsUtility\">{iceToolFreezeTime.Value} seconds</style> <style=\"cStack\">(+{iceToolFreezeTimeStack.Value} per stack)</style>. ");
+            }
+        }
+        #endregion
+        
+        #region execution
+        
+        speedmult = config.Bind("SS2",
+                "execution speed damage multiplier",
+                10f,
+                "like uhh how much extrad amage should be added of how fast you go past starting velocity compared to terminal ,.,. idk just move it around be yourself !!!! you can just set to 0 if you dont like !!!!");
+        BNRUtils.SliderConfig(0, 60, speedmult);
+
+        baseSpeed = config.Bind("SS2",
+            "execution base speed",
+            10f,
+            "base starting speed for special !!!! multiplied by movespeed unless config for that is off ,.,. (then its multiplied by 10,. .,.,");
+        BNRUtils.SliderConfig(0, 40, baseSpeed);
+
+        boostedSpeed = config.Bind("SS2",
+            "execution boosted speed",
+            20f,
+            "boosted speed when you use special from dash !!!! also multiplied by movespeed unless config for that is off ,.,. (then its multiplied by 10,. .,.,");
+        BNRUtils.SliderConfig(0, 40, boostedSpeed);
+
+        terminalSpeed = config.Bind("SS2",
+            "execution terminal speed",
+            30f,
+            "how fast max speed should be !! be careful equation uses lerp so you go reallys fast if you put a high number ,..,");
+        BNRUtils.SliderConfig(0, 60, terminalSpeed);
+
+        baseDamage = config.Bind("SS2",
+            "execution base damage coeff",
+            13f,
+            "base damage coeff when not boosted !!!!! speedmult is added on top too ,.,. ");
+        BNRUtils.SliderConfig(1, 25, baseDamage);
+
+        boostedDamage = config.Bind("SS2",
+            "boosted damage coeff",
+            15.5f,
+            "boosted damage coeff  !!!!! speedmult is added on top too ,.,. ");
+        BNRUtils.SliderConfig(1, 25, boostedDamage);
+
+
+        useMovespeed = config.Bind("SS2",
+            "execution use movespeed",
+            true,
+            "should movespeed affect how fast down you go !!! regular ss2 its just a set number ,.,.");
+        BNRUtils.CheckboxConfig(useMovespeed);
+        
+        baseDamage.SettingChanged += BaseDamageOnSettingChanged;
+        boostedDamage.SettingChanged += BaseDamageOnSettingChanged;
+
+        void BaseDamageOnSettingChanged(object sender, EventArgs e)
+        {
+            if (applySS2.Value)
+            {
+                LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC",
+                    $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
+            }
+        }
+
+        #endregion
+    }
+
+    
+    public static ConfigEntry<bool> applySS2;
+
+    public static ConfigEntry<float> baseSpeed;
+    public static ConfigEntry<float> boostedSpeed;
+    public static ConfigEntry<float> terminalSpeed;
+    public static ConfigEntry<float> speedmult;
+    public static ConfigEntry<float> baseDamage;
+    public static ConfigEntry<float> boostedDamage;
+    public static ConfigEntry<bool> useMovespeed;
+    
+    public static ConfigEntry<float> iceToolFreezeChance;
+    public static ConfigEntry<float> iceToolFreezeTime;
+    public static ConfigEntry<float> iceToolFreezeTimeStack;
+    public static ConfigEntry<float> iceToolFreezeChanceStack;
 }
 
 public class SpeedTester : MonoBehaviour
