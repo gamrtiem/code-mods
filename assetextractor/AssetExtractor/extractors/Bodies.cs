@@ -11,7 +11,7 @@ using Path = System.IO.Path;
 
 namespace AssetExtractor;
 
-public static partial class WikiFormat
+public partial class WikiFormat
 {
     public static void FormatBodies(ReadOnlyContentPack readOnlyContentPack)
     {
@@ -69,8 +69,7 @@ public static partial class WikiFormat
                 if (!Language.english.TokenIsRegistered(charbody.baseNameToken.Replace("_NAME", "_LORE")))
                     f += "\tNoLogbook = true,\n";
                 else
-                    loredefs.Add("Monsters " + charbody.baseNameToken + " " +
-                                                                         charbody.baseNameToken.Replace("_NAME", "_LORE"));
+                    loredefs.Add("Monsters " + charbody.baseNameToken + " " + charbody.baseNameToken.Replace("_NAME", "_LORE"));
 
                 var deathRewards = charbody.gameObject.GetComponent<DeathRewards>();
                 if (deathRewards != null && deathRewards.bossDropTable)
@@ -85,7 +84,8 @@ public static partial class WikiFormat
                     if (!cards.Contains(card)) continue;
                     if (!card.spawnCard.prefab.GetComponent<CharacterMaster>().bodyPrefab.name.Equals(bodyprefab.name)) continue;
 
-                    f += $"\tCreditsCost = {card.cost},\n";
+                    if(card.cost != 0)
+                        f += $"\tCreditsCost = {card.cost},\n";
                     if (card.minimumStageCompletions != 0)
                     {
                         f += $"\tStartingStage = {card.minimumStageCompletions},\n";

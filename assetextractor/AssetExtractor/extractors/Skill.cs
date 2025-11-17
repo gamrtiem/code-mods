@@ -10,19 +10,13 @@ using Path = System.IO.Path;
 
 namespace AssetExtractor;
 
-public static partial class WikiFormat
+public partial class WikiFormat
 {
     public static void FormatSkill(ReadOnlyContentPack readOnlyContentPack)
     {
         var path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SKILLS);
 
-        var f = "skills[\"{0}\"] = {{\n";
-        f += "\tName = \"{1}\",\n";
-        f += "\tDesc = \"{2}\",\n";
-        f += "\tSurvivor = \"{3}\",\n";
-        f += "\tType = \"{4}\",\n";
-        f += "\tCooldown = \"{5}\",\n";
-        f += "\tUnlock = \"{6}\",\n";
+        
 
 
         if (!Directory.Exists(WikiOutputPath)) Directory.CreateDirectory(WikiOutputPath);
@@ -31,6 +25,13 @@ public static partial class WikiFormat
         foreach (var surv in readOnlyContentPack.survivorDefs)
             try
             {
+                var f = "skills[\"{0}\"] = {{\n";
+                f += "\tName = \"{1}\",\n";
+                f += "\tDesc = \"{2}\",\n";
+                f += "\tSurvivor = \"{3}\",\n";
+                f += "\tType = \"{4}\",\n";
+                f += "\tCooldown = \"{5}\",\n";
+                
                 if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
                 {
                     var scripts = body.GetComponents<GenericSkill>();
@@ -66,9 +67,10 @@ public static partial class WikiFormat
                             if (variant.unlockableDef != null)
                             {
                                 var unlockable =
-                                    AchievementManager.GetAchievementDefFromUnlockable(variant.unlockableDef
-                                        .cachedName);
+                                    AchievementManager.GetAchievementDefFromUnlockable(variant.unlockableDef.cachedName);
                                 if (unlockable != null) unlock = Language.GetString(unlockable.nameToken);
+                                f += "\tUnlock = \"{" + unlock + "}\",\n";
+                                
                                 //Log.Debug(unlockable.nameToken);
                             }
 
@@ -165,14 +167,14 @@ public static partial class WikiFormat
                             {
                                 tempformat += "\t}},";
                                 format = Language.GetStringFormatted(tempformat, name, name, desc, survivor, type,
-                                    cooldown, unlock);
+                                    cooldown);
                             }
                             else
                             {
                                 tempformat += "\tProc = \"{7}\",\n";
                                 tempformat += "\t}},";
                                 format = Language.GetStringFormatted(tempformat, name, name, desc, survivor, type,
-                                    cooldown, unlock, proc);
+                                    cooldown, proc);
                             }
 
                             foreach (var kvp in FormatR2ToWiki) format = format.Replace(kvp.Key, kvp.Value);

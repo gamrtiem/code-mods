@@ -6,7 +6,7 @@ using Path = System.IO.Path;
 
 namespace AssetExtractor;
 
-public static partial class WikiFormat
+public partial class WikiFormat
 {
     public static void FormatBuffs(ReadOnlyContentPack readOnlyContentPack)
     {
@@ -59,7 +59,7 @@ public static partial class WikiFormat
                 try
                 {
                     exportTexture(buffdef.iconSprite,
-                        Path.Combine(temp, name.Replace(" ", "_") + WikiModname + ".png"));
+                        Path.Combine(temp, "Status " + name.Replace(" ", "_") + WikiModname + ".png"));
                 }
                 catch (Exception e)
                 {

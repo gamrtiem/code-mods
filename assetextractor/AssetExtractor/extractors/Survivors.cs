@@ -7,7 +7,7 @@ using Path = System.IO.Path;
 
 namespace AssetExtractor;
 
-public static partial class WikiFormat
+public partial class WikiFormat
 {
     public static void FormatSurvivor(ReadOnlyContentPack readOnlyContentPack)
     {
@@ -31,11 +31,9 @@ public static partial class WikiFormat
                 f += "\tBaseSpeed = {9},\n";
                 f += "\tBaseArmor = {10},\n";
                 f += "\tDescription = \"{11}\",\n";
-                f += "\tUnlock = \"{17}\",\n";
-                f += "\tUmbra = \"{18}\",\n";
+                f += "\tUmbra = \"{17}\",\n";
                 f += "\tPhraseEscape = \"{12}\",\n";
                 f += "\tPhraseVanish = \"{13}\",\n";
-                f += "\tClass = \"\",\n";
                 f += "\tMass = {14},\n";
                 f += "\tLocalizationInternalName = \"{15}\",\n";
                 f += "\tColor = \"{16}\",\n";
@@ -107,6 +105,8 @@ public static partial class WikiFormat
                 {
                     var achievement = AchievementManager.GetAchievementDefFromUnlockable(surv.unlockableDef.cachedName);
                     unlocktoken = Language.GetString(achievement.nameToken);
+                    
+                    f += "\tUnlock = \"{" + unlocktoken + "}\",\n";
                 }
 
                 if (surv.GetRequiredExpansion() != null)
@@ -118,8 +118,7 @@ public static partial class WikiFormat
                 var format = Language.GetStringFormatted(f, survName, survName,
                     survName.Replace(" ", "_") + WikiModname + ".png", basehealth, scalinghealth, damage, scalingdamage,
                     regen,
-                    scalingregen, speed, armor, desc, outroFlavor, mainendingescape, mass, token, "#" + color,
-                    unlocktoken, umbrasubtitle);
+                    scalingregen, speed, armor, desc, outroFlavor, mainendingescape, mass, token, "#" + color, umbrasubtitle);
 
                 foreach (var kvp in FormatR2ToWiki)
                     format = format.Replace(kvp.Key, kvp.Value);

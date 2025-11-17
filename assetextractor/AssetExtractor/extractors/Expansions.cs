@@ -6,7 +6,7 @@ using Path = System.IO.Path;
 
 namespace AssetExtractor;
 
-public static partial class WikiFormat
+public partial class WikiFormat
 {
     public static void exportExpansions(ReadOnlyContentPack readOnlyContentPack)
     {

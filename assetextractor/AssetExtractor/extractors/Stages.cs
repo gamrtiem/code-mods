@@ -12,7 +12,7 @@ using SceneExitController = On.RoR2.SceneExitController;
 
 namespace AssetExtractor;
 
-public static partial class WikiFormat
+public partial class WikiFormat
 {
     public static void FormatStages(ReadOnlyContentPack readOnlyContentPack)
     {
