@@ -1,6 +1,6 @@
-using static BNA.butterscotchnroses;
+using static BNR.butterscotchnroses;
 
-namespace BNA;
+namespace BNR;
 using System;
 using EntityStates.Executioner2;
 using HarmonyLib;

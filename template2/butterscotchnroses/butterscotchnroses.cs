@@ -12,7 +12,7 @@ using RoR2.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace BNA
+namespace BNR
 {
     [BepInDependency(ItemAPI.PluginGUID)]
     [BepInDependency(LanguageAPI.PluginGUID)]
@@ -23,7 +23,7 @@ namespace BNA
         public const string PluginGUID = "zzz" + PluginAuthor + "." + PluginName;
 
         public const string PluginAuthor = "icebro";
-        public const string PluginName = "BNA";
+        public const string PluginName = "BNR";
         public const string PluginVersion = "1.0.0";
 
         public void Awake()
@@ -38,20 +38,47 @@ namespace BNA
             configs();
 
             Harmony harmony = new(Info.Metadata.GUID);
+            //look into items like how that works instead of individual
+            
             if (applySS2.Value)
             {
-                harmony.CreateClassProcessor(typeof(starstorm.Starstorm2ExeChanges)).Patch();
-            }
-            if (applyGCP.Value)
-            {
-                harmony.CreateClassProcessor(typeof(gildedcoastplus.GoldenCoastChanges)).Patch();
-            }
-            if (applyCE.Value)
-            {
-                harmony.CreateClassProcessor(typeof(coolereclipse.CoolerEclipseChanges)).Patch();
+                try
+                {
+                    harmony.CreateClassProcessor(typeof(starstorm.Starstorm2ExeChanges)).Patch();
+                    LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC", $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
+                    
+                }
+                catch
+                {
+                    Log.Error("failed to patch ss2 !!");
+                }
             }
             
-            LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC", $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
+            if (applyGCP.Value)
+            {
+                try
+                {
+                    harmony.CreateClassProcessor(typeof(gildedcoastplus.GoldenCoastChanges)).Patch();
+                }
+                catch
+                {
+                    Log.Error("failed to patch golded coast plus !!");
+                }
+            }
+            
+            if (applyCE.Value)
+            {
+                try
+                {
+                    harmony.CreateClassProcessor(typeof(coolereclipse.CoolerEclipseChanges)).Patch();
+                }
+                catch
+                {
+                    Log.Error("failed to patch cooler eclipse !!");
+                }
+            }
+
+            
 
             //make money/lunar text smaller why isnt it smaller it makes me go grrrrrrrrrrrrrrrrrrrrrrrr 
             RoR2.UI.HUD.onHudTargetChangedGlobal += (self) =>

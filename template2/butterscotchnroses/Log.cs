@@ -1,6 +1,6 @@
 ﻿using BepInEx.Logging;
 
-namespace BNA
+namespace BNR
 {
     internal static class Log
     {

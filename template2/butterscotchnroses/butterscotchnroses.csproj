@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
+		<PackageReference Include="BepInEx.Analyzers" Version="1.0.8">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -16,10 +16,12 @@
 		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
 
 		<PackageReference Include="R2API" Version="5.0.5" />
+
+		<PackageReference Include="R2API.Core" Version="5.1.7" />
 		<PackageReference Include="R2API.Language" Version="1.0.1" />
 		<PackageReference Include="Rune580.Mods.RiskOfRain2.RiskOfOptions" Version="2.8.3" />
 
-		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
+		<PackageReference Include="UnityEngine.Modules" Version="6000.2.12" IncludeAssets="compile" />
 		<PackageReference Include="MMHOOK.RoR2" Version="2025.6.3" NoWarn="NU1701" />
 	</ItemGroup>
 
@@ -38,6 +40,9 @@
 	  </Reference>
 	  <Reference Include="Starstorm2">
 	    <HintPath>..\Starstorm2-nstrip.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Unity.Postprocessing.Runtime">
+	    <HintPath>..\Unity.Postprocessing.Runtime.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 </Project>

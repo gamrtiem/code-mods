@@ -1,7 +1,7 @@
-using static BNA.butterscotchnroses;
+using static BNR.butterscotchnroses;
 using HarmonyLib;
 
-namespace BNA;
+namespace BNR;
 
 public class gildedcoastplus
 {
