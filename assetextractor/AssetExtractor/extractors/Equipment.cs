@@ -11,14 +11,21 @@ public partial class WikiFormat
     public static void FormatEquipment(ReadOnlyContentPack readOnlyContentPack)
     {
         var path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_EQUIPMENT);
-        var f = "equipments[\"{0}\"] = {{\n\tRarity = \"{1}\",\n\tQuote = \"{2}\",\n\tDesc = \"{3}\",\n\tUnlock = \"{4}\",\n\t ID = ,\n\tLocalizationInternalName = \"{5}\",\n\t}}";
 
         TextWriter tw = new StreamWriter(path, WikiAppend);
 
-        static void FormatEquipmentDef(EquipmentDef def, TextWriter tw, string f)
+        static void FormatEquipmentDef(EquipmentDef def, TextWriter tw)
         {
             try
             {
+                var f = "equipments[\"{0}\"] = {{\n" +
+                        "\tRarity = \"{1}\",\n" +
+                        "\tQuote = \"{2}\",\n" +
+                        "\tDesc = \"{3}\",\n" +
+                        "\tID = {4},\n" +
+                        "\tCooldown = {5},\n" +
+                        "\tLocalizationInternalName = \"{6}\",\n";
+                
                 var equip = def;
 
                 if (equip == null) return; // you never know 
@@ -41,6 +48,11 @@ public partial class WikiFormat
                     if (equip.nameToken != null && equip.nameToken.EndsWith("_NAME"))
                         token = equip.nameToken.Remove(equip.nameToken.Length - 5); // remove _NAME
                     else if (equip.nameToken != null) token = equip.nameToken;
+
+                    if (itemName == "")
+                    {
+                        itemName = equip.nameToken;
+                    }
                 }
 
                 if (equip.pickupToken != null) pickup = Language.GetString(equip.pickupToken);
@@ -53,9 +65,20 @@ public partial class WikiFormat
                         ?.nameToken;
                     if (nameToken != null)
                         unlock = Language.GetString(nameToken);
+                    if (unlock != "")
+                    {
+                        f += "\tUnlock = \"" + unlock + "\",\n";
+                    }
+                }
+                
+                if (equip.requiredExpansion)
+                {
+                    string expansion = acronymHelper(Language.GetString(equip.requiredExpansion.nameToken), false);
+                    f += "\tExpansion = \"" + expansion + "\",\n";
                 }
 
-                var format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, unlock, token);
+                f += "\t}}";
+                var format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, "\"" + equip.name + "\"", equip.cooldown, token);
 
                 foreach (var kvp in FormatR2ToWiki) format = format.Replace(kvp.Key, kvp.Value);
                 tw.WriteLine(format);
@@ -90,7 +113,7 @@ public partial class WikiFormat
             }
         }
 
-        foreach (var def in readOnlyContentPack.equipmentDefs) FormatEquipmentDef(def, tw, f);
+        foreach (var def in readOnlyContentPack.equipmentDefs) FormatEquipmentDef(def, tw);
         tw.Close();
 
         var length = new FileInfo(path).Length;

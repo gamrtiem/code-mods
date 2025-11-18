@@ -106,7 +106,7 @@ public partial class WikiFormat
                     var achievement = AchievementManager.GetAchievementDefFromUnlockable(surv.unlockableDef.cachedName);
                     unlocktoken = Language.GetString(achievement.nameToken);
                     
-                    f += "\tUnlock = \"{" + unlocktoken + "}\",\n";
+                    f += "\tUnlock = \"" + unlocktoken + "\",\n";
                 }
 
                 if (surv.GetRequiredExpansion() != null)
@@ -173,6 +173,10 @@ public partial class WikiFormat
                             filename = Language.GetString(skin.nameToken);
                         }
 
+                        if (filename == "" || skin.nameToken == "")
+                        {
+                            filename = skin.name;
+                        }
                         exportTexture(skin.icon, Path.Combine(temp2, filename.Replace(" ", "_") + WikiModname + ".png"));
                     }
                     catch

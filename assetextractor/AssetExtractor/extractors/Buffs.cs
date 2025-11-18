@@ -54,18 +54,19 @@ public partial class WikiFormat
                 if (name.StartsWith("bd")) name = name[2..];
                 image += name;
 
-                var temp = WikiOutputPath + @"\buffs\";
-                Directory.CreateDirectory(temp);
-                try
+                if (buffdef.iconSprite)
                 {
-                    exportTexture(buffdef.iconSprite,
-                        Path.Combine(temp, "Status " + name.Replace(" ", "_") + WikiModname + ".png"));
+                    var temp = WikiOutputPath + @"\buffs\";
+                    Directory.CreateDirectory(temp);
+                    try
+                    {
+                        exportTexture(buffdef.iconSprite, Path.Combine(temp, "Status " + name.Replace(" ", "_") + WikiModname + ".png"));
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Debug($"erm ,,.,. failed to export buff icon {buffdef.name} ,,. {e}");
+                    }
                 }
-                catch (Exception e)
-                {
-                    Log.Debug($"erm ,,.,. failed to export buff icon {buffdef.name} ,,. {e}");
-                }
-
 
                 var format = string.Format(f, name, name, name, image, type, stackable, dot, color, hidden);
 

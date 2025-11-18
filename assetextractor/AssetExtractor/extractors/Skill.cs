@@ -15,29 +15,26 @@ public partial class WikiFormat
     public static void FormatSkill(ReadOnlyContentPack readOnlyContentPack)
     {
         var path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_SKILLS);
-
         
-
-
         if (!Directory.Exists(WikiOutputPath)) Directory.CreateDirectory(WikiOutputPath);
         TextWriter tw = new StreamWriter(path, WikiAppend);
 
         foreach (var surv in readOnlyContentPack.survivorDefs)
             try
             {
-                var f = "skills[\"{0}\"] = {{\n";
-                f += "\tName = \"{1}\",\n";
-                f += "\tDesc = \"{2}\",\n";
-                f += "\tSurvivor = \"{3}\",\n";
-                f += "\tType = \"{4}\",\n";
-                f += "\tCooldown = \"{5}\",\n";
-                
                 if (surv.bodyPrefab.TryGetComponent(out CharacterBody body))
                 {
                     var scripts = body.GetComponents<GenericSkill>();
                     var skilllocator = body.GetComponent<SkillLocator>();
                     foreach (var skill in scripts)
                     {
+                        var f = "skills[\"{0}\"] = {{\n";
+                        f += "\tName = \"{1}\",\n";
+                        f += "\tDesc = \"{2}\",\n";
+                        f += "\tSurvivor = \"{3}\",\n";
+                        f += "\tType = \"{4}\",\n";
+                        f += "\tCooldown = \"{5}\",\n";
+                        
                         var type = "Passive";
                         var name = "";
                         var desc = "";
@@ -69,13 +66,12 @@ public partial class WikiFormat
                                 var unlockable =
                                     AchievementManager.GetAchievementDefFromUnlockable(variant.unlockableDef.cachedName);
                                 if (unlockable != null) unlock = Language.GetString(unlockable.nameToken);
-                                f += "\tUnlock = \"{" + unlock + "}\",\n";
+                                f += "\tUnlock = \"" + unlock + "\",\n";
                                 
                                 //Log.Debug(unlockable.nameToken);
                             }
 
-                            if (variant.skillDef.activationState.stateType != null &&
-                                WikiTryGetProcs) // must be passive then if not
+                            if (variant.skillDef.activationState.stateType != null && WikiTryGetProcs) // must be passive then if not
                                 try
                                 {
                                     var entitystate = EntityStateCatalog.InstantiateState(
@@ -160,7 +156,7 @@ public partial class WikiFormat
                                 exportTexture(variant.skillDef.icon,
                                     Path.Combine(temp, variant.skillDef.skillNameToken + WikiModname + ".png"));
                             }
-
+                            
                             string format;
                             var tempformat = f;
                             if (proc.Count == 0) // no proc found, dont add 
@@ -171,7 +167,7 @@ public partial class WikiFormat
                             }
                             else
                             {
-                                tempformat += "\tProc = \"{7}\",\n";
+                                tempformat += "\tProc = \"{6}\",\n";
                                 tempformat += "\t}},";
                                 format = Language.GetStringFormatted(tempformat, name, name, desc, survivor, type,
                                     cooldown, proc);

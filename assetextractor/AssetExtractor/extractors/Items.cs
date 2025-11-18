@@ -11,18 +11,25 @@ public static partial class WikiFormat
     public static void FormatItem(ReadOnlyContentPack readOnlyContentPack)
     {
         var path = Path.Combine(WikiOutputPath, WIKI_OUTPUT_ITEM);
-        var f =
-            "items[\"{0}\"] = {{\n\tRarity = \"{1}\",\n\tQuote = \"{2}\",\n\tDesc = \"{3}\",\n\tCategory = {{ {4} }},\n\tUnlock = \"{5}\",\n\tCorrupt = \"{6}\", \n\tUncorrupt = \"{7}\",\n\tID = ,\n\tStats = {{\n\t\t {{\n\t\t\tStat = \"\",\n\t\t\tValue = \"\",\n\t\t\tStack = \"\",\n\t\t\tAdd = \"\"\n\t\t}}\n\t}},\n\tLocalizationInternalName = \"{8}\",\n\t}}";
         if (!Directory.Exists(WikiOutputPath)) Directory.CreateDirectory(WikiOutputPath);
 
         TextWriter tw = new StreamWriter(path, WikiAppend);
 
-        foreach (var def in readOnlyContentPack.itemDefs) ItemDefFormat(def, tw, f);
+        foreach (var def in readOnlyContentPack.itemDefs) ItemDefFormat(def, tw);
 
-        void ItemDefFormat(ItemDef def, TextWriter tw, string f)
+        void ItemDefFormat(ItemDef def, TextWriter tw)
         {
             try
             {
+                var f =
+                    "items[\"{0}\"] = {{\n" +
+                    "\tRarity = \"{1}\",\n" +
+                    "\tQuote = \"{2}\",\n" +
+                    "\tDesc = \"{3}\",\n" +
+                    "\tCategory = {{ {4} }},\n" +
+                    "\tID = {5},\n" +
+                    "\tStats = {{\n\t\t {{\n\t\t\tStat = \"\",\n\t\t\tValue = \"\",\n\t\t\tStack = \"\",\n\t\t\tAdd = \"\"\n\t\t}}\n\t}},\n\tLocalizationInternalName = \"{6}\",\n";
+                
                 var item = def;
                 var itemName = "";
                 var pickup = "";
@@ -38,6 +45,11 @@ public static partial class WikiFormat
 
                     if (Language.english.TokenIsRegistered(item.nameToken.Replace("_NAME", "_LORE")))
                         loredefs.Add("Items " + item.nameToken + " " + item.nameToken.Replace("_NAME", "_LORE"));
+                    
+                    if (itemName == "")
+                    {
+                        itemName = item.nameToken;
+                    }
                 }
 
                 var itemTier = item.tier;
@@ -73,14 +85,24 @@ public static partial class WikiFormat
                         AchievementManager.GetAchievementDefFromUnlockable(item.unlockableDef.cachedName);
                     if (achievement != null && !string.IsNullOrEmpty(achievement.nameToken))
                         unlock = Language.GetString(achievement.nameToken);
+                    if (unlock != "")
+                    {
+                        f += "\tUnlock = \"" + unlock + "\",\n";
+                    }
+                }
+
+                if (item.requiredExpansion)
+                {
+                    string expansion = acronymHelper(Language.GetString(item.requiredExpansion.nameToken), false);
+                    f += "\tExpansion = \"" + expansion + "\",\n";
                 }
 
                 if (item.nameToken != null && item.nameToken.EndsWith("_NAME"))
                     token = item.nameToken.Remove(item.nameToken.Length - 5); // remove _NAME
                 else if (item.nameToken != null) token = item.nameToken;
 
-                var format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, tags, unlock, string.Empty,
-                    string.Empty, token);
+                f += "\t}}";
+                var format = Language.GetStringFormatted(f, itemName, rarity, pickup, desc, tags, "\"" + item.name + "\"", token);
                 foreach (var kvp in FormatR2ToWiki) format = format.Replace(kvp.Key, kvp.Value);
 
                 tw.WriteLine(format);

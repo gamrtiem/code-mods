@@ -135,7 +135,7 @@ public partial class WikiFormat
 
                 if (charbody.TryGetComponent(out ExpansionRequirementComponent expansion))
                     if (expansion != null)
-                        Language.GetString(expansion.name);
+                        acronymHelper(Language.GetString(expansion.requiredExpansion.nameToken), false);
 
 
                 if (charbody.baseNameToken != null && charbody.baseNameToken.EndsWith("_NAME"))
@@ -147,7 +147,7 @@ public partial class WikiFormat
 
                 if (charbody.TryGetComponent(out CharacterMotor motor))
                 {
-                    if (motor.mass.ToString() != "1E+14")
+                    if ((int)motor.mass < 99999999)
                         mass = motor.mass;
                     else
                         mass = 0;

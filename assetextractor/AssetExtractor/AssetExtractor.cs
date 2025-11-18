@@ -1,16 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
+using On.EntityStates;
 using R2API;
+using RoR2;
 using RoR2.ContentManagement;
 using RoR2.Projectile;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using GlobalEventManager = On.RoR2.GlobalEventManager;
+using OverlapAttack = On.RoR2.OverlapAttack;
 using Path = System.IO.Path;
-using UnityHotReloadNS;
+using ProjectileManager = On.RoR2.Projectile.ProjectileManager;
 
 namespace AssetExtractor
 {
@@ -23,11 +29,12 @@ namespace AssetExtractor
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "icebro";
         public const string PluginName = "assetextractor";
-        public const string PluginVersion = "0.4.1";
+        public const string PluginVersion = "0.9.0";
         public ConfigEntry<bool> useModnameInFile;
         public ConfigEntry<bool> useModnameInDirectory;
         public ConfigEntry<bool> trygettingprocs;
         public ConfigEntry<bool> logskillprocs;
+        public ConfigEntry<bool> labelCopies;
         
         private Stopwatch timer = new();
         internal static AssetExtractor Instance { get; private set; }
@@ -40,17 +47,45 @@ namespace AssetExtractor
             useModnameInDirectory = Config.Bind("export options", "use mod dir", true, "export everything in a content pack to its own folder (off for monolithic wiki folder with every skill/item/etc in one file/folder");
             trygettingprocs = Config.Bind("export options", "try getting skill procs automatically", false, "attempt to automatically get skill procs from entity state configurations (slow, bad and doesnt work half the time../ just get them from log brah !!");
             logskillprocs = Config.Bind("export options", "log skill procs", true, "log any on hit procs from skills (like 100 leeching seeds but awesome");
+            labelCopies = Config.Bind("export options", "add (copy) to copied textures", true, "adds the prefix (copy) when a texture/sprite already exists instead of overwriting., ,. useful for things like allies with different icons but same names !!!");
            
+            logskillprocs.SettingChanged += (sender, args) =>
+            {
+                if (logskillprocs.Value)
+                {
+                    On.RoR2.BlastAttack.Fire += BlastAttackOnFire;
+                    On.RoR2.Projectile.ProjectileManager.FireProjectileClient += ProjectileManagerOnFireProjectileClient;
+                    On.EntityStates.GenericBulletBaseState.GenerateBulletAttack += GenericBulletBaseStateOnGenerateBulletAttack;
+                    On.RoR2.BulletAttack.Fire += BulletAttackOnFire;
+                    On.RoR2.OverlapAttack.Fire += OverlapAttackOnFire;
+                    On.RoR2.GlobalEventManager.OnHitAll += GlobalEventManagerOnOnHitAll;
+                }
+                else
+                {
+                    On.RoR2.BlastAttack.Fire -= BlastAttackOnFire;
+                    On.RoR2.Projectile.ProjectileManager.FireProjectileClient -= ProjectileManagerOnFireProjectileClient;
+                    On.EntityStates.GenericBulletBaseState.GenerateBulletAttack -= GenericBulletBaseStateOnGenerateBulletAttack;
+                    On.RoR2.BulletAttack.Fire -= BulletAttackOnFire;
+                    On.RoR2.OverlapAttack.Fire -= OverlapAttackOnFire;
+                    On.RoR2.GlobalEventManager.OnHitAll -= GlobalEventManagerOnOnHitAll;
+                }
+            };
+            
             if (!logskillprocs.Value) return;
-            On.RoR2.BlastAttack.Fire += (orig, self) =>
+            On.RoR2.BlastAttack.Fire += BlastAttackOnFire;
+
+            BlastAttack.Result BlastAttackOnFire(On.RoR2.BlastAttack.orig_Fire orig, BlastAttack self)
             {
                 Log.Debug("Firing blast proc " + self.procCoefficient);
                 return orig(self);
-            };
-            On.RoR2.Projectile.ProjectileManager.FireProjectileClient += (orig, self, info, client, time) =>
+            }
+            
+            On.RoR2.Projectile.ProjectileManager.FireProjectileClient += ProjectileManagerOnFireProjectileClient;
+
+            void ProjectileManagerOnFireProjectileClient(ProjectileManager.orig_FireProjectileClient orig, RoR2.Projectile.ProjectileManager self, FireProjectileInfo fireProjectileInfo, NetworkClient client, double fireTime)
             {
-                Log.Debug("Firing projectile" + info.projectilePrefab);
-                if (info.projectilePrefab.TryGetComponent<ProjectileController>(out var controller))
+                Log.Debug("Firing projectile" + fireProjectileInfo.projectilePrefab);
+                if (fireProjectileInfo.projectilePrefab.TryGetComponent<ProjectileController>(out var controller))
                 {
                     Log.Debug("Firing projectile proc " + controller.procCoefficient);
                 }
@@ -59,54 +94,52 @@ namespace AssetExtractor
                     Log.Error("could not get projectile controller out of prefab ! ");
                 }
 
-                orig(self, info, client, time);
-            };
-            On.EntityStates.GenericBulletBaseState.GenerateBulletAttack += (orig, self, ray) =>
+                orig(self, fireProjectileInfo, client, fireTime);
+            }
+
+            On.EntityStates.GenericBulletBaseState.GenerateBulletAttack += GenericBulletBaseStateOnGenerateBulletAttack;
+
+            BulletAttack GenericBulletBaseStateOnGenerateBulletAttack(GenericBulletBaseState.orig_GenerateBulletAttack orig, EntityStates.GenericBulletBaseState self, Ray aimRay)
             {
                 Log.Debug("Firing bullet proc " + self.procCoefficient);
 
-                return orig(self, ray);
-            };
-            On.RoR2.BulletAttack.Fire += (orig, self) =>
+                return orig(self, aimRay);
+            }
+
+            On.RoR2.BulletAttack.Fire += BulletAttackOnFire;
+
+            void BulletAttackOnFire(On.RoR2.BulletAttack.orig_Fire orig, BulletAttack self)
             {
                 Log.Debug("Firing bullet proc " + self.procCoefficient);
                 orig(self);
-            };
-            On.RoR2.OverlapAttack.Fire += (orig, self, hurtboxes) =>
+            }
+
+            On.RoR2.OverlapAttack.Fire += OverlapAttackOnFire;
+
+            bool OverlapAttackOnFire(OverlapAttack.orig_Fire orig, RoR2.OverlapAttack self, List<HurtBox> hitResults)
             {
                 Log.Debug("Firing overlap proc " + self.procCoefficient);
-                return orig(self, hurtboxes);
-            };
-            On.RoR2.GlobalEventManager.OnHitAll += (orig, self, damageInfo, hit) =>
+                return orig(self, hitResults);
+            }
+
+            On.RoR2.GlobalEventManager.OnHitAll += GlobalEventManagerOnOnHitAll;
+
+            void GlobalEventManagerOnOnHitAll(GlobalEventManager.orig_OnHitAll orig, RoR2.GlobalEventManager self, DamageInfo damageInfo, GameObject hitObject)
             {
                 Log.Debug("hit by proc " + damageInfo.procCoefficient);
-                orig(self, damageInfo, hit);
-            };
+                orig(self, damageInfo, hitObject);
+            }
         }
-        
+
 
         private void Update()
         {
-            if (Input.GetKeyUp(KeyCode.F2))
-            {
-                // Process.Start(new ProcessStartInfo() { 
-                //     FileName = Path.Combine(Path.Combine(Path.GetDirectoryName(Instance.Info.Location) ?? throw new InvalidOperationException(), "wiki")),
-                //     UseShellExecute = true,
-                //     Verb = "open"
-                // });
-                
-                UnityHotReload.LoadNewAssemblyVersion(
-                    typeof(AssetExtractor).Assembly, // The currently loaded assembly to replace.
-                    "Z:\\run\\media\\icebrah\\buh\\gale\\riskofrain2\\profiles\\debug\\BepInEx\\plugins\\icebro-asset_extractor/AssetExtractor.dll"  // The path to the newly compiled DLL.
-                );
-            }
-
-            if (Input.GetKeyUp(KeyCode.F1))
-            {
-                Log.Debug("wow !2323!");
-            }
-            
             if (!Input.GetKeyDown(KeyCode.F5)) return;
+            if (SceneManager.GetActiveScene().name != "logbook")
+            {
+                Log.Error("please go to logbook from mainmenu !!!! exports softlock otherwise .,,.");
+                return;
+            }
             Log.Info("F5 pressed ,,. extracting !!!!");
             
             long itemTime = 0;

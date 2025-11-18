@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
@@ -21,9 +23,19 @@ public partial class WikiFormat
         if (!Directory.Exists(WikiOutputPath)) Directory.CreateDirectory(WikiOutputPath);
         TextWriter tw = new StreamWriter(path, WikiAppend);
 
-        foreach (var sceneDef in readOnlyContentPack.sceneDefs)
+        foreach (SceneDef sceneDef in readOnlyContentPack.sceneDefs)
             try
             {
+                //Log.Debug(sceneDef.nameToken);
+                //Log.Debug(sceneDef.sceneAddress.AssetGUID);
+                if (sceneDef.nameToken == "") continue;
+                
+                var loadedscene = Addressables.LoadSceneAsync(sceneDef.sceneAddress.AssetGUID).WaitForCompletion();
+                Addressables.UnloadSceneAsync(loadedscene).WaitForCompletion(); //stupid , but otherwise would :333 : :# ;#?;# :3 sorry the voices got to me otherwise the sceneinfo would be saved from the last stage ?? it was acting weird ,.,.
+                
+                var loadedsceneagain = Addressables.LoadSceneAsync(sceneDef.sceneAddress.AssetGUID).WaitForCompletion();
+                var sceneInfo = GameObject.Find("SceneInfo");
+                
                 var f = "Environments[\"{0}\"] = {{\n"; // cutoff "Hidden Realm: "
                 f += "\tName = \"{1}\",\n";
                 f += "\tInternalName = \"{2}\",\n";
@@ -31,156 +43,53 @@ public partial class WikiFormat
                 f += "\tSubName = \"{4}\",\n";
                 f += "\tStage = \"{5}\",\n"; //sceneDef.stageOrder
                 f += "\tSoundtrack = \"{6}\",\n";
-                f += "\tInteractableCredits = \"{7}\",\n";
-                f += "\tMonsterCredits = \"{8}\",\n";
-                f += "\tDescription = \"{9}\",\n";
-                
-                Log.Debug(sceneDef.nameToken);
-                Log.Debug(sceneDef.sceneAddress.AssetGUID);
-                if (sceneDef.nameToken == "") continue;
-                
-                var loadedscene = Addressables.LoadSceneAsync(sceneDef.sceneAddress.AssetGUID).WaitForCompletion();
-                var sceneInfo = GameObject.Find("SceneInfo");
+                f += "\tDescription = \"{7}\",\n";
                 if (sceneInfo != null)
                 {
-                    Log.Debug("found scene info !! hooray !!!");
+                    //Log.Debug("found scene info !! hooray !!!");
                     var classicStageInfo = sceneInfo.GetComponent<ClassicStageInfo>();
 
                     #region interactables
-                    f += "\tInteractables = {{\n";
-                    List<List<string>> awesome = [];
-                    foreach (var category in classicStageInfo.GetInteractableDccsPool.poolCategories)
-                    {
-                        foreach (var poolEntry in category.alwaysIncluded)
-                        {
-                            foreach (var interactableCategory in poolEntry.dccs.categories)
-                            {
-                                // I LOVE NESTING !!!!!!!!!!!!!!!!!!!!!!!!!!
-                                foreach (var interactableCard in interactableCategory.cards)
-                                {
-                                    string nameToken = processNameToken(interactableCard.spawnCard.prefab);
-                                    int selectionWeight = interactableCard.selectionWeight;
-                                    
-                                    string awesomestring = nameToken + "," + selectionWeight;
-                                    List<string> awesomeadd =
-                                    [
-                                        awesomestring
-                                    ];
-                                    awesome.Add(awesomeadd);
-                                }
-                            }
-                        }
-                        
-                        foreach (var poolEntry in category.includedIfConditionsMet)
-                        {
-                            foreach (var interactableCategory in poolEntry.dccs.categories)
-                            {
-                                foreach (var interactableCard in interactableCategory.cards)
-                                {
-                                    string nameToken = processNameToken(interactableCard.spawnCard.prefab);
-                                    int selectionWeight = interactableCard.selectionWeight;
-
-                                    string awesomeaddstring = nameToken + "," + selectionWeight + "," + acronymHelper(Language.GetString(poolEntry.requiredExpansions[0].nameToken), true);
-                                    
-                                    bool contains = false;
-                                    foreach (var awesomestring in awesome)
-                                    {
-                                        foreach (var awesomerstring in awesomestring.ToList())
-                                        {
-                                            if (awesomerstring.Split(",")[0].Equals(nameToken))
-                                            {
-                                                contains = true;
-                                                awesomestring.Add(awesomeaddstring);
-                                            }
-                                        }
-                                    }
-                                    if (!contains)
-                                    {
-                                        List<string> awesomeadd =
-                                        [
-                                            awesomeaddstring
-                                        ];
-                                        awesome.Add(awesomeadd);
-                                    }
-                                }
-                            }
-                        }
-
-                        foreach (var stringList in awesome)
-                        {
-                            //stringList[0].Split(",")[0] = name 
-                            //stringList[0].Split(",")[1] = weight
-                            //stringList[0].Split(",")[2] = dlc (if applicable
-                            f += "\t\t[\"" + stringList[0].Split(",")[0] + "\"] = {{ ";//[ALL] = {{ Weight = " + selectionWeight + " }} }},\n";
-                            for (int i = 0; i < stringList.Count; i++)
-                            {
-                                if(i == 0)
-                                {
-                                    //starting string is an always case
-                                    Log.Debug(stringList[i]);
-                                    if (stringList[0].Split(",").Length == 2)
-                                    {
-                                        f += "[ALL] = {{ Weight = " + stringList[i].Split(",")[1] + " }}";
-                                    }
-                                    else
-                                    {
-                                        f += "[" + stringList[i].Split(",")[2] + "] = {{ Weight = " + stringList[i].Split(",")[1] + " }}";
-                                    }
-                                }
-                                else
-                                {
-                                    f += ", [" + stringList[i].Split(",")[2] + "] = {{ Weight = " + stringList[i].Split(",")[1] + " }}";
-                                }
-                            }
-
-                            f += " }},\n";
-                        }
-                    }
-                    f += "\t}},\n";
-                    #endregion
                     
-                    #region monsters
-                    f += "\tMonsters = {{\n";
-                    List<List<string>> awesome2 = [];
-                    foreach (var category in classicStageInfo.GetMonsterDccsPool.poolCategories)
+                    List<List<string>> awesome = [];
+                    if (classicStageInfo && classicStageInfo.GetInteractableDccsPool)
                     {
-                        if (category.name == "Standard")
+                        f += "\tInteractables = {{\n";
+                        foreach (var category in classicStageInfo.GetInteractableDccsPool.poolCategories)
                         {
                             foreach (var poolEntry in category.alwaysIncluded)
                             {
-                                foreach (var monsterCategory in poolEntry.dccs.categories)
+                                foreach (var interactableCategory in poolEntry.dccs.categories)
                                 {
                                     // I LOVE NESTING !!!!!!!!!!!!!!!!!!!!!!!!!!
-                                    foreach (var monsterCard in monsterCategory.cards)
+                                    foreach (var interactableCard in interactableCategory.cards)
                                     {
-                                        string nameToken = Language.GetString(monsterCard.spawnCard.prefab.GetComponent<CharacterMaster>().bodyPrefab.GetComponent<CharacterBody>().baseNameToken);
-                                        int selectionWeight = monsterCard.selectionWeight;
-                                        int minimumStage = monsterCard.minimumStageCompletions;
-                                        string categoryName = monsterCategory.name;
-                                        string awesomestring = nameToken + "," + selectionWeight + "," + minimumStage + "," + categoryName;
+                                        string nameToken = processNameToken(interactableCard.spawnCard.prefab);
+                                        int selectionWeight = interactableCard.selectionWeight;
+                                        
+                                        string awesomestring = nameToken + "," + selectionWeight;
                                         List<string> awesomeadd =
                                         [
                                             awesomestring
                                         ];
-                                        awesome2.Add(awesomeadd);
+                                        awesome.Add(awesomeadd);
                                     }
                                 }
                             }
                             
                             foreach (var poolEntry in category.includedIfConditionsMet)
                             {
-                                foreach (var monsterCategory in poolEntry.dccs.categories)
+                                foreach (var interactableCategory in poolEntry.dccs.categories)
                                 {
-                                    foreach (var monsterCard in monsterCategory.cards)
+                                    foreach (var interactableCard in interactableCategory.cards)
                                     {
-                                        string nameToken = Language.GetString(monsterCard.spawnCard.prefab.GetComponent<CharacterMaster>().bodyPrefab.GetComponent<CharacterBody>().baseNameToken);
-                                        int selectionWeight = monsterCard.selectionWeight;
-                                        int minimumStage = monsterCard.minimumStageCompletions;
-                                        string categoryName = monsterCategory.name;
-                                        string awesomeaddstring = nameToken + "," + selectionWeight + "," + minimumStage + "," + categoryName + "," + acronymHelper(Language.GetString(poolEntry.requiredExpansions[0].nameToken), true);
+                                        string nameToken = processNameToken(interactableCard.spawnCard.prefab);
+                                        int selectionWeight = interactableCard.selectionWeight;
+
+                                        string awesomeaddstring = nameToken + "," + selectionWeight + "," + acronymHelper(Language.GetString(poolEntry.requiredExpansions[0].nameToken), true);
                                         
                                         bool contains = false;
-                                        foreach (var awesomestring in awesome2)
+                                        foreach (var awesomestring in awesome)
                                         {
                                             foreach (var awesomerstring in awesomestring.ToList())
                                             {
@@ -197,13 +106,13 @@ public partial class WikiFormat
                                             [
                                                 awesomeaddstring
                                             ];
-                                            awesome2.Add(awesomeadd);
+                                            awesome.Add(awesomeadd);
                                         }
                                     }
                                 }
                             }
 
-                            foreach (var stringList in awesome2)
+                            foreach (var stringList in awesome)
                             {
                                 //stringList[0].Split(",")[0] = name 
                                 //stringList[0].Split(",")[1] = weight
@@ -214,70 +123,212 @@ public partial class WikiFormat
                                     if(i == 0)
                                     {
                                         //starting string is an always case
-                                        Log.Debug(stringList[i]);
-                                        if (stringList[0].Split(",").Length == 4)
+                                        //Log.Debug(stringList[i]);
+                                        if (stringList[0].Split(",").Length == 2)
                                         {
-                                            if (Int32.Parse(stringList[0].Split(",")[2]) > 0)
-                                            {
-                                                f += "[ALL] = {{ Weight = " + stringList[i].Split(",")[1] + ", Stage = " + stringList[i].Split(",")[2] + ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
-                                            }
-                                            else
-                                            {
-                                                f += "[ALL] = {{ Weight = " + stringList[i].Split(",")[1] + ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
-                                            }
-                                        }
-                                        else if (Int32.Parse(stringList[0].Split(",")[2]) > 0)
-                                        {
-                                            f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " + stringList[i].Split(",")[1] + ", Stage = " + stringList[i].Split(",")[2] + ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
+                                            f += "[ALL] = {{ Weight = " + stringList[i].Split(",")[1] + " }}";
                                         }
                                         else
                                         {
-                                            f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " + stringList[i].Split(",")[1] + ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
+                                            f += "[" + stringList[i].Split(",")[2] + "] = {{ Weight = " + stringList[i].Split(",")[1] + " }}";
                                         }
                                     }
                                     else
                                     {
-                                        if (Int32.Parse(stringList[0].Split(",")[2]) > 0)
-                                        {
-                                            f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " + stringList[i].Split(",")[1] + ", Stage = " + stringList[i].Split(",")[2] + ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
-                                        }
-                                        else
-                                        {
-                                            f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " + stringList[i].Split(",")[1] + ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
-                                        }
+                                        f += ", [" + stringList[i].Split(",")[2] + "] = {{ Weight = " + stringList[i].Split(",")[1] + " }}";
                                     }
                                 }
 
                                 f += " }},\n";
                             }
                         }
+                        f += "\t}},\n";
                     }
-                    f += "\t}},\n";
+                    else
+                    {
+                        Log.Warning($"no interactable dccs found for {sceneDef.nameToken}");
+                    }
+                    
                     #endregion
                     
-                    #region family
-                    string family = "\tFamily = {{ ";
-                    foreach (var category in classicStageInfo.GetMonsterDccsPool.poolCategories)
+                    #region monsters
+                    
+                    List<List<string>> awesome2 = [];
+                    if (classicStageInfo && classicStageInfo.GetMonsterDccsPool)
                     {
-                        if (category.name != "Standard")
-                        { // family or void 
+                        f += "\tMonsters = {{\n";
+                        foreach (var category in classicStageInfo.GetMonsterDccsPool.poolCategories)
+                        {
+                            if (category.name == "Standard")
                             {
+                                foreach (var poolEntry in category.alwaysIncluded)
+                                {
+                                    foreach (var monsterCategory in poolEntry.dccs.categories)
+                                    {
+                                        // I LOVE NESTING !!!!!!!!!!!!!!!!!!!!!!!!!!
+                                        foreach (var monsterCard in monsterCategory.cards)
+                                        {
+                                            string nameToken = Language.GetString(monsterCard.spawnCard.prefab
+                                                .GetComponent<CharacterMaster>().bodyPrefab
+                                                .GetComponent<CharacterBody>().baseNameToken);
+                                            int selectionWeight = monsterCard.selectionWeight;
+                                            int minimumStage = monsterCard.minimumStageCompletions;
+                                            string categoryName = monsterCategory.name;
+                                            string awesomestring = nameToken + "," + selectionWeight + "," +
+                                                                   minimumStage + "," + categoryName;
+                                            List<string> awesomeadd =
+                                            [
+                                                awesomestring
+                                            ];
+                                            awesome2.Add(awesomeadd);
+                                        }
+                                    }
+                                }
+
                                 foreach (var poolEntry in category.includedIfConditionsMet)
                                 {
-                                    family += "\"" + poolEntry.dccs.name.Replace("dccs", "").Replace("FamilySandy", "").Replace("FamilyNature", "").Replace("FamilySnowy", "").Replace("Family", "") + "\", ";
+                                    foreach (var monsterCategory in poolEntry.dccs.categories)
+                                    {
+                                        foreach (var monsterCard in monsterCategory.cards)
+                                        {
+                                            string nameToken = Language.GetString(monsterCard.spawnCard.prefab
+                                                .GetComponent<CharacterMaster>().bodyPrefab
+                                                .GetComponent<CharacterBody>().baseNameToken);
+                                            int selectionWeight = monsterCard.selectionWeight;
+                                            int minimumStage = monsterCard.minimumStageCompletions;
+                                            string categoryName = monsterCategory.name;
+                                            string awesomeaddstring = nameToken + "," + selectionWeight + "," +
+                                                                      minimumStage + "," + categoryName + "," +
+                                                                      acronymHelper(
+                                                                          Language.GetString(poolEntry
+                                                                              .requiredExpansions[0].nameToken), true);
+
+                                            bool contains = false;
+                                            foreach (var awesomestring in awesome2)
+                                            {
+                                                foreach (var awesomerstring in awesomestring.ToList())
+                                                {
+                                                    if (awesomerstring.Split(",")[0].Equals(nameToken))
+                                                    {
+                                                        contains = true;
+                                                        awesomestring.Add(awesomeaddstring);
+                                                    }
+                                                }
+                                            }
+
+                                            if (!contains)
+                                            {
+                                                List<string> awesomeadd =
+                                                [
+                                                    awesomeaddstring
+                                                ];
+                                                awesome2.Add(awesomeadd);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                foreach (var stringList in awesome2)
+                                {
+                                    //stringList[0].Split(",")[0] = name 
+                                    //stringList[0].Split(",")[1] = weight
+                                    //stringList[0].Split(",")[2] = dlc (if applicable
+                                    f += "\t\t[\"" + stringList[0].Split(",")[0] +
+                                         "\"] = {{ "; //[ALL] = {{ Weight = " + selectionWeight + " }} }},\n";
+                                    for (int i = 0; i < stringList.Count; i++)
+                                    {
+                                        if (i == 0)
+                                        {
+                                            //starting string is an always case
+                                            //Log.Debug(stringList[i]);
+                                            if (stringList[0].Split(",").Length == 4)
+                                            {
+                                                if (Int32.Parse(stringList[0].Split(",")[2]) > 0)
+                                                {
+                                                    f += "[ALL] = {{ Weight = " + stringList[i].Split(",")[1] +
+                                                         ", Stage = " + stringList[i].Split(",")[2] +
+                                                         ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
+                                                }
+                                                else
+                                                {
+                                                    f += "[ALL] = {{ Weight = " + stringList[i].Split(",")[1] +
+                                                         ", Category = \"" + stringList[i].Split(",")[3] + "\" }}";
+                                                }
+                                            }
+                                            else if (Int32.Parse(stringList[0].Split(",")[2]) > 0)
+                                            {
+                                                f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " +
+                                                     stringList[i].Split(",")[1] + ", Stage = " +
+                                                     stringList[i].Split(",")[2] + ", Category = \"" +
+                                                     stringList[i].Split(",")[3] + "\" }}";
+                                            }
+                                            else
+                                            {
+                                                f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " +
+                                                     stringList[i].Split(",")[1] + ", Category = \"" +
+                                                     stringList[i].Split(",")[3] + "\" }}";
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (Int32.Parse(stringList[0].Split(",")[2]) > 0)
+                                            {
+                                                f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " +
+                                                     stringList[i].Split(",")[1] + ", Stage = " +
+                                                     stringList[i].Split(",")[2] + ", Category = \"" +
+                                                     stringList[i].Split(",")[3] + "\" }}";
+                                            }
+                                            else
+                                            {
+                                                f += "[" + stringList[i].Split(",")[4] + "] = {{ Weight = " +
+                                                     stringList[i].Split(",")[1] + ", Category = \"" +
+                                                     stringList[i].Split(",")[3] + "\" }}";
+                                            }
+                                        }
+                                    }
+
+                                    f += " }},\n";
                                 }
                             }
                         }
+
+                        f += "\t}},\n";
                     }
-                    family = family[..^2];
-                    family += " }}\n";
-                    if (family != "\tFamily = {{ }}\n")
+                    else
                     {
-                        f += family;
+                        Log.Warning($"no monster dccs found for {sceneDef.nameToken}");
                     }
+
                     #endregion
                     
-                    string bazaar = "BAZAAR_SEER_" + loadedscene.Scene.name.ToUpper();
+                    #region family
+                    
+                    string family = "\tFamily = {{ ";
+                    if (classicStageInfo && classicStageInfo.GetMonsterDccsPool)
+                    {
+                        foreach (var category in classicStageInfo.GetMonsterDccsPool.poolCategories)
+                        {
+                            if (category.name != "Standard")
+                            { // family or void 
+                                {
+                                    foreach (var poolEntry in category.includedIfConditionsMet)
+                                    {
+                                        family += "\"" + poolEntry.dccs.name.Replace("dccs", "").Replace("FamilySandy", "").Replace("FamilyNature", "").Replace("FamilySnowy", "").Replace("Family", "") + "\", ";
+                                    }
+                                }
+                            }
+                        }
+                        family = family[..^2];
+                        family += " }}\n";
+                        if (family != "\tFamily = { }}\n")
+                        {
+                            f += family;
+                        }
+                    }
+                    
+                    #endregion
+                    
+                    string bazaar = "BAZAAR_SEER_" + loadedsceneagain.Scene.name.ToUpper();
                     if (Language.english.TokenIsRegistered(bazaar))
                     {
                         f += "\tLunarSeer = \"" + Language.GetString(bazaar).Replace("<style=cWorldEvent>", "").Replace("</style>", "") + "\",\n";
@@ -292,30 +343,58 @@ public partial class WikiFormat
                     
                     loredefs.Add("Environments " + sceneDef.nameToken + " " + sceneDef.loreToken);
 
+                    if (classicStageInfo != null)
+                    {
+                        f += "\tInteractableCredits = \"" + classicStageInfo.sceneDirectorInteractibleCredits + "\",\n";
+                        f += "\tMonsterCredits = \"" + classicStageInfo.sceneDirectorMonsterCredits + "\",\n";
+                    }
+                    
                     f += "}}";
-                    string format = Language.GetStringFormatted(f, 
-                        name, 
-                        name, 
-                        loadedscene.Scene.name,
-                        name + " Logbook Thumbnail.png", 
-                        Language.GetString(sceneDef.subtitleToken),
-                        sceneDef.stageOrder,
-                        sceneDef.mainTrack.cachedName,
-                        classicStageInfo.sceneDirectorInteractibleCredits, 
-                        classicStageInfo.sceneDirectorMonsterCredits, 
-                        "DESCRIPTION TEMP REPLACE ME PRETTY PLEASE !!");
-                
-                    foreach (var kvp in FormatR2ToWiki)
-                        format = format.Replace(kvp.Key, kvp.Value);
-                
-                    tw.WriteLine(format);
+                    try
+                    {
+                        string scenename = name;
+                        if (loadedsceneagain.Scene != null && loadedsceneagain.Scene.name != null )
+                        {
+                            scenename =  loadedsceneagain.Scene.name;
+                        }
+                        else
+                        {
+                            Log.Warning("loaded scene is null " + name);
+                        }
 
-                    Texture preview = Addressables.LoadAssetAsync<Texture>(sceneDef.previewTextureReference).WaitForCompletion();
+                        string format = Language.GetStringFormatted(f,
+                            name,
+                            name,
+                            scenename,
+                            name + " Logbook Thumbnail.png",
+                            Language.GetString(sceneDef.subtitleToken),
+                            sceneDef.stageOrder,
+                            sceneDef.mainTrack.cachedName,
+                            "DESCRIPTION TEMP REPLACE ME PRETTY PLEASE !!");
+
+                        foreach (var kvp in FormatR2ToWiki)
+                            format = format.Replace(kvp.Key, kvp.Value);
+
+                        tw.WriteLine(format);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e);
+                        Log.Debug(f);
+                    }
+                    
+
+                    Texture preview = sceneDef.previewTexture; // deprecated, .,. but other one isnt assigned for alot of them .,,..,., 
+                    if (preview == null)
+                    {
+                        preview = Addressables.LoadAssetAsync<Texture>(sceneDef.previewTextureReference.AssetGUID).WaitForCompletion();
+                    }
+                    
                     string temp = WikiOutputPath + @"\stages\";
                     Directory.CreateDirectory(temp);
                     try
                     {
-                        exportTexture(preview, Path.Combine(temp, name + WikiModname + ".png"));
+                        exportTexture(preview, Path.Combine(temp, name + " Logbook Thumbnail" + WikiModname + ".png"));
                     }
                     catch
                     {
@@ -326,7 +405,7 @@ public partial class WikiFormat
                 {
                     Log.Warning("uable to f9ind scene info ,., ");
                 }
-                Addressables.UnloadSceneAsync(loadedscene).WaitForCompletion();
+                Addressables.UnloadSceneAsync(loadedsceneagain).WaitForCompletion();
                 Log.Debug("unlaoded scene !! ");
             }
             catch (Exception e)
@@ -335,6 +414,9 @@ public partial class WikiFormat
             }
 
         tw.Close();
+        
+        var length = new FileInfo(path).Length;
+        if (length <= 0) File.Delete(path);
     }
 
     public static string processNameToken(GameObject prefab)
@@ -393,4 +475,12 @@ public partial class WikiFormat
         { "ShrineHalcyonite", "Halcyonite Shrine" }, 
         { "ShrineColossusAccess", "Shrine of Shaping" }, 
     };
+
+    static IEnumerator waitingCouroutine()
+    {
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(5);
+
+
+    }
 }
