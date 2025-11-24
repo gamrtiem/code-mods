@@ -1,6 +1,6 @@
 ﻿using BepInEx.Logging;
 
-namespace CrackedEggmoji
+namespace SolusHeartReward
 {
     internal static class Log
     {

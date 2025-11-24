@@ -7,13 +7,14 @@ using BepInEx.Configuration;
 using BNR.patches;
 using GoldenCoastPlusRevived.Items;
 using HarmonyLib;
-using MiscModpackUtils;
+//using MiscModpackUtils;
 using R2API;
 using RiskOfOptions;
 using RiskOfOptions.OptionConfigs;
 using RiskOfOptions.Options;
 using RoR2.UI;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 namespace BNR
@@ -84,7 +85,7 @@ namespace BNR
             };
             
             //try to fix misc modpackutils logo not showing up when i boot into main profile (dunno why it happens ,.,.
-            On.RoR2.UI.MainMenu.MainMenuController.Awake += (orig, controller) =>
+            /*On.RoR2.UI.MainMenu.MainMenuController.Awake += (orig, controller) =>
             {
                 orig(controller);
                 
@@ -96,7 +97,7 @@ namespace BNR
                 obj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
                 obj.GetComponent<Image>().sprite = Utils.Load(Path.Combine(Paths.ConfigPath, "logo.png"));
                 Log.Debug("Changed Logo Image");
-            };
+            };*/
             
             //this doesnt work fix later 
            On.RoR2.UI.SkinControllers.ButtonSkinController.Awake += (orig, self) =>
