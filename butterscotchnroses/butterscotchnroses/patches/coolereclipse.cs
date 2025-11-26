@@ -221,7 +221,7 @@ public class coolereclipse : PatchBase<coolereclipse>
         
         blacklistStages = config.Bind("coolerEclipse", 
             "stage blacklist", 
-            "", 
+            "goldshores,bazaar,solutionalhaunt", 
             "eclipse stage blacklist (seperate by , !! (eg golemplains,blackbeach!!");
         BNRUtils.StringConfig(blacklistStages);
         

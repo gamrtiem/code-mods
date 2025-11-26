@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
@@ -35,14 +36,16 @@ namespace SolusHeartReward
     {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "icebro";
-        public const string PluginName = "SolusHeartReward";
+        public const string PluginName = "heartofthecollective";
         public const string PluginVersion = "1.0.0";
 
         private static ConfigEntry<string> blacklist;
         public static ConfigEntry<bool> logDebug;
         public static ConfigEntry<bool> silenceSPEX;
         
-        public static ItemDef myItemDef;
+        public static GameObject impactEffectPrefab;
+        public static ItemDef nullHeart;
+        public static List<string> solusFamilyBodyNames = [];
         public static string[] blacklistArray;
         private string assetbundledir;
 
@@ -59,24 +62,54 @@ namespace SolusHeartReward
                 if(material.name == "matTransparentChip")
                 {
                     material.shader = Addressables.LoadAssetAsync<Shader>("RoR2/DLC3/TransparentTextureScrolling.shader").WaitForCompletion();
+                    material.SetTexture("_MainTex", Addressables.LoadAssetAsync<Texture2D>("RoR2/DLC3/texSolusWireGridBoss.tga").WaitForCompletion());
+                    material.SetTexture("_RemapTex", Addressables.LoadAssetAsync<Texture2D>("RoR2/DLC3/texBossWire.png").WaitForCompletion());
+                    material.SetTexture("_ScrollTex", Addressables.LoadAssetAsync<Texture2D>("RoR2/Base/Common/TiledTextures/texDepth2.jpg").WaitForCompletion());
+                    Log.Debug("swapped chip material shader");
+                }
+                
+                if(material.name == "matSolusHeart")
+                {
+                    //material.shader = Addressables.LoadAssetAsync<Shader>("RoR2/DLC3/TransparentTextureScrolling.shader").WaitForCompletion();
+                    material.SetTexture("_Cloud1Tex", Addressables.LoadAssetAsync<Texture2D>("RoR2/DLC3/Drone Tech/texNanoPistolAOE_1c.png").WaitForCompletion());
+                    material.SetTexture("_Cloud2Tex", Addressables.LoadAssetAsync<Texture2D>("RoR2/DLC3/Drone Tech/texNanoPistolAOE_1d.png").WaitForCompletion());
+                    material.SetTexture("_RemapTex", Addressables.LoadAssetAsync<Texture2D>("RoR2/Base/Common/ColorRamps/texRampTritone3.png").WaitForCompletion());
                     Log.Debug("swapped solus heart reward material shader");
                 }
             }
             
-            myItemDef = ScriptableObject.CreateInstance<ItemDef>();
-            myItemDef.name = "ITEM_SOLUSHEARTREWARD_NAME";
-            myItemDef.nameToken = "ITEM_SOLUSHEARTREWARD_NAME";
-            myItemDef.pickupToken = "ITEM_SOLUSHEARTREWARD_PICKUP";
-            myItemDef.descriptionToken = "ITEM_SOLUSHEARTREWARD_DESC";
-            myItemDef.loreToken = "ITEM_SOLUSHEARTREWARD_LORE";
-            myItemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Common.BossTierDef_asset).WaitForCompletion();
-            myItemDef.pickupIconSprite = assetbundle.LoadAsset<Sprite>("SolusHeartPickup");
-            myItemDef.pickupModelPrefab = assetbundle.LoadAsset<GameObject>("SolusHeartReward");
-            myItemDef.tags = [ItemTag.BrotherBlacklist, ItemTag.AIBlacklist, ItemTag.CannotDuplicate, ItemTag.CannotSteal, ItemTag.CannotCopy, ItemTag.WorldUnique];
-            myItemDef.hidden = false;
-            myItemDef.canRemove = true;
+            FamilyDirectorCardCategorySelection solusFamilyCard = Addressables.LoadAssetAsync<FamilyDirectorCardCategorySelection>("RoR2/DLC3/dccsSuperRoboBallpitFamily.asset").WaitForCompletion();
+            if (solusFamilyCard)
+            {
+                foreach (DirectorCardCategorySelection.Category category in solusFamilyCard.categories)
+                {
+                    foreach (RoR2.DirectorCard card in category.cards)
+                    {
+                        if (card.spawnCard && card.spawnCard.prefab)
+                        {
+                            solusFamilyBodyNames.Add(card.spawnCard.prefab.name);
+                        }
+                    }
+                }
+            }
+            
+            impactEffectPrefab = assetbundle.LoadAsset<GameObject>("SolusHeartRewardImpactEffect");
+            ContentAddition.AddEffect(impactEffectPrefab);
+            
+            nullHeart = ScriptableObject.CreateInstance<ItemDef>();
+            nullHeart.name = "ITEM_SOLUSHEARTREWARD_NAME";
+            nullHeart.nameToken = "ITEM_SOLUSHEARTREWARD_NAME";
+            nullHeart.pickupToken = "ITEM_SOLUSHEARTREWARD_PICKUP";
+            nullHeart.descriptionToken = "ITEM_SOLUSHEARTREWARD_DESC";
+            nullHeart.loreToken = "ITEM_SOLUSHEARTREWARD_LORE";
+            nullHeart._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Common.BossTierDef_asset).WaitForCompletion();
+            nullHeart.pickupIconSprite = assetbundle.LoadAsset<Sprite>("SolusHeartPickup");
+            nullHeart.pickupModelPrefab = assetbundle.LoadAsset<GameObject>("SolusHeartReward");
+            nullHeart.tags = [ItemTag.BrotherBlacklist, ItemTag.AIBlacklist, ItemTag.CannotDuplicate, ItemTag.CannotSteal, ItemTag.CannotCopy, ItemTag.WorldUnique];
+            nullHeart.hidden = false;
+            nullHeart.canRemove = true;
             var displayRules = new ItemDisplayRuleDict(null);
-            ItemAPI.Add(new CustomItem(myItemDef, displayRules));
+            ItemAPI.Add(new CustomItem(nullHeart, displayRules));
             
             blacklist = Config.Bind("Solus Heart Reward",
                 "enemy blacklist",
@@ -157,7 +190,7 @@ namespace SolusHeartReward
                     (death, vector, corepos) =>
                     {
                         RoR2.PickupDropletController.CreatePickupDroplet(
-                            PickupCatalog.FindPickupIndex(myItemDef.itemIndex),
+                            PickupCatalog.FindPickupIndex(nullHeart.itemIndex),
                             vector,
                             corepos
                         );
@@ -176,22 +209,22 @@ namespace SolusHeartReward
             }
         }
 
-        // private void Update()
-        // {
-        //     if (Input.GetKeyDown(KeyCode.F1))
-        //     {
-        //         Transform transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
-        //
-        //         Log.Info($"Player pressed F2. Spawning our custom item at coordinates {transform.position}");
-        //         PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(myItemDef.itemIndex),
-        //             transform.position, transform.forward * 20f);
-        //     }
-        // }
+         private void Update()
+         {
+             if (Input.GetKeyDown(KeyCode.F1))
+             {
+                 Transform transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
+        
+                 Log.Info($"Player pressed F2. Spawning our custom item at coordinates {transform.position}");
+                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(nullHeart.itemIndex),
+                     transform.position, transform.forward * 20f);
+             }
+         }
 
-        public sealed class Behavior : BaseItemBodyBehavior//, IOnDamageDealtServerReceiver, IOnIncomingDamageServerReceiver
+        public sealed class Behavior : BaseItemBodyBehavior, IOnDamageDealtServerReceiver//, IOnDamageDealtServerReceiver, IOnIncomingDamageServerReceiver
         {
             [ItemDefAssociation]
-            private static ItemDef GetItemDef() => myItemDef;
+            private static ItemDef GetItemDef() => nullHeart;
 
 
             public void OnEnable()
@@ -209,7 +242,7 @@ namespace SolusHeartReward
 
             private void BodyOnonInventoryChanged()
             {
-                if (body.inventory.GetItemCountEffective(myItemDef) == 0)
+                if (body.inventory.GetItemCountEffective(nullHeart) == 0)
                 {
                     Destroy(GameObject.Find("watcher"));
                 }
@@ -219,16 +252,32 @@ namespace SolusHeartReward
             {
                 body.onInventoryChanged -= BodyOnonInventoryChanged;
             }
-
-            // public void OnDamageDealtServer(DamageReport damageReport)
-            // {
-            //     //idk apply a debuff or something !!
-            // }
-            //
-            // public void OnIncomingDamageServer(DamageInfo damageInfo)
-            // {
-            //     //damageInfo.damage *= 0.1f;
-            // }
+            
+            public void OnDamageDealtServer(DamageReport damageReport)
+            {
+                Log.Debug(string.Join(Environment.NewLine, solusFamilyBodyNames.ToArray()).Replace("\n", " "));
+                Log.Debug(damageReport.victimBody.master.name.Replace("(Clone)", ""));
+                if (!damageReport.victimBody || !damageReport.victimBody.master || (!solusFamilyBodyNames.Contains(damageReport.victimBody.master.name.Replace("(Clone)", "")) && !damageReport.victimBody.master.name.Contains("Solus"))) return;
+                if (!Util.CheckRoll(50f * damageReport.damageInfo.procCoefficient, damageReport.attackerBody.master)) return;
+                
+                DamageInfo damageInfo = new()
+                {
+                    damage = damageReport.damageInfo.damage * 0.5f,
+                    attacker = damageReport.attackerBody ? damageReport.attackerBody.gameObject : null,
+                    inflictor = damageReport.attackerBody ? damageReport.attackerBody.gameObject : null,
+                    position = damageReport.victimBody.corePosition,
+                    force = Vector3.zero,
+                    crit = damageReport.attackerBody.RollCrit(),
+                    damageColorIndex = DamageColorIndex.Luminous,
+                    damageType = DamageType.Generic,
+                    procCoefficient = 0
+                };
+                damageReport.victimBody.healthComponent.TakeDamage(damageInfo);
+                
+                EffectManager.SimpleEffect(impactEffectPrefab, damageReport.victimBody.transform.position, Quaternion.identity, true);
+                //EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.gainCoinsImpactEffectPrefab, report.victimBody.transform.position, UnityEngine.Vector3.up, true)
+                //maybe spawn a chip particle coming off the enemy ? 
+            }
         }
     }
 }
@@ -260,7 +309,7 @@ public class SolusHeartRewardHelper : MonoBehaviour
     {
         orig(self);
         
-        if (Util.GetItemCountForTeam(TeamIndex.Player, SolusHeartReward.SolusHeartReward.myItemDef.itemIndex, false) == 0)
+        if (Util.GetItemCountForTeam(TeamIndex.Player, SolusHeartReward.SolusHeartReward.nullHeart.itemIndex, false) == 0)
         {
             Destroy(gameObject);
         }

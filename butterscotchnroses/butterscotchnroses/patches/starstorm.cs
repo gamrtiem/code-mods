@@ -223,7 +223,7 @@ public class starstorm : PatchBase<starstorm>
             orig(self, info);
             CharacterBody attackerbody = info.attacker.GetComponent<CharacterBody>();
             
-            if (!attackerbody.inventory) return;
+            if (!attackerbody || !attackerbody.inventory) return;
             
             int stacks = attackerbody.inventory.GetItemCount(SS2Content.Items.IceTool._itemIndex);
             if (stacks <= 0) return;
