@@ -24,4 +24,10 @@
 		<PackageReference Include="RoR2BepInExPack" Version="1.36.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="ShaderSwapper">
+	    <HintPath>..\ShaderSwapper.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 </Project>
