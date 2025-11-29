@@ -27,13 +27,13 @@ public class gildedcoastplus : PatchBase<gildedcoastplus>
 
     public override void Config(ConfigFile config)
     {
-        applyGCP = config.Bind("apply patches",
-            "try to apply gilded coast plus reival patches !!",
+        applyGCP = config.Bind("Mods - GoldenCoastPlus",
+            "apply golden coast plus patches !!",
             true,
             "");
         BNRUtils.CheckboxConfig(applyGCP);
         
-        skipGoldenRewards = config.Bind("golden coast plus", 
+        skipGoldenRewards = config.Bind("Mods - GoldenCoastPlus", 
             "skip hidden buff", 
             true, 
             "");

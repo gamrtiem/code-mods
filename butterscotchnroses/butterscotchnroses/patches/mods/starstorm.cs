@@ -225,7 +225,7 @@ public class starstorm : PatchBase<starstorm>
             
             if (!attackerbody || !attackerbody.inventory) return;
             
-            int stacks = attackerbody.inventory.GetItemCount(SS2Content.Items.IceTool._itemIndex);
+            int stacks = attackerbody.inventory.GetItemCountEffective(SS2Content.Items.IceTool._itemIndex);
             if (stacks <= 0) return;
             
             if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
@@ -241,33 +241,33 @@ public class starstorm : PatchBase<starstorm>
 
     public override void Config(ConfigFile config)
     {
-        applySS2 = config.Bind("apply patches",
-            "try to apply ss2 patches !!",
+        applySS2 = config.Bind("Mods - SS2",
+            "apply ss2 patches !!",
             true,
             "");
         BNRUtils.CheckboxConfig(applySS2);
         
         #region iceTool
 
-        iceToolFreezeChance = config.Bind("SS2",
+        iceToolFreezeChance = config.Bind("Mods - SS2",
             "ice tool freeze chance",
             5f,
             "percent chance for icetool to freeze enemies !!");
         BNRUtils.SliderConfig(0, 100, iceToolFreezeChance);
         
-        iceToolFreezeTime = config.Bind("SS2",
+        iceToolFreezeTime = config.Bind("Mods - SS2",
             "ice tool freeze time",
             0.5f,
             "how long icetool should freeze enemies !!");
         BNRUtils.SliderConfig(0, 30, iceToolFreezeTime);
         
-        iceToolFreezeChanceStack = config.Bind("SS2",
+        iceToolFreezeChanceStack = config.Bind("Mods - SS2",
             "ice tool freeze chance stack",
             2.5f,
             "percent chance for icetool to freeze enemies stack !!");
         BNRUtils.SliderConfig(0, 100, iceToolFreezeChanceStack);
         
-        iceToolFreezeTimeStack = config.Bind("SS2",
+        iceToolFreezeTimeStack = config.Bind("Mods - SS2",
             "ice tool freeze time stack",
             0.25f,
             "how long icetool should freeze enemies !!");
@@ -289,44 +289,44 @@ public class starstorm : PatchBase<starstorm>
         
         #region execution
         
-        speedmult = config.Bind("SS2",
+        speedmult = config.Bind("Mods - SS2",
                 "execution speed damage multiplier",
                 10f,
                 "like uhh how much extrad amage should be added of how fast you go past starting velocity compared to terminal ,.,. idk just move it around be yourself !!!! you can just set to 0 if you dont like !!!!");
         BNRUtils.SliderConfig(0, 60, speedmult);
 
-        baseSpeed = config.Bind("SS2",
+        baseSpeed = config.Bind("Mods - SS2",
             "execution base speed",
             10f,
             "base starting speed for special !!!! multiplied by movespeed unless config for that is off ,.,. (then its multiplied by 10,. .,.,");
         BNRUtils.SliderConfig(0, 40, baseSpeed);
 
-        boostedSpeed = config.Bind("SS2",
+        boostedSpeed = config.Bind("Mods - SS2",
             "execution boosted speed",
             20f,
             "boosted speed when you use special from dash !!!! also multiplied by movespeed unless config for that is off ,.,. (then its multiplied by 10,. .,.,");
         BNRUtils.SliderConfig(0, 40, boostedSpeed);
 
-        terminalSpeed = config.Bind("SS2",
+        terminalSpeed = config.Bind("Mods - SS2",
             "execution terminal speed",
             30f,
             "how fast max speed should be !! be careful equation uses lerp so you go reallys fast if you put a high number ,..,");
         BNRUtils.SliderConfig(0, 60, terminalSpeed);
 
-        baseDamage = config.Bind("SS2",
+        baseDamage = config.Bind("Mods - SS2",
             "execution base damage coeff",
             13f,
             "base damage coeff when not boosted !!!!! speedmult is added on top too ,.,. ");
         BNRUtils.SliderConfig(1, 25, baseDamage);
 
-        boostedDamage = config.Bind("SS2",
+        boostedDamage = config.Bind("Mods - SS2",
             "boosted damage coeff",
             15.5f,
             "boosted damage coeff  !!!!! speedmult is added on top too ,.,. ");
         BNRUtils.SliderConfig(1, 25, boostedDamage);
 
 
-        useMovespeed = config.Bind("SS2",
+        useMovespeed = config.Bind("Mods - SS2",
             "execution use movespeed",
             true,
             "should movespeed affect how fast down you go !!! regular ss2 its just a set number ,.,.");

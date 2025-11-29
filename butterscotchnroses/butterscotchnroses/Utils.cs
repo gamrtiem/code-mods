@@ -13,6 +13,11 @@ public class BNRUtils
         return new Color(r / 255f, g / 255f, b / 255f, a / 255f);
     }
     
+    public static Color Color255(float r, float g, float b, float a)
+    {
+        return new Color(r / 255f, g / 255f, b / 255f, a / 255f);
+    }
+    
     public static Color Color255(int r, int g, int b)
     {
         return new Color(r / 255f, g / 255f, b / 255f, 1);
@@ -28,6 +33,18 @@ public class BNRUtils
         };
         StepSliderOption stepSliderOption = new(config, stepSliderConfig);
         ModSettingsManager.AddOption(stepSliderOption);
+    }
+    
+    public static void SliderConfig(int min, int max, ConfigEntry<int> config)
+    {
+        IntSliderConfig intSliderConfig = new()
+        {
+            max = max,
+            min = min,
+            formatString = "{0:0}"
+        };
+        IntSliderOption intSliderOption = new(config, intSliderConfig);
+        ModSettingsManager.AddOption(intSliderOption);
     }
     
     public static void CheckboxConfig(ConfigEntry<bool> config)

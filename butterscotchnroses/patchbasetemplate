@@ -1,0 +1,41 @@
+using static BNR.butterscotchnroses;
+using BNR.patches;
+using BepInEx.Configuration;
+using HarmonyLib;
+using RoR2;
+using UnityEngine;
+
+namespace BNR;
+
+public class $CLASS$ : PatchBase<$CLASS$>
+{
+    public override void Init(Harmony harmony)
+    {
+        if(!enabled.Value)
+        {
+            return;
+        }
+    }
+
+    public override void Config(ConfigFile config)
+    {
+        enabled = config.Bind("BNR - $CLASS$",
+            "enable patches for $CLASS$",
+            true,
+            "");
+        BNRUtils.CheckboxConfig(enabled);
+        enabled.SettingChanged += (_, _) =>
+        {
+            if (enabled.Value)
+            {
+
+            }
+            else
+            {
+
+            }
+        };
+    }
+
+    private ConfigEntry<bool> enabled;
+}
