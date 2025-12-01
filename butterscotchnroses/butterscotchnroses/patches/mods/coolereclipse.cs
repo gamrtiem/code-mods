@@ -228,7 +228,7 @@ public abstract class coolereclipse : PatchBase<coolereclipse>
         
         whitelistStages = config.Bind("Mods - CoolerEclipse", 
             "stage whitelist", 
-            "titanicplains", 
+            "golemplains,golemplains2,ss2_voidshop,goldshores", 
             "what stages to force eclipses on (seperate by , !! (eg golemplains,blackbeach!! will not work with moon2, ,..");
         BNRUtils.StringConfig(whitelistStages);
     }

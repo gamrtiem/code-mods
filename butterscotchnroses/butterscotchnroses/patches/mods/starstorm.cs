@@ -215,6 +215,8 @@ public class starstorm : PatchBase<starstorm>
         On.RoR2.HealthComponent.TakeDamageProcess += (orig, self, info) =>
         {
             orig(self, info);
+            
+            if (!info.attacker) return;
             CharacterBody attackerbody = info.attacker.GetComponent<CharacterBody>();
             
             if (!attackerbody || !attackerbody.inventory) return;
