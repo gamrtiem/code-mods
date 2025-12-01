@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BNR;
 using BNR.patches;
@@ -60,7 +61,6 @@ namespace BNR
                 catch (Exception e)
                 {
                     Log.Error(e);
-                    throw;
                 }
             }
             

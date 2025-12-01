@@ -5,12 +5,14 @@ using HarmonyLib;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using BossGroup = On.RoR2.BossGroup;
 
 namespace BNR;
 
 public class quickerhalcshrine : PatchBase<quickerhalcshrine>
 {
     private HalcyoniteShrineInteractable halcshrineinteractable;
+    private GameObject bluePortalRef;
     private float startingTickRate;
     public override void Init(Harmony harmony)
     {
@@ -20,6 +22,7 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
         }
         
         GameObject shrineHalcyonite = Addressables.LoadAssetAsync<GameObject>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC2.ShrineHalcyonite_prefab).WaitForCompletion();
+        bluePortalRef = Addressables.LoadAssetAsync<GameObject>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_PortalShop.PortalShop_prefab).WaitForCompletion();
         halcshrineinteractable = shrineHalcyonite.GetComponent<HalcyoniteShrineInteractable>();
         startingTickRate = halcshrineinteractable.tickRate;
 
@@ -31,6 +34,27 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
         
         On.RoR2.HalcyoniteShrineInteractable.Start += HalcyoniteShrineInteractableOnStart;
         On.RoR2.GoldSiphonNearbyBodyController.DrainGold += GoldSiphonNearbyBodyControllerOnDrainGold;
+        On.RoR2.BossGroup.OnDefeatedServer += BossGroupOnOnDefeatedServer;
+    }
+
+    private void BossGroupOnOnDefeatedServer(BossGroup.orig_OnDefeatedServer orig, RoR2.BossGroup self)
+    {
+        orig(self);
+
+        if (!greenToBlue.Value)
+        {
+            return;
+        }
+        
+        GameObject greenportal = GameObject.Find("PortalColossus(Clone)");
+        if (!greenportal)
+        {
+            return;
+        }
+        
+        GameObject blueportal = Object.Instantiate(bluePortalRef);
+        blueportal.transform.position = greenportal.transform.position;
+        Object.Destroy(greenportal);
     }
 
     private void GoldSiphonNearbyBodyControllerOnDrainGold(On.RoR2.GoldSiphonNearbyBodyController.orig_DrainGold orig, RoR2.GoldSiphonNearbyBodyController self)
@@ -91,10 +115,17 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
             true,
             "make time scale with halcyon shrine speed as well");
         BNRUtils.CheckboxConfig(scaleTime);
+        
+        greenToBlue = config.Bind("BNR - Halyc Shrines",
+            "turn green portal to blue",
+            true,
+            "makes green portals become blue after the boss has been defeated !!!");
+        BNRUtils.CheckboxConfig(greenToBlue);
     }
 
     private ConfigEntry<bool> enabled;
     private ConfigEntry<float> multiplier;
     private ConfigEntry<int> playerCount;
     private ConfigEntry<bool> scaleTime;
+    private ConfigEntry<bool> greenToBlue;
 }

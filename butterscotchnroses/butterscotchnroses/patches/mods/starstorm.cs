@@ -1,13 +1,8 @@
 using BepInEx.Configuration;
 using BNR.patches;
-using On.RoR2.Navigation;
 using R2API;
-using RiskOfOptions;
-using RiskOfOptions.OptionConfigs;
-using RiskOfOptions.Options;
 using SS2;
 using UnityEngine.Networking;
-using static BNR.butterscotchnroses;
 
 namespace BNR;
 using System;
@@ -21,7 +16,6 @@ using UnityEngine;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
 public class starstorm : PatchBase<starstorm>
 {
-    
     [HarmonyPatch]
     public class Starstorm2ExeChanges
     {
@@ -346,7 +340,6 @@ public class starstorm : PatchBase<starstorm>
 
         #endregion
     }
-
     
     public static ConfigEntry<bool> applySS2;
 
