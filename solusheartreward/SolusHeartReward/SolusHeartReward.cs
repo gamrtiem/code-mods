@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
-using EntityStates.InfiniteTowerSafeWard;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using On.RoR2.CharacterSpeech;
@@ -13,19 +11,13 @@ using RiskOfOptions;
 using RiskOfOptions.OptionConfigs;
 using RiskOfOptions.Options;
 using RoR2;
-using RoR2.ContentManagement;
 using RoR2.Items;
 using ShaderSwapper;
 using SolusHeartReward;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.ResourceLocations;
 using CharacterSpeechController = RoR2.CharacterSpeech.CharacterSpeechController;
-using ClassicStageInfo = On.RoR2.ClassicStageInfo;
-using CombatDirector = On.RoR2.CombatDirector;
 using DirectorCard = On.RoR2.DirectorCard;
-using PluginInfo = BepInEx.PluginInfo;
-using RoachController = On.RoR2.RoachController;
 
 namespace SolusHeartReward
 {
@@ -196,7 +188,7 @@ namespace SolusHeartReward
 
         private void updateEnemyList()
         {
-            Log.Debug("updating item desc !!");
+            //Log.Debug("updating item desc !!");
             blacklistArray = blacklist.Value.Replace(" ", "").Replace("body", "").Split(',');
                 
             string descAddition = "";
@@ -208,7 +200,7 @@ namespace SolusHeartReward
                     
                     if (bodyPrefab.GetComponent<CharacterBody>() == null) continue;
                     
-                    Log.Debug(bodyPrefab.GetComponent<CharacterBody>().baseNameToken);
+                    //Log.Debug(bodyPrefab.GetComponent<CharacterBody>().baseNameToken);
                     descAddition += Language.GetString(bodyPrefab.GetComponent<CharacterBody>().baseNameToken) + "s</style>, <style=\"cIsUtility\">";
                 }
             }
@@ -302,10 +294,10 @@ namespace SolusHeartReward
 
             private void BodyOnonInventoryChanged()
             {
-                if (body.inventory.GetItemCountEffective(nullHeart) == 0)
-                {
-                    Destroy(GameObject.Find("watcher"));
-                }
+                if (body.inventory.GetItemCountEffective(nullHeart) != 0) return;
+                
+                Destroy(GameObject.Find("watcher"));
+                Log.Debug("killed solus heart reward helper");
             }
 
             public void OnDisable()
@@ -390,6 +382,7 @@ public class SolusHeartRewardHelper : MonoBehaviour
         
         if (Util.GetItemCountForTeam(TeamIndex.Player, SolusHeartReward.SolusHeartReward.nullHeart.itemIndex, false) == 0)
         {
+            Log.Debug("killed solus heart reward helper");
             Destroy(gameObject);
         }
     }
