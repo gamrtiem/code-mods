@@ -10,6 +10,7 @@ using MonoMod.Cil;
 using On.RoR2.CharacterSpeech;
 using R2API;
 using RiskOfOptions;
+using RiskOfOptions.OptionConfigs;
 using RiskOfOptions.Options;
 using RoR2;
 using RoR2.ContentManagement;
@@ -42,6 +43,11 @@ namespace SolusHeartReward
         private static ConfigEntry<string> blacklist;
         public static ConfigEntry<bool> logDebug;
         public static ConfigEntry<bool> silenceSPEX;
+        public static ConfigEntry<bool> enableProc;
+        public static ConfigEntry<int> procChance;
+        public static ConfigEntry<int> procDamage;
+        private static ConfigEntry<string> descFormat;
+        private static ConfigEntry<string> procFormat;
         
         public static GameObject impactEffectPrefab;
         public static ItemDef nullHeart;
@@ -59,6 +65,7 @@ namespace SolusHeartReward
             
             foreach (Material material in assetbundle.LoadAllAssets<Material>())
             {
+                //replace trans scrolling texture since no dummy shader for that and add the in game textures so theyre not in the asset bundle and make it take like 5mb !!!
                 if(material.name == "matTransparentChip")
                 {
                     material.shader = Addressables.LoadAssetAsync<Shader>("RoR2/DLC3/TransparentTextureScrolling.shader").WaitForCompletion();
@@ -70,7 +77,6 @@ namespace SolusHeartReward
                 
                 if(material.name == "matSolusHeart")
                 {
-                    //material.shader = Addressables.LoadAssetAsync<Shader>("RoR2/DLC3/TransparentTextureScrolling.shader").WaitForCompletion();
                     material.SetTexture("_Cloud1Tex", Addressables.LoadAssetAsync<Texture2D>("RoR2/DLC3/Drone Tech/texNanoPistolAOE_1c.png").WaitForCompletion());
                     material.SetTexture("_Cloud2Tex", Addressables.LoadAssetAsync<Texture2D>("RoR2/DLC3/Drone Tech/texNanoPistolAOE_1d.png").WaitForCompletion());
                     material.SetTexture("_RemapTex", Addressables.LoadAssetAsync<Texture2D>("RoR2/Base/Common/ColorRamps/texRampTritone3.png").WaitForCompletion());
@@ -110,7 +116,19 @@ namespace SolusHeartReward
             nullHeart.canRemove = true;
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(nullHeart, displayRules));
+
+            Configs();
             
+            IL.EntityStates.SolusHeart.Death.SolusHeartFinaleSequence.Death.OnEnter += DeathOnOnEnter;
+            On.RoR2.BodyCatalog.SetBodyPrefabs += (orig, prefabs) => // NREs if we try to go through body catalog in awake .,,..
+            {
+                orig(prefabs);
+                updateEnemyList();
+            }; 
+        }
+
+        private void Configs()
+        {
             blacklist = Config.Bind("Solus Heart Reward",
                 "enemy blacklist",
                 "MinePod,ExtractorUnit,DefectiveUnit", 
@@ -133,12 +151,47 @@ namespace SolusHeartReward
                 "makes spex silent post defeating solus heart !!");
             ModSettingsManager.AddOption(new CheckBoxOption(silenceSPEX));
             
-            IL.EntityStates.SolusHeart.Death.SolusHeartFinaleSequence.Death.OnEnter += DeathOnOnEnter;
-            On.RoR2.BodyCatalog.SetBodyPrefabs += (orig, prefabs) => // NREs if we try to go through body catalog in awake .,,..
+            enableProc = Config.Bind("Solus Heart Reward",
+                "Solus family on hit proc",
+                true, 
+                "gives null heart a on hit chance to deal extra damage to solus family enemies !!");
+            ModSettingsManager.AddOption(new CheckBoxOption(enableProc));
+            
+            procChance = Config.Bind("Solus Heart Reward",
+                "On hit proc chance",
+                15, 
+                "chance for null heart to proc against enemies !!");
+            IntSliderConfig slideconfig = new()
             {
-                orig(prefabs);
-                updateEnemyList();
-            }; 
+                formatString = "{0}%",
+                min = 1,
+                max = 100,
+            };
+            ModSettingsManager.AddOption(new IntSliderOption(procChance, slideconfig));
+            
+            procDamage = Config.Bind("Solus Heart Reward",
+                "Null heart damage",
+                50, 
+                "percent of damage null heart should give extra on proc !!");
+            IntSliderConfig slideconfig2 = new()
+            {
+                formatString = "{0}%",
+                min = 1,
+                max = 100,
+            };
+            ModSettingsManager.AddOption(new IntSliderOption(procDamage, slideconfig2));
+            
+            descFormat = Config.Bind("Solus Heart Reward",
+                "description format",
+                "Prevent <style=\"cIsUtility\">{0}</style> from spawning{1}.", 
+                "like evil version of lang file for description .,.,., {0} is the list of enemies prevented from spawning and {1} is the proc description !!!!");
+            ModSettingsManager.AddOption(new StringInputFieldOption(descFormat));
+            
+            procFormat = Config.Bind("Solus Heart Reward",
+                "proc format",
+                "and have a <style=\"cIsUtility\">{0}%</style> chance to deal <style=\"cIsDamage\">{1}%</style> total extra damage to solus enemies", 
+                "like evil version of lang file for proc .,.,., {0} is the chance and {1} is the damage !!!!");
+            ModSettingsManager.AddOption(new StringInputFieldOption(procFormat));
         }
 
         private void updateEnemyList()
@@ -160,13 +213,20 @@ namespace SolusHeartReward
                 }
             }
             descAddition = descAddition[..^30];
+            
             int lastComma = descAddition.LastIndexOf(", ", StringComparison.Ordinal);
             if (lastComma != -1)
             {
                 descAddition = descAddition.Remove(lastComma, 2).Insert(lastComma, " and ");
             }
-                
-            LanguageAPI.Add("ITEM_SOLUSHEARTREWARD_DESC", $"Prevent <style=\"cIsUtility\">{descAddition}</style> from spawning.");
+
+            string procstring = "";
+            if (enableProc.Value)
+            {
+                procstring = " " + string.Format(procFormat.Value, procChance.Value, procDamage.Value);
+            }
+            
+            LanguageAPI.Add("ITEM_SOLUSHEARTREWARD_DESC", string.Format(descFormat.Value, descAddition, procstring));
         }
 
         private void DeathOnOnEnter(ILContext il)
@@ -211,14 +271,14 @@ namespace SolusHeartReward
 
          private void Update()
          {
-             if (Input.GetKeyDown(KeyCode.F1))
-             {
-                 Transform transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
-        
-                 Log.Info($"Player pressed F2. Spawning our custom item at coordinates {transform.position}");
-                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(nullHeart.itemIndex),
-                     transform.position, transform.forward * 20f);
-             }
+             // if (Input.GetKeyDown(KeyCode.F1))
+             // {
+             //     Transform transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
+             //
+             //     Log.Info($"Player pressed F2. Spawning our custom item at coordinates {transform.position}");
+             //     PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(nullHeart.itemIndex),
+             //         transform.position, transform.forward * 20f);
+             // }
          }
 
         public sealed class Behavior : BaseItemBodyBehavior, IOnDamageDealtServerReceiver//, IOnDamageDealtServerReceiver, IOnIncomingDamageServerReceiver
@@ -255,14 +315,28 @@ namespace SolusHeartReward
             
             public void OnDamageDealtServer(DamageReport damageReport)
             {
-                Log.Debug(string.Join(Environment.NewLine, solusFamilyBodyNames.ToArray()).Replace("\n", " "));
-                Log.Debug(damageReport.victimBody.master.name.Replace("(Clone)", ""));
-                if (!damageReport.victimBody || !damageReport.victimBody.master || (!solusFamilyBodyNames.Contains(damageReport.victimBody.master.name.Replace("(Clone)", "")) && !damageReport.victimBody.master.name.Contains("Solus"))) return;
-                if (!Util.CheckRoll(50f * damageReport.damageInfo.procCoefficient, damageReport.attackerBody.master)) return;
+                if (!enableProc.Value)
+                {
+                    return;
+                }
+
+                if (!damageReport.victimBody || !damageReport.victimBody.master ||
+                    (!solusFamilyBodyNames.Contains(damageReport.victimBody.master.name.Replace("(Clone)", "")) &&
+                     !(damageReport.victimBody.master.name.Contains("Solus") ||
+                       damageReport.victimBody.master.name.Contains("RoboBallMini")) &&
+                        damageReport.victimBody.master.name != "SolusVendorMaster"))
+                {
+                    return;
+                }
+
+                if (!Util.CheckRoll(procChance.Value * damageReport.damageInfo.procCoefficient, damageReport.attackerBody.master))
+                {
+                    return;
+                }
                 
                 DamageInfo damageInfo = new()
                 {
-                    damage = damageReport.damageInfo.damage * 0.5f,
+                    damage = damageReport.damageInfo.damage * procDamage.Value/100,
                     attacker = damageReport.attackerBody ? damageReport.attackerBody.gameObject : null,
                     inflictor = damageReport.attackerBody ? damageReport.attackerBody.gameObject : null,
                     position = damageReport.victimBody.corePosition,
@@ -274,9 +348,14 @@ namespace SolusHeartReward
                 };
                 damageReport.victimBody.healthComponent.TakeDamage(damageInfo);
                 
-                EffectManager.SimpleEffect(impactEffectPrefab, damageReport.victimBody.transform.position, Quaternion.identity, true);
-                //EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.gainCoinsImpactEffectPrefab, report.victimBody.transform.position, UnityEngine.Vector3.up, true)
-                //maybe spawn a chip particle coming off the enemy ? 
+                EffectData effectData = new()
+                {
+                    origin = damageReport.victimBody.corePosition,
+                    start = damageReport.victimBody.corePosition,
+                    rotation = Quaternion.identity,
+                    scale = damageReport.victimBody.radius
+                };
+                EffectManager.SpawnEffect(impactEffectPrefab, effectData, true);
             }
         }
     }
@@ -330,8 +409,11 @@ public class SolusHeartRewardHelper : MonoBehaviour
             {
                 if (SolusHeartReward.SolusHeartReward.blacklistArray.Contains(self.spawnCard.name.Replace("csc", "")))
                 {
-                    Log.Debug("disabling spawn card " + self.spawnCard.name.Replace("csc", ""));
-                
+                    if (SolusHeartReward.SolusHeartReward.logDebug.Value)
+                    {
+                        Log.Debug("disabling spawn card " + self.spawnCard.name.Replace("csc", ""));
+                    }
+
                     return false;
                 }
 
