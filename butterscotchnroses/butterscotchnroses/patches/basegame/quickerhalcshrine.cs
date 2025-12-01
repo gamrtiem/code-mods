@@ -63,7 +63,7 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
 
         if (self.isTetheredToAtLeastOneObject && scaleTime.Value && Run.instance.participatingPlayerCount <= playerCount.Value)
         {
-            Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + 1f / self.tickRate);
+            Run.instance.SetRunStopwatch((Run.instance.GetRunStopwatch() + 1f / self.tickRate) * (multiplier.Value - 1));
         }
     }
 
