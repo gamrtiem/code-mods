@@ -1,0 +1,11 @@
+{
+    "name": "Heart_of_the_Collective",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/gamrtiem/code-mods/tree/main/solusheartreward",
+    "description": "makes evil solus heart drop a boss item on death !!!!",
+    "dependencies": [
+        "tristanmcpherson-R2API-5.0.5",
+        "Smooth_Salad-ShaderSwapper-1.0.1",
+        "Rune580-Risk_Of_Options-2.8.4"
+    ]
+}

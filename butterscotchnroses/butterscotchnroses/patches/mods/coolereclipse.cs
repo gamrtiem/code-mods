@@ -2,17 +2,15 @@ using BepInEx.Configuration;
 using BNR.patches;
 using static BNR.butterscotchnroses;
 using HarmonyLib;
-using RiskOfOptions;
-using RiskOfOptions.OptionConfigs;
-using RiskOfOptions.Options;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.SceneManagement;
+
 namespace BNR;
 
-public abstract class coolereclipse : PatchBase<coolereclipse>
+public class coolereclipse : PatchBase<coolereclipse>
 {
     [HarmonyPatch]
     public class CoolerEclipseChanges
@@ -194,8 +192,11 @@ public abstract class coolereclipse : PatchBase<coolereclipse>
 
     public override void Init(Harmony harmony)
     {
+        this.name = "cooler eclipse";
+        Log.Debug("init cooler eclipse !! " + applyCE.Value);
         if (!applyCE.Value) return;
         harmony.CreateClassProcessor(typeof(CoolerEclipseChanges)).Patch();
+        Log.Debug("ptached cooler eclipse !!");
     }
 
     public override void Config(ConfigFile config)

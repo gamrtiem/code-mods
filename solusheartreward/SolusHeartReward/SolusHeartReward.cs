@@ -7,6 +7,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using On.RoR2.CharacterSpeech;
 using R2API;
+using R2API.ContentManagement;
 using RiskOfOptions;
 using RiskOfOptions.OptionConfigs;
 using RiskOfOptions.Options;
@@ -36,6 +37,7 @@ namespace SolusHeartReward
         public static ConfigEntry<bool> logDebug;
         public static ConfigEntry<bool> silenceSPEX;
         public static ConfigEntry<bool> enableProc;
+        public static ConfigEntry<bool> useMechFlag;
         public static ConfigEntry<int> procChance;
         public static ConfigEntry<int> procDamage;
         private static ConfigEntry<string> descFormat;
@@ -149,9 +151,15 @@ namespace SolusHeartReward
                 "gives null heart a on hit chance to deal extra damage to solus family enemies !!");
             ModSettingsManager.AddOption(new CheckBoxOption(enableProc));
             
+            useMechFlag = Config.Bind("Solus Heart Reward",
+                "proc on mechanical enemies",
+                false, 
+                "have null heart proc on any mechanical enemy instead of just solus !!! !!");
+            ModSettingsManager.AddOption(new CheckBoxOption(useMechFlag));
+            
             procChance = Config.Bind("Solus Heart Reward",
                 "On hit proc chance",
-                15, 
+                25, 
                 "chance for null heart to proc against enemies !!");
             IntSliderConfig slideconfig = new()
             {
@@ -181,8 +189,8 @@ namespace SolusHeartReward
             
             procFormat = Config.Bind("Solus Heart Reward",
                 "proc format",
-                "and have a <style=\"cIsUtility\">{0}%</style> chance to deal <style=\"cIsDamage\">{1}%</style> total extra damage to solus enemies", 
-                "like evil version of lang file for proc .,.,., {0} is the chance and {1} is the damage !!!!");
+                "and gain a <style=\"cIsUtility\">{0}%</style> chance to deal <style=\"cIsDamage\">{1}%</style> TOTAL damage against {2} enemies", 
+                "like evil version of lang file for proc .,.,., {0} is the chance and {1} is the damage !!!! {2} is for if mechanical flag is used instead of solus .,,.");
             ModSettingsManager.AddOption(new StringInputFieldOption(procFormat));
         }
 
@@ -212,10 +220,16 @@ namespace SolusHeartReward
                 descAddition = descAddition.Remove(lastComma, 2).Insert(lastComma, " and ");
             }
 
+            string proctype = "solus";
+            if (useMechFlag.Value)
+            {
+                proctype = "mechanical";
+            }
+            
             string procstring = "";
             if (enableProc.Value)
             {
-                procstring = " " + string.Format(procFormat.Value, procChance.Value, procDamage.Value);
+                procstring = " " + string.Format(procFormat.Value, procChance.Value, procDamage.Value, proctype);
             }
             
             LanguageAPI.Add("ITEM_SOLUSHEARTREWARD_DESC", string.Format(descFormat.Value, descAddition, procstring));
@@ -312,15 +326,29 @@ namespace SolusHeartReward
                     return;
                 }
 
-                if (!damageReport.victimBody || !damageReport.victimBody.master ||
-                    (!solusFamilyBodyNames.Contains(damageReport.victimBody.master.name.Replace("(Clone)", "")) &&
-                     !(damageReport.victimBody.master.name.Contains("Solus") ||
-                       damageReport.victimBody.master.name.Contains("RoboBallMini")) &&
-                        damageReport.victimBody.master.name != "SolusVendorMaster"))
+                if (!damageReport.victimBody || !damageReport.victimBody.master)
                 {
                     return;
                 }
 
+                if (!useMechFlag.Value)
+                {
+                    if((!solusFamilyBodyNames.Contains(damageReport.victimBody.master.name.Replace("(Clone)", "")) &&
+                        !(damageReport.victimBody.master.name.Contains("Solus") ||
+                          damageReport.victimBody.master.name.Contains("RoboBallMini")) &&
+                        damageReport.victimBody.master.name != "SolusVendorMaster"))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    if ((damageReport.victimBody.bodyFlags & CharacterBody.BodyFlags.Mechanical) == 0)
+                    {
+                        return;
+                    }
+                }
+                
                 if (!Util.CheckRoll(procChance.Value * damageReport.damageInfo.procCoefficient, damageReport.attackerBody.master))
                 {
                     return;
