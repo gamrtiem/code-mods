@@ -52,7 +52,7 @@ public class starstorm : PatchBase<starstorm>
         [HarmonyILManipulator]
         public static void OnEnterPostFix(ILContext il)
         {
-            Log.Debug("loading il gook ");
+            Log.Debug("loading il gook HandleMovement");
             var c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchLdsfld(typeof(ExecuteSlam), "verticlalSpeed")))
@@ -121,7 +121,7 @@ public class starstorm : PatchBase<starstorm>
         [HarmonyILManipulator]
         private static void slam(ILContext il)
         {
-            Log.Debug("loading il gook ");
+            Log.Debug("loading il gook DoImpactAuthority");
             var c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchLdsfld(typeof(ExecuteSlam), "exesillymod.baseDamageCoefficient")

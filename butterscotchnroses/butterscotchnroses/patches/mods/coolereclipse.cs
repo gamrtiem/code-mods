@@ -192,7 +192,6 @@ public class coolereclipse : PatchBase<coolereclipse>
 
     public override void Init(Harmony harmony)
     {
-        this.name = "cooler eclipse";
         Log.Debug("init cooler eclipse !! " + applyCE.Value);
         if (!applyCE.Value) return;
         harmony.CreateClassProcessor(typeof(CoolerEclipseChanges)).Patch();

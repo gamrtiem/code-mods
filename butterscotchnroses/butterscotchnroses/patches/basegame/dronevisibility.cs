@@ -16,13 +16,25 @@ public class dronevisibility : PatchBase<dronevisibility>
 {
     public override void Init(Harmony harmony)
     {
-        if (!enabled.Value)
-        {
-            return;
-        }
+        //replace with actual operator material later ,.,.
+        operatorMat = Object.Instantiate(Addressables.LoadAssetAsync<Material>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Huntress.matHuntressArrowTrail_mat).WaitForCompletion());
+        operatorMat.SetColor("_TintColor", operatorIndicatorColor.Value);
         
-        On.RoR2.Hologram.HologramProjector.BuildHologram += HologramProjectorOnBuildHologram;
-        On.RoR2.SummonMasterBehavior.OnEnable += SummonMasterBehaviorOnOnEnable;
+        Hook();
+    }
+
+    private void Hook()
+    {
+        if (enabled.Value)
+        {
+            On.RoR2.Hologram.HologramProjector.BuildHologram += HologramProjectorOnBuildHologram;
+            On.RoR2.SummonMasterBehavior.OnEnable += SummonMasterBehaviorOnOnEnable;
+        }
+        else
+        {
+            On.RoR2.Hologram.HologramProjector.BuildHologram -= HologramProjectorOnBuildHologram;
+            On.RoR2.SummonMasterBehavior.OnEnable -= SummonMasterBehaviorOnOnEnable;
+        }
     }
 
     private void SummonMasterBehaviorOnOnEnable(On.RoR2.SummonMasterBehavior.orig_OnEnable orig, SummonMasterBehavior self)
@@ -83,7 +95,7 @@ public class dronevisibility : PatchBase<dronevisibility>
             {
                 vfxChild.GetComponent<ParticleSystem>().startSpeed = -10;
                 //vfxChild.GetComponent<ParticleSystem>().simulationSpace = ParticleSystemSimulationSpace.World;
-                vfxChild.GetComponent<ParticleSystemRenderer>().sharedMaterial.SetColor("_TintColor", operatorIndicatorColor.Value);
+                vfxChild.GetComponent<ParticleSystemRenderer>().sharedMaterial = operatorMat;
             }
         }
         vfx.transform.position = vfx.transform.localPosition;
@@ -100,16 +112,7 @@ public class dronevisibility : PatchBase<dronevisibility>
         BNRUtils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
-            if (enabled.Value)
-            {
-                On.RoR2.Hologram.HologramProjector.BuildHologram += HologramProjectorOnBuildHologram;
-                On.RoR2.SummonMasterBehavior.OnEnable += SummonMasterBehaviorOnOnEnable;
-            }
-            else
-            {
-                On.RoR2.Hologram.HologramProjector.BuildHologram -= HologramProjectorOnBuildHologram;
-                On.RoR2.SummonMasterBehavior.OnEnable -= SummonMasterBehaviorOnOnEnable;
-            }
+            Hook();
         };
         
         useSillyMaterials = config.Bind("BNR - Drone Visibility",
@@ -142,6 +145,7 @@ public class dronevisibility : PatchBase<dronevisibility>
     private ConfigEntry<Color> sillyMaterialColor;
     private ConfigEntry<Color> operatorIndicatorColor;
     private ConfigEntry<float> visibilityDistance;
+    private Material operatorMat;
 }
 
 public class HologramHelper : MonoBehaviour

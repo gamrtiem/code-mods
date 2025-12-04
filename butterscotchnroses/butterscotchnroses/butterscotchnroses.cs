@@ -2,26 +2,9 @@ using System;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
-using BepInEx.Bootstrap;
-using BepInEx.Configuration;
-using BNR;
 using BNR.patches;
-using GoldenCoastPlusRevived.Items;
 using HarmonyLib;
-using On.RoR2.UI.MainMenu;
-//using MiscModpackUtils;
 using R2API;
-using RiskOfOptions;
-using RiskOfOptions.OptionConfigs;
-using RiskOfOptions.Options;
-using RoR2;
-using RoR2.Hologram;
-using RoR2.UI;
-using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.UI;
-using MainMenuController = RoR2.UI.MainMenu.MainMenuController;
-using Path = System.IO.Path;
 
 namespace BNR
 {
@@ -63,23 +46,6 @@ namespace BNR
                     Log.Error(e);
                 }
             }
-            
-            //try to fix misc modpackutils logo not showing up when i boot into main profile (dunno why it happens ,.,.
-            On.RoR2.UI.MainMenu.BaseMainMenuScreen.OnEnter += BaseMainMenuScreenOnOnEnter;
-        }
-
-        private void BaseMainMenuScreenOnOnEnter(BaseMainMenuScreen.orig_OnEnter orig, RoR2.UI.MainMenu.BaseMainMenuScreen self, MainMenuController mainMenuController)
-        {
-            orig(self, mainMenuController);
-                
-            //if (!MiscModpackUtils.Patches.MainScreen.Override.Value) return;
-                
-            GameObject obj = GameObject.Find("LogoImage");
-            if (obj == null) return;
-            obj.transform.localPosition = new Vector3(0, 20, 0);
-            obj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-            obj.GetComponent<Image>().sprite = ProdzModpackUtils.Utils.Load(Path.Combine(Paths.ConfigPath, "logo.png"));
-            Log.Debug("Changed Logo Image");
         }
     }
 }
