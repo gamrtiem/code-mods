@@ -15,6 +15,20 @@ public class $CLASS$ : PatchBase<$CLASS$>
         {
             return;
         }
+        
+        applyHooks();
+    }
+    
+    public void applyHooks()
+    {
+        if (enabled.Value)
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
     public override void Config(ConfigFile config)
@@ -26,14 +40,7 @@ public class $CLASS$ : PatchBase<$CLASS$>
         BNRUtils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
-            if (enabled.Value)
-            {
-
-            }
-            else
-            {
-
-            }
+            applyHooks();
         };
     }
 

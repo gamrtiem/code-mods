@@ -1,10 +1,13 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BNR.patches;
 using HarmonyLib;
 using R2API;
+using UnityEngine;
+using UnityHotReloadNS;
 
 namespace BNR
 {
@@ -45,6 +48,22 @@ namespace BNR
                 {
                     Log.Error(e);
                 }
+            }
+        }
+        
+        void Update()
+        {
+            if (Input.GetKeyUp(KeyCode.F4))
+            {
+                UnityHotReload.LoadNewAssemblyVersion(
+                    typeof(butterscotchnroses).Assembly, // The currently loaded assembly to replace.
+                    "Z:\\run\\media\\icebrah\\buh\\gale\\riskofrain2\\profiles\\debug2 awese\\BepInEx\\plugins\\MarioVsLuigi-Linux-v1.7.1.0-beta\\butterscotchnroses.dll"  // The path to the newly compiled DLL.
+                );
+            }
+            
+            if (Input.GetKeyUp(KeyCode.F1))
+            {
+                Log.Debug("asdasdasdasd");
             }
         }
     }

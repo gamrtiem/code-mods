@@ -44,5 +44,12 @@
 	  <Reference Include="Unity.Postprocessing.Runtime">
 	    <HintPath>..\Unity.Postprocessing.Runtime.dll</HintPath>
 	  </Reference>
+	  <Reference Include="UnityHotReload">
+	    <HintPath>..\UnityHotReload.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.dll&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug2 awese/BepInEx/plugins/MarioVsLuigi-Linux-v1.7.1.0-beta/butterscotchnroses.dll&quot;&#xA;cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.pdb&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug2 awese/BepInEx/plugins/MarioVsLuigi-Linux-v1.7.1.0-beta/butterscotchnroses.pdb&quot;" />
+	</Target>
 </Project>

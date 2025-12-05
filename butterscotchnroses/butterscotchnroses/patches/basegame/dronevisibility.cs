@@ -17,7 +17,7 @@ public class dronevisibility : PatchBase<dronevisibility>
     public override void Init(Harmony harmony)
     {
         //replace with actual operator material later ,.,.
-        operatorMat = Object.Instantiate(Addressables.LoadAssetAsync<Material>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Huntress.matHuntressArrowTrail_mat).WaitForCompletion());
+        operatorMat = Object.Instantiate(Addressables.LoadAssetAsync<Material>("RoR2/DLC3/Drone Tech/matDroneTechCarryRings.mat").WaitForCompletion());
         operatorMat.SetColor("_TintColor", operatorIndicatorColor.Value);
         
         Hook();
