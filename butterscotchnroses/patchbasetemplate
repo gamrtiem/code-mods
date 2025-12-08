@@ -10,16 +10,16 @@ namespace BNR;
 public class $CLASS$ : PatchBase<$CLASS$>
 {
     public override void Init(Harmony harmony)
-    {
+    {     
+        applyHooks();
+        
         if(!enabled.Value)
         {
             return;
         }
-        
-        applyHooks();
     }
     
-    public void applyHooks()
+    private void applyHooks()
     {
         if (enabled.Value)
         {
