@@ -4,10 +4,21 @@ using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BNR.patches;
+using ExamplePlugin.items;
 using HarmonyLib;
 using R2API;
+using RoR2;
 using UnityEngine;
 using UnityHotReloadNS;
+using RoR2.ContentManagement;
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using BepInEx.Configuration;
+using RoR2.ExpansionManagement;
+
 
 namespace BNR
 {
@@ -48,6 +59,23 @@ namespace BNR
                 {
                     Log.Error(e);
                 }
+            }
+            
+            var buffTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(BuffBase)));
+
+            foreach (var buffType in buffTypes)
+            {
+                BuffBase buff = (BuffBase)System.Activator.CreateInstance(buffType);
+                buff.AddBuff();
+            }
+            
+            //scan for all items
+            var itemTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(ItemBase)));
+
+            foreach (var itemType in itemTypes)
+            {
+                ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
+                item.Init(Config);
             }
         }
         
