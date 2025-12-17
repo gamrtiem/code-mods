@@ -1,6 +1,6 @@
 ﻿using BepInEx.Logging;
 
-namespace ExamplePlugin
+namespace DroneVisibility
 {
     internal static class Log
     {

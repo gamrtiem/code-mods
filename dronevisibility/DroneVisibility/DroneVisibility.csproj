@@ -4,6 +4,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<RootNamespace>ExamplePlugin</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
