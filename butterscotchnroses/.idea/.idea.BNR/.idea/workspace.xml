@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="195d8b6e-88d7-4ada-98c3-ec42e4bb6093" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/UnityHotReload.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/drifter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/dronevisibility.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/dronevisibility.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patchbasetemplate" beforeDir="false" afterPath="$PROJECT_DIR$/patchbasetemplate" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BNR/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BNR/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butterscotchnroses/items/WoodToolkit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/items/WoodToolkit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/drifter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/drifter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../template/ExamplePlugin/ExamplePlugin.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../template/ExamplePlugin/Log.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../template/RoR2Mods.sln" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +23,10 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/butterscotchnroses/ProdzModpackUtils.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/butterscotchnroses/items/BuffBase.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/butterscotchnroses/items/WoodToolkit.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/butterscotchnroses/items/WoodToolkitBuff.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/butterscotchnroses/items/itemBase.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/butterscotchnroses/patches/basegame/buttonrecolors.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/butterscotchnroses/patches/basegame/drifter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/butterscotchnroses/patches/basegame/dronevisibility.cs" root0="FORCE_HIGHLIGHTING" />
@@ -48,17 +52,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/UnityHotReload.dll&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;RiderCSharpLiveTemplatesSettingsId&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/run/media/icebrah/buh/github/code-mods/template",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />

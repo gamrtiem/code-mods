@@ -73,6 +73,7 @@ public class drifter : PatchBase<drifter>
                 self.transform.GetChild(i).name != "JunkCubeDamagedEffect(Clone)" &&
                 self.transform.GetChild(i).name != "JunkCubePreDeath(Clone)" &&
                 self.transform.GetChild(i).name != "JunkCubeLaunchEffect(Clone)")
+                
             {
                 Log.Debug($"drifter explode 2 - {self.transform.GetChild(i)}");
                 var child = self.transform.GetChild(i);
