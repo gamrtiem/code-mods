@@ -1,4 +1,5 @@
 using BepInEx;
+using BepInEx.Bootstrap;
 using R2API;
 using RoR2;
 using UnityEngine;
@@ -6,16 +7,18 @@ using UnityEngine.AddressableAssets;
 
 namespace ExamplePlugin
 {
+    [BepInDependency("iDeathHD.UnityHotReload", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ItemAPI.PluginGUID)]
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-
     public class ExamplePlugin : BaseUnityPlugin
     {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "icebro";
         public const string PluginName = "ExamplePlugin";
         public const string PluginVersion = "1.0.0";
+        
+        public static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
 
         private static ItemDef myItemDef;
 
@@ -76,6 +79,20 @@ namespace ExamplePlugin
                 Log.Info($"Player pressed F2. Spawning our custom item at coordinates {transform.position}");
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(myItemDef.itemIndex), transform.position, transform.forward * 20f);
             }
+            
+#if DEBUG
+            if (Input.GetKeyUp(KeyCode.F8))
+            {
+                if (UHRInstalled)
+                {
+                    UHRSupport.hotReload(typeof(ExamplePlugin).Assembly, System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "ExamplePlugin.dll"));
+                }
+                else
+                {
+                    Log.Debug("couldnt finds unity hot reload !!");
+                }
+            }
+#endif  
         }
     }
 }
