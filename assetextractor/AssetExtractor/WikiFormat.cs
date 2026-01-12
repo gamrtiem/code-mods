@@ -121,6 +121,69 @@ public partial class WikiFormat
             
         }
         
+        public static void exportTexture(Sprite sprite, String path, Color buffColor)
+        {
+            Texture2D readableText = makeReadable(sprite.texture);
+            
+            Texture2D newTexture = new Texture2D(Mathf.FloorToInt(sprite.textureRect.width), Mathf.FloorToInt(sprite.textureRect.height));
+            
+            var pixels = readableText.GetPixels(  
+                Mathf.FloorToInt(sprite.textureRect.x), 
+                Mathf.FloorToInt(sprite.textureRect.y), 
+                Mathf.FloorToInt(sprite.textureRect.width), 
+                Mathf.FloorToInt(sprite.textureRect.height) );
+
+            try
+            {
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    pixels[i] *= buffColor;
+                }
+
+                newTexture.SetPixels(pixels);
+                newTexture.Apply();
+                
+                if (File.Exists(path) && AssetExtractor.Instance.labelCopies.Value)
+                {
+                    Log.Debug("file exitst" + (path));
+                    
+                    string pathnew = path.Replace(".png", "");
+                    while (File.Exists(pathnew + ".png"))
+                    {
+                        pathnew += " (copy)";
+                    }
+                    Log.Debug("writing file " + (pathnew));
+                    File.WriteAllBytes(pathnew + ".png", newTexture.EncodeToPNG());
+                }
+                else
+                {
+                    File.WriteAllBytes(path, newTexture.EncodeToPNG());
+                }
+            }
+            catch (System.Exception e)
+            {
+                Log.Error(e);
+                Log.Info("exporting png without cropping !!,.., ");
+                if (File.Exists(path) && AssetExtractor.Instance.labelCopies.Value)
+                {
+                    Log.Debug("file exitst" + (path));
+                    
+                    string pathnew = path.Replace(".png", "");
+                    while (File.Exists(pathnew + ".png"))
+                    {
+                        pathnew += " (copy)";
+                    }
+                    Log.Debug("writing file " + (pathnew));
+                    File.WriteAllBytes(pathnew + ".png", readableText.EncodeToPNG());
+                }
+                else
+                {
+                    File.WriteAllBytes(path, readableText.EncodeToPNG());
+                }
+            }
+            
+        }
+        
         static Texture2D makeReadable(Texture texture)
         {
             var tmp = RenderTexture.GetTemporary(texture.width, texture.height, 32);

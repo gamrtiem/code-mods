@@ -60,7 +60,7 @@ public partial class WikiFormat
                     Directory.CreateDirectory(temp);
                     try
                     {
-                        exportTexture(buffdef.iconSprite, Path.Combine(temp, "Status " + name.Replace(" ", "_") + WikiModname + ".png"));
+                        exportTexture(buffdef.iconSprite, Path.Combine(temp, "Status " + name.Replace(" ", "_") + WikiModname + ".png"), buffdef.buffColor);
                     }
                     catch (Exception e)
                     {
