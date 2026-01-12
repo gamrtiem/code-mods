@@ -18,8 +18,8 @@ public class WoodToolkit : ItemBase<WoodToolkit>
 {
     public override string ItemName => "Carving Kit";
     public override string ItemLangTokenName => "WoodenToolkit";
-    public override string ItemPickupDesc => "Interacting with <style=\"cIsHealing\">Shrines of the Wood</style> gives you <style=\"cIsUtility\">bark</style>, droping after 1.5 seconds, creating a <style=\"cIsHealing\">healing aura</style>.";
-    public override string ItemFullDescription => "After interacting with a <style=\"cIsHealing\">Shrine of the Woods</style>, gain a piece of <style=\"cIsUtility\">bark</style> that drops after standing still for <style=\"cIsHealing\">1.5</style> seconds, healing for <style=\"cIsHealing\">6%</style> <style=\"cStack\">(+4% per stack)</style> of your health every second to all allies within <style=\"cIsHealing\">7m</style> <style=\"cStack\">(+4m per stack)</style>.";
+    public override string ItemPickupDesc => "Interacting with <style=\"cIsHealing\">Shrines of the Wood</style> gives you <style=\"cIsUtility\">bark</style>, droping after 2 seconds, creating a <style=\"cIsHealing\">healing aura</style>. Guarantee a Shrine of the Woods spawn.";
+    public override string ItemFullDescription => "After interacting with a <style=\"cIsHealing\">Shrine of the Woods</style>, gain a piece of <style=\"cIsUtility\">bark</style> that drops after standing still for <style=\"cIsHealing\">2</style> seconds, healing for <style=\"cIsHealing\">6%</style> <style=\"cStack\">(+4% per stack)</style> of your health every second to all allies within <style=\"cIsHealing\">7m</style> <style=\"cStack\">(+4m per stack)</style>. Guarantee a Shrine of the Woods spawn.";
     public override string ItemLore => "WoodenToolkit";
     public override ItemTier Tier => ItemTier.Tier2;
     public override GameObject ItemModel => Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
@@ -61,6 +61,41 @@ public class WoodToolkit : ItemBase<WoodToolkit>
         private void OnEnable()
         {
             On.RoR2.ShrineHealingBehavior.AddShrineStack += ShrineHealingBehaviorOnAddShrineStack;
+            SceneDirector.onPostPopulateSceneServer += SceneDirectorOnonPostPopulateSceneServer;
+        }
+
+        private void SceneDirectorOnonPostPopulateSceneServer(SceneDirector obj)
+        {
+            if (!SceneInfo.instance.countsAsStage && !SceneInfo.instance.sceneDef.allowItemsToSpawnObjects)
+            {
+                return;
+            }
+            bool flag = false;
+            Xoroshiro128Plus rng = new Xoroshiro128Plus(obj.rng.nextUlong);
+            foreach (CharacterMaster readOnlyInstances in CharacterMaster.readOnlyInstancesList)
+            {
+                int itemCountEffective = readOnlyInstances.inventory.GetItemCountEffective(WoodToolkit.instance.ItemDef);
+                if (itemCountEffective > 0)
+                {
+                    flag = true;
+                }
+            }
+            if (!flag)
+            {
+                return;
+            }
+            GameObject gameObject = DirectorCore.instance.TrySpawnObject(new DirectorSpawnRequest(Addressables.LoadAssetAsync<InteractableSpawnCard>("RoR2/Base/ShrineHealing/iscShrineHealing.asset").WaitForCompletion(), new DirectorPlacementRule
+            {
+                placementMode = DirectorPlacementRule.PlacementMode.Random
+            }, rng));
+            if (gameObject != null)
+            {
+                PurchaseInteraction component = gameObject.GetComponent<PurchaseInteraction>();
+                if (component != null)
+                {
+                    component.Networkcost = Run.instance.GetDifficultyScaledCost(0);
+                }
+            }
         }
 
         private void ShrineHealingBehaviorOnAddShrineStack(ShrineHealingBehavior.orig_AddShrineStack orig, RoR2.ShrineHealingBehavior self, Interactor activator)
@@ -92,7 +127,7 @@ public class WoodToolkit : ItemBase<WoodToolkit>
                 timer = 0;
             }
             
-            if (!(timer > 1.5f) || body.GetBuffCount(WoodToolkitBuff.instance.BuffDef.buffIndex) <= 0) return;
+            if (!(timer > 2f) || body.GetBuffCount(WoodToolkitBuff.instance.BuffDef.buffIndex) <= 0) return;
 
             timer = 0;
             int itemCount = instance.GetCount(body);
@@ -134,7 +169,7 @@ public class WoodToolkit : ItemBase<WoodToolkit>
                 mushroomWardTeamFilter.teamIndex = base.body.teamComponent.teamIndex;
             }
             
-            body.SetBuffCount(WoodToolkitBuff.instance.BuffDef.buffIndex, 0);
+            body.SetBuffCount(WoodToolkitBuff.instance.BuffDef.buffIndex, body.GetBuffCount(WoodToolkitBuff.instance.BuffDef.buffIndex) - 1);
         }
 
         private GameObject mushroomWardPrefab = Addressables.LoadAssetAsync<GameObject>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Mushroom.MushroomWard_prefab).WaitForCompletion();

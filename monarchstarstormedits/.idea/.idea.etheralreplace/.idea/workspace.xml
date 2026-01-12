@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3274eddd-39b3-4a14-8a32-3bd14dd358b2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../butterscotchnroses/butterscotchnroses/patches/mods/chefbazaar.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.AssemblyInfoInputs.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.sourcelink.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/project.packagespec.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../butterscotchnroses/butterscotchnroses/items/WoodToolkit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../butterscotchnroses/butterscotchnroses/items/WoodToolkit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.etheralreplace/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.etheralreplace/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.etheralreplace/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.etheralreplace/.idea/projectSettingsUpdater.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.etheralreplace/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.etheralreplace/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etheralreplace.sln" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/Log.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/Log.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/Starstorm2-nstrip.dll" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/Starstorm2-nstrip.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/Unity.Postprocessing.Runtime.dll" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/Unity.Postprocessing.Runtime.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/UnityHotReload.dll" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/UnityHotReload.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/awesome !!.zip" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/awesome !!.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/etherealreplace.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/etherealreplace.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/etherealreplace.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/etherealreplace.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/bin/Debug/netstandard2.1/etherealreplace.zip" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/bin/Debug/netstandard2.1/etherealreplace.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/etherealreplace.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/MonarchStarstormEdits.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/etherealreplace.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/MonarchStarstormEdits.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/ExamplePlugin.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/ExamplePlugin.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/ExamplePlugin.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/ExamplePlugin.assets.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/ExamplePlugin.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/ExamplePlugin.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/ethereal.8EB30BAD.Up2Date" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/ethereal.8EB30BAD.Up2Date" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.AssemblyInfoInputs.cache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.assets.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.csproj.CoreCompileInputs.cache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/Debug/netstandard2.1/etherealreplace.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.sourcelink.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/ExamplePlugin.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/ExamplePlugin.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/ExamplePlugin.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/ExamplePlugin.csproj.nuget.g.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/ExamplePlugin.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/ExamplePlugin.csproj.nuget.g.targets" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/etherealreplace.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/etherealreplace.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/etherealreplace.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/etherealreplace.csproj.nuget.g.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/etherealreplace.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/etherealreplace.csproj.nuget.g.targets" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/MonarchStarstormEdits/obj/project.nuget.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/project.packagespec.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/rider.project.model.nuget.info" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/etherealreplace/obj/rider.project.restore.info" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../template/ExamplePlugin/ExamplePlugin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../template/ExamplePlugin/ExamplePlugin.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/f06ee9a3ef5741e1a8136dd7fb5aa0d7295e00/f7/64c0634d/ItemTier.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/MonarchStarstormEdits/MonarchStarstormEdits.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="383GU6F7Kt9wTmcTwxlkEMJngNP" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/run/media/icebrah/buh/github/code-mods/butterscotchnroses",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="runtimes">
+        <list />
+      </option>
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3274eddd-39b3-4a14-8a32-3bd14dd358b2" name="Changes" comment="" />
+      <created>1768020854234</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1768020854234</updated>
+      <workItem from="1768203378310" duration="72000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityProjectDiscoverer">
+    <option name="hasUnityReference" value="true" />
+  </component>
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

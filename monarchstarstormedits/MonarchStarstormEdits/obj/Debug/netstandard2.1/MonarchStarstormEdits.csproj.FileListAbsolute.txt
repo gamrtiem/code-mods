@@ -1,0 +1,15 @@
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.deps.json
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.dll
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.pdb
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/bin/Debug/netstandard2.1/Starstorm2-nstrip.dll
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/bin/Debug/netstandard2.1/UnityHotReload.dll
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/bin/Debug/netstandard2.1/Unity.Postprocessing.Runtime.dll
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.csproj.AssemblyReference.cache
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.AssemblyInfoInputs.cache
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.AssemblyInfo.cs
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.csproj.CoreCompileInputs.cache
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.sourcelink.json
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchS.1EA0D11C.Up2Date
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.dll
+/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.pdb
