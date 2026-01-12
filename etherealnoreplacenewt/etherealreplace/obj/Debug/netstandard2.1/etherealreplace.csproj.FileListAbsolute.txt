@@ -1,0 +1,15 @@
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/bin/Debug/netstandard2.1/etherealreplace.deps.json
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/bin/Debug/netstandard2.1/etherealreplace.dll
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/bin/Debug/netstandard2.1/etherealreplace.pdb
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/bin/Debug/netstandard2.1/Starstorm2-nstrip.dll
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/bin/Debug/netstandard2.1/UnityHotReload.dll
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/bin/Debug/netstandard2.1/Unity.Postprocessing.Runtime.dll
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.csproj.AssemblyReference.cache
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.GeneratedMSBuildEditorConfig.editorconfig
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.AssemblyInfoInputs.cache
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.AssemblyInfo.cs
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.csproj.CoreCompileInputs.cache
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.sourcelink.json
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/ethereal.8EB30BAD.Up2Date
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.dll
+/home/icebrah/Documents/github/code-mods/etherealnoreplacenewt/etherealreplace/obj/Debug/netstandard2.1/etherealreplace.pdb
