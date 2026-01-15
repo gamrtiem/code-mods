@@ -61,7 +61,7 @@ namespace DroneRepairBeacon
             #region configs
             DeathTokenConfigs = Config.Bind("drone repair beacon",
                 "silly death strings ! split with /,   ...,., set to nothing to disable !",
-                "res me twin....,,./,HELP HELP MEEE HEEEEEELP/,ough ,.,.../,babe,.,.its {TIME},,, time for your drone reviving session,.,.,.,/,im not broken! im just.... napping... indefinitely..../,REQUESTING HELP.../,LOST CONNECTION.../,YOUR WARRANTY IS 3 DAYS EXPIRED.",
+                "res me twin....,,./,HELP HELP MEEE HEEEEEELP/,ough ,.,.../,babe its {TIME},,, time for your drone reviving session,.,.,.,/,im not broken! im just.... napping... indefinitely..../,REQUESTING HELP.../,LOST CONNECTION.../,YOUR WARRANTY IS 3 DAYS EXPIRED.",
                 "byeah !");
             
             DroneSpecificDeathTokenConfigs = Config.Bind("drone repair beacon",
@@ -284,7 +284,7 @@ namespace DroneRepairBeacon
                             string[] specificTokens = DroneSpecificDeathTokenConfigs.Value.Split(";;");
                             for (int i = 0; i < specificTokens.Length; i++)
                             {
-                                if (specificTokens[i].Trim().Replace("Body", "") != deathState.characterBody.name.Replace("Body", "")) continue;
+                                if (specificTokens[i].Trim().Replace("Body", "") != deathState.characterBody.name.Replace("Body", "").Replace("(Clone)", "")) continue;
                                 
                                 string[] specificTokensReal = specificTokens[i + 1].Split("/,");
                                 deathTokens.AddRange(specificTokensReal);
@@ -292,7 +292,7 @@ namespace DroneRepairBeacon
                             Log.Debug("drone name = " + deathState.characterBody.name);
                             
                             string deathString = deathTokens[Run.instance.runRNG.RangeInt(0, deathTokens.Count)];
-                            deathString = deathString.Trim();
+                            deathString = deathString.Trim().Replace("{TIME}", DateTime.Now.ToString("hh") + DateTime.Now.ToString("tt"));
                             Chat.SendBroadcastChat(new Chat.SimpleChatMessage
                             {
                                 baseToken = $"{Language.GetStringFormatted(deathState.characterBody.baseNameToken)}: {deathString}"
