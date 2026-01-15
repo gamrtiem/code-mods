@@ -1,0 +1,14 @@
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.deps.json
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.dll
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.pdb
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/UnityHotReload.dll
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.AssemblyReference.cache
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.AssemblyInfoInputs.cache
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.AssemblyInfo.cs
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.CoreCompileInputs.cache
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.sourcelink.json
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRep.5C02D22F.Up2Date
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.dll
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.pdb
+/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/ShaderSwapper.dll

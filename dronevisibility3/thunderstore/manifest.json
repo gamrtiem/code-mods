@@ -1,0 +1,9 @@
+{
+    "name": "DroneRepairBeacon",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/gamrtiem/code-mods/tree/main/dronevisibility3",
+    "description": "adds a little beacon above killed drones and makes them scream in agony !! configurable ,..,",
+    "dependencies": [
+        "RiskofThunder-R2API_Prefab-1.1.1"
+    ]
+}

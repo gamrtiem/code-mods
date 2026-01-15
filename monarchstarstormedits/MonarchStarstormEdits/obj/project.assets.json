@@ -2945,11 +2945,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
+      "projectUniqueName": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
       "projectName": "MonarchStarstormEdits",
-      "projectPath": "/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
+      "projectPath": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
       "packagesPath": "/home/icebrah/.nuget/packages/",
-      "outputPath": "/run/media/icebrah/buh/github/code-mods/etherealnoreplacenewt/MonarchStarstormEdits/obj/",
+      "outputPath": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/icebrah/.nuget/NuGet/NuGet.Config"
