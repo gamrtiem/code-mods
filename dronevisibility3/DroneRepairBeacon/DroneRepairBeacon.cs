@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -32,6 +33,7 @@ namespace DroneRepairBeacon
         public static ConfigEntry<float> displayDistance;
         public static ConfigEntry<float> helpScale;
         private static ConfigEntry<string> DeathTokenConfigs;
+        private static ConfigEntry<string> DroneSpecificDeathTokenConfigs;
         private static ConfigEntry<string> droneSprites;
         private static ConfigEntry<bool> customDroneSprites;
         private static ConfigEntry<bool> alwaysShowHelp;
@@ -58,9 +60,14 @@ namespace DroneRepairBeacon
 
             #region configs
             DeathTokenConfigs = Config.Bind("drone repair beacon",
-                "silly death strings ! seperated by comma...,., set to nothing to disable !",
-                "res me twin....,HELP HELP MEEE HEEEEEELP",
+                "silly death strings ! split with /,   ...,., set to nothing to disable !",
+                "res me twin....,,./,HELP HELP MEEE HEEEEEELP/,ough ,.,.../,babe,.,.its {TIME},,, time for your drone reviving session,.,.,.,/,im not broken! im just.... napping... indefinitely..../,REQUESTING HELP.../,LOST CONNECTION.../,YOUR WARRANTY IS 3 DAYS EXPIRED.",
                 "byeah !");
+            
+            DroneSpecificDeathTokenConfigs = Config.Bind("drone repair beacon",
+                "specific drone death strings! formatting like (drone internal name);;(string,string);;!",
+                "Drone1Body;;do your own DPS instead... im done...;'.;/,pls revive i had raygun;;Drone2Body;;ill,,.,., miss you 🥺/,please don't leave me here.,.,./,I MISS_YOU ALREADY;",
+                "you can get them from debugtoolkit or wiki (wiki ones are missing body sometimes though ! like .,., Drone1Body = gunnerdrone ,.,. Drone2Body = healing drone .,.,,..");
             
             displayDistance = Config.Bind("drone repair beacon",
                 "how far should help be visible !!",
@@ -112,7 +119,7 @@ namespace DroneRepairBeacon
 
             if (customDroneSprites.Value)
             {
-                string dir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(BepInEx.Paths.ConfigPath)!, "config", "DroneBeacon");
+                string dir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Paths.ConfigPath)!, "config", "DroneBeacon");
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
@@ -162,11 +169,11 @@ namespace DroneRepairBeacon
         
         private Sprite LoadSpriteFromFile(string path)
         {
-            if (string.IsNullOrEmpty(path) || !System.IO.File.Exists(path)) return null;
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
             
             int sprite_width = 100;
             int sprite_height = 100;
-            byte[] bytes = System.IO.File.ReadAllBytes(path);
+            byte[] bytes = File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(sprite_width, sprite_height, TextureFormat.RGB24, false);
             texture.LoadImage(bytes);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
@@ -181,7 +188,7 @@ namespace DroneRepairBeacon
             IL.RoR2.Hologram.HologramProjector.UpdateForViewer += HologramProjectorOnUpdateForViewer;
         }
 
-        private void SummonMasterBehaviorOnOnEnable(On.RoR2.SummonMasterBehavior.orig_OnEnable orig, RoR2.SummonMasterBehavior self)
+        private void SummonMasterBehaviorOnOnEnable(On.RoR2.SummonMasterBehavior.orig_OnEnable orig, SummonMasterBehavior self)
         {
             orig(self);
             if(!alwaysShowHelp.Value || !alwaysShowHelpAllowTurrets.Value && self.gameObject.name.Contains("Turret"))
@@ -273,8 +280,18 @@ namespace DroneRepairBeacon
                                 return;
                             }
                             
-                            var deathTokens = DeathTokenConfigs.Value.Split(",");
-                            String deathString = deathTokens[Run.instance.runRNG.RangeInt(0, deathTokens.Length)];
+                            List<string> deathTokens = DeathTokenConfigs.Value.Split("/,").ToList();
+                            string[] specificTokens = DroneSpecificDeathTokenConfigs.Value.Split(";;");
+                            for (int i = 0; i < specificTokens.Length; i++)
+                            {
+                                if (specificTokens[i].Trim().Replace("Body", "") != deathState.characterBody.name.Replace("Body", "")) continue;
+                                
+                                string[] specificTokensReal = specificTokens[i + 1].Split("/,");
+                                deathTokens.AddRange(specificTokensReal);
+                            }
+                            Log.Debug("drone name = " + deathState.characterBody.name);
+                            
+                            string deathString = deathTokens[Run.instance.runRNG.RangeInt(0, deathTokens.Count)];
                             deathString = deathString.Trim();
                             Chat.SendBroadcastChat(new Chat.SimpleChatMessage
                             {
