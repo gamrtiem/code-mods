@@ -3,9 +3,11 @@ using BNR.patches;
 using BepInEx.Configuration;
 using HarmonyLib;
 using RoR2;
+using SS2.Components;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using CraftingController = On.RoR2.CraftingController;
+using WormBodyPositions2 = On.RoR2.WormBodyPositions2;
 
 namespace BNR;
 
@@ -127,6 +129,7 @@ public class ChefBazaar : PatchBase<ChefBazaar>
             if (scene.name != "computationalexchange")
             {
                 Log.Debug("rahh not exchange dont cook !! ");
+                self.result = PickupIndex.none;
             }
             else
             {
@@ -137,13 +140,32 @@ public class ChefBazaar : PatchBase<ChefBazaar>
 
     private bool CraftingControllerOnAllSlotsFilled(CraftingController.orig_AllSlotsFilled orig, RoR2.CraftingController self)
     {
-        
+
+        /*if (PickupCatalog.GetPickupDef(PickupIndex.none).itemTier == ItemTier.FoodTier)
+        {
+            if (cookedItem.tier == ItemTier.FoodTier)
+            {
+                Log.Debug($"chefbazaar - caughts trying to cook a food item !! checking for if computational exchange .,,. ");
+                Scene scene = SceneManager.GetActiveScene();
+                Log.Debug($"chefbazaar - {scene.name}");
+
+                if (scene.name != "computationalexchange")
+                {
+                    Log.Debug("rahh not exchange dont cook !! ");
+                }
+                else
+                {
+                    Log.Debug("ok nvm keep cooking !! ");
+                }
+            }
+            self.result = PickupIndex.none;
+        }*/
         return orig(self);
     }
 
     public override void Config(ConfigFile config)
     {
-        enabled = config.Bind("BNR - ChefBazaar",
+        enabled = config.Bind("Mods - ChefBazaar",
             "enable patches for ChefBazaar",
             true,
             "");

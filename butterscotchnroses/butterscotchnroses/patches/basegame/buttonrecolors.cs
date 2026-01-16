@@ -86,7 +86,7 @@ public class buttonrecolors : PatchBase<buttonrecolors>
         
         colorButtons = config.Bind("BNR - UI",
             "change buttons colors", 
-            true, 
+            false, 
             "whether or not to use custom menu button colors,..,"); 
         ModSettingsManager.AddOption(new CheckBoxOption(colorButtons));
             

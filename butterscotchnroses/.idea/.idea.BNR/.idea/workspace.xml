@@ -6,11 +6,41 @@
   <component name="ChangeListManager">
     <list default="true" id="195d8b6e-88d7-4ada-98c3-ec42e4bb6093" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BNR/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BNR/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butterscotchnroses/items/WoodToolkit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/items/WoodToolkit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/butterscotchnroses.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/buttonrecolors.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/buttonrecolors.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/drifter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/drifter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../template/ExamplePlugin/ExamplePlugin.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../template/ExamplePlugin/Log.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../template/RoR2Mods.sln" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/pingcolor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/patches/basegame/pingcolor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butterscotchnroses/patches/mods/chefbazaar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/butterscotchnroses/patches/mods/chefbazaar.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/DroneRepairBeacon/obj/Debug/netstandard2.1/DroneRepairBeacon.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/thunderstore/DroneRepairBeacon.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/thunderstore/DroneRepairBeacon.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/thunderstore/DroneRepairBeacon.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../dronevisibility3/thunderstore/DroneRepairBeacon.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/thunderstore/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dronevisibility3/thunderstore/icon.xcf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/bin/Debug/netstandard2.1/MonarchStarstormEdits.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/obj/Debug/netstandard2.1/MonarchStarstormEdits.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/patches/etherealSaplingChanges.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/MonarchStarstormEdits/patches/etherealSaplingChanges.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/thunderstore/AssetExtractor.pdb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/thunderstore/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/thunderstore/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/thunderstore/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/thunderstore/icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../monarchstarstormedits/thunderstore/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/../monarchstarstormedits/thunderstore/manifest.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,17 +82,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/run/media/icebrah/buh/github/code-mods/template",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/run/media/icebrah/buh/github/code-mods/infernostunbeetles&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
@@ -75,10 +105,10 @@
       <option name="selectedOptions">
         <list />
       </option>
-      <option name="useMixedMode" value="false" />
       <method v="2" />
     </configuration>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="195d8b6e-88d7-4ada-98c3-ec42e4bb6093" name="Changes" comment="" />
@@ -95,24 +125,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
-          <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
-          <option name="timeStamp" value="1" />
-        </breakpoint>
-        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
-          <properties exception="System.Threading.Tasks.TaskCanceledException" breakIfHandledByOtherCode="false" displayValue="System.Threading.Tasks.TaskCanceledException" />
-          <option name="timeStamp" value="2" />
-        </breakpoint>
-        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
-          <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
-          <option name="timeStamp" value="3" />
-        </breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

@@ -1,10 +1,9 @@
 {
     "name": "MonarchsStarstormEdits",
-    "version_number": "0.0.1",
+    "version_number": "0.1.0",
     "website_url": "https://github.com/gamrtiem/code-mods/tree/main/monarchstarstormedits",
-    "description": "random minor starstorm 2 edits ,.,..,,. mostly to beta stuff !!!!!!",
+    "description": "random minor starstorm 2 edits ,.,..,,. mostly to beta stuff !!!!!! configurable !!!!!!!!!",
     "dependencies": [
-        "bbepis-BepInExPack-5.4.2117",
-        "tristanmcpherson-R2API-5.0.5"
+        "TeamMoonstorm-Starstorm2-0.6.31"
     ]
 }

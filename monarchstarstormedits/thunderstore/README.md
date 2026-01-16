@@ -1,3 +1,15 @@
 # Monarchs Starstorm Edits 
 
-minor ss2 edits to beta stuff ,.,.
+variety of edits to ss2 !!!!!!!!!
+likes .,.,,. umm .,.,,,...., uhhh ,..,.,,.,., gives ethereal saplings odds to spawn instead of always replacing newt altars !!!!!! and has special chat message when it spawns that you can configure !!!!!!!
+
+plus custom ethereal sapling vfxs for when you hit and makes it so you only have to hit it once !!! (twice to cancel ,.,.,. 
+![new ethereal vfx showcase !!](https://files.catbox.moe/qajshw.gif)
+
+
+ohs and ethereal sapling upgrades make eclipse level up instead of deluge ! or just upgrades scaling difficulty while keeping eclipse level the same !! 
+
+
+and and and fixes lunar gambler errors when it gives a void potential as a payout !! 
+and replaces old composite injector drops (would do nothing befores,..,( with functional coupler drops !!!! 
+and makes the hidden enemies curse have a timed buff instead of always because i hate it alot !!!!!!!!!  

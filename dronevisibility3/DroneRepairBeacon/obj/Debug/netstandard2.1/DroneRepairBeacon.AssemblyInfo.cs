@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DroneRepairBeacon")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2c3deef6caa07f81bc1299147736123f62aa1cd8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8867b6cb6ab144ec433c853e05f8a92e8f0f0403")]
 [assembly: System.Reflection.AssemblyProductAttribute("DroneRepairBeacon")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DroneRepairBeacon")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

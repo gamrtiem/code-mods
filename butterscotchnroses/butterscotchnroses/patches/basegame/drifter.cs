@@ -22,11 +22,9 @@ public class drifter : PatchBase<drifter>
 {
     public override void Init(Harmony harmony)
     {
-        applyHooks();
-        
-        if (!enabled.Value)
+        if (enabled.Value)
         {
-            return;
+            applyHooks();
         }
     }
 
@@ -35,7 +33,6 @@ public class drifter : PatchBase<drifter>
         if (enabled.Value)
         {
             EmptyBag.ModifyProjectile += EmptyBagOnModifyProjectile;
-            RigidbodyStickOnImpact.OnCollisionEnter += RigidbodyStickOnImpactOnOnCollisionEnter;
             ProjectileStickOnImpact.TrySticking += ProjectileStickOnImpactOnTrySticking;
             ProjectileStickOnImpact.UpdateSticking += ProjectileStickOnImpactOnUpdateSticking;
             DeathState.Explode += DeathStateOnExplode;
@@ -45,7 +42,6 @@ public class drifter : PatchBase<drifter>
         else
         {
             EmptyBag.ModifyProjectile -= EmptyBagOnModifyProjectile;
-            RigidbodyStickOnImpact.OnCollisionEnter -= RigidbodyStickOnImpactOnOnCollisionEnter;
             ProjectileStickOnImpact.TrySticking -= ProjectileStickOnImpactOnTrySticking;
             ProjectileStickOnImpact.UpdateSticking -= ProjectileStickOnImpactOnUpdateSticking;
             DeathState.Explode -= DeathStateOnExplode;
@@ -208,23 +204,11 @@ public class drifter : PatchBase<drifter>
                     self.rigidbody.isKinematic = true;
 
                 }
-
-                
                 return true;
             }
         }
         
-    
-
-
         return orig(self, hitCollider, impactNormal);
-    }
-
-    private void RigidbodyStickOnImpactOnOnCollisionEnter(RigidbodyStickOnImpact.orig_OnCollisionEnter orig, RoR2.RigidbodyStickOnImpact self, Collision collision)
-    {
-        Log.Debug($"drifter - {collision.transform.gameObject.name}");
-        
-        orig(self, collision);
     }
 
     private void EmptyBagOnModifyProjectile(EmptyBag.orig_ModifyProjectile orig, EntityStates.Drifter.EmptyBag self, ref FireProjectileInfo fireProjectileInfo)

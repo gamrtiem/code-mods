@@ -19,17 +19,22 @@ public class pingrecolor : PatchBase<pingrecolor>
     {
         if (enabled.Value)
         {
+            On.RoR2.UI.PingIndicator.OnEnable += PingIndicatorOnOnEnable;
             PingIndicator.RebuildPing += PingIndicatorOnRebuildPing;
         }
         else
         {
+            PingIndicator.OnEnable -= PingIndicatorOnOnEnable;
             PingIndicator.RebuildPing -= PingIndicatorOnRebuildPing;
         }
     }
 
-    private void PingIndicatorOnRebuildPing(PingIndicator.orig_RebuildPing orig, RoR2.UI.PingIndicator self)
+    private void PingIndicatorOnOnEnable(PingIndicator.orig_OnEnable orig, RoR2.UI.PingIndicator self)
     {
-        orig(self);
+        Log.Debug(self.pingColor + "bwaa 2");
+        self.defaultPingColor = pingIndicatorDefault.Value;
+        self.enemyPingColor = pingIndicatorEnemy.Value;
+        self.interactablePingColor = pingIndicatorInteractable.Value;
 
         self.pingColor = self.pingType switch
         {
@@ -39,6 +44,33 @@ public class pingrecolor : PatchBase<pingrecolor>
             RoR2.UI.PingIndicator.PingType.Count => pingIndicatorCount.Value,
             _ => self.pingColor
         };
+        self.transform.GetChild(0).GetComponent<ParticleSystem>().startColor = pingIndicatorDefault.Value;
+        self.transform.GetChild(1).GetComponent<ParticleSystem>().startColor = pingIndicatorInteractable.Value;
+        self.transform.GetChild(2).GetComponent<ParticleSystem>().startColor = pingIndicatorEnemy.Value;
+        self.positionIndicator.alwaysVisibleObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = self.pingColor;
+        orig(self);
+    }
+
+    private void PingIndicatorOnRebuildPing(PingIndicator.orig_RebuildPing orig, RoR2.UI.PingIndicator self)
+    {
+        Log.Debug(self.pingColor + "bwaa ");
+        self.defaultPingColor = pingIndicatorDefault.Value;
+        self.enemyPingColor = pingIndicatorEnemy.Value;
+        self.interactablePingColor = pingIndicatorInteractable.Value;
+
+        self.pingColor = self.pingType switch
+        {
+            RoR2.UI.PingIndicator.PingType.Default => pingIndicatorDefault.Value,
+            RoR2.UI.PingIndicator.PingType.Enemy => pingIndicatorEnemy.Value,
+            RoR2.UI.PingIndicator.PingType.Interactable => pingIndicatorInteractable.Value,
+            RoR2.UI.PingIndicator.PingType.Count => pingIndicatorCount.Value,
+            _ => self.pingColor
+        };
+        self.transform.GetChild(0).GetComponent<ParticleSystem>().startColor = pingIndicatorDefault.Value;
+        self.transform.GetChild(1).GetComponent<ParticleSystem>().startColor = pingIndicatorInteractable.Value;
+        self.transform.GetChild(2).GetComponent<ParticleSystem>().startColor = pingIndicatorEnemy.Value;
+        self.positionIndicator.alwaysVisibleObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = self.pingColor;
+        orig(self);
     }
 
     public override void Config(ConfigFile config)

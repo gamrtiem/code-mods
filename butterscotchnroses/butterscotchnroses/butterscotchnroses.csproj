@@ -32,6 +32,9 @@
 	  <Reference Include="GoldenCoastPlusRevived">
 	    <HintPath>..\GoldenCoastPlusRevived-nstrip.dll</HintPath>
 	  </Reference>
+	  <Reference Include="Inferno">
+	    <HintPath>..\Inferno-nstrip.dll</HintPath>
+	  </Reference>
 	  <Reference Include="LittleGameplayTweaks">
 	    <HintPath>..\LittleGameplayTweaks-nstrip.dll</HintPath>
 	  </Reference>

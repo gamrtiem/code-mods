@@ -61,7 +61,7 @@ namespace DroneRepairBeacon
             #region configs
             DeathTokenConfigs = Config.Bind("drone repair beacon",
                 "silly death strings ! split with /,   ...,., set to nothing to disable !",
-                "res me twin....,,./,HELP HELP MEEE HEEEEEELP/,ough ,.,.../,babe its {TIME},,, time for your drone reviving session,.,.,.,/,im not broken! im just.... napping... indefinitely..../,REQUESTING HELP.../,LOST CONNECTION.../,YOUR WARRANTY IS 3 DAYS EXPIRED.",
+                "res me twin....,,./,HELP HELP MEEE HEEEEEELP/,ough ,.,.../,babe its {TIME},,, time for your drone reviving session,.,.,.,/,im not broken! im just.... napping... indefinitely..../,REQUESTING HELP.../,LOST CONNECTION.../,YOUR WARRANTY IS 3 DAYS EXPIRED./,oof ouch my bo lts..,",
                 "byeah !");
             
             DroneSpecificDeathTokenConfigs = Config.Bind("drone repair beacon",
@@ -292,7 +292,19 @@ namespace DroneRepairBeacon
                             Log.Debug("drone name = " + deathState.characterBody.name);
                             
                             string deathString = deathTokens[Run.instance.runRNG.RangeInt(0, deathTokens.Count)];
-                            deathString = deathString.Trim().Replace("{TIME}", DateTime.Now.ToString("hh") + DateTime.Now.ToString("tt"));
+                            if (deathString.Contains("{TIME}"))
+                            {
+                                string time = DateTime.Now.ToString("hh") + DateTime.Now.ToString("tt");
+                                
+                                if (time.StartsWith("0"))
+                                {
+                                    time = time.Substring(1, time.Length - 1);
+                                }
+
+                                deathString = deathString.Replace("{TIME}", time.ToLower());
+                            }
+                            
+                            deathString = deathString.Trim();
                             Chat.SendBroadcastChat(new Chat.SimpleChatMessage
                             {
                                 baseToken = $"{Language.GetStringFormatted(deathState.characterBody.baseNameToken)}: {deathString}"

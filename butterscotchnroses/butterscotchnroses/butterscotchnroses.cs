@@ -22,8 +22,6 @@ using RoR2.ExpansionManagement;
 
 namespace BNR
 {
-    [BepInDependency(ItemAPI.PluginGUID)]
-    [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
 
     public class butterscotchnroses : BaseUnityPlugin
