@@ -4,7 +4,7 @@ using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace ExamplePlugin.items;
+namespace BNR.items;
 internal class WoodToolkitBuff : BuffBase<WoodToolkitBuff>
 {
     internal override string name => "Bark";

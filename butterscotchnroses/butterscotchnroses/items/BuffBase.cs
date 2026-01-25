@@ -3,7 +3,7 @@ using R2API;
 using RoR2;
 using UnityEngine;
 
-namespace ExamplePlugin.items
+namespace BNR.items
 {
     public abstract class BuffBase<T> : BuffBase where T : BuffBase<T>
     {

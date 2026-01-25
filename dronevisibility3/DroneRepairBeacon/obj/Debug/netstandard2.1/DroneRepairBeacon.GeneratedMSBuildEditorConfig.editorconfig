@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = DroneRepairBeacon
-build_property.ProjectDir = /run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/
+build_property.ProjectDir = /home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

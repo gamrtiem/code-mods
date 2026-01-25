@@ -1,4 +1,4 @@
-using static BNR.butterscotchnroses;
+/*using static BNR.butterscotchnroses;
 using BNR.patches;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -159,7 +159,7 @@ public class ChefBazaar : PatchBase<ChefBazaar>
                 }
             }
             self.result = PickupIndex.none;
-        }*/
+        }*//*
         return orig(self);
     }
 
@@ -178,3 +178,4 @@ public class ChefBazaar : PatchBase<ChefBazaar>
 
     private ConfigEntry<bool> enabled;
 }
+*/

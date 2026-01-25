@@ -2981,11 +2981,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+      "projectUniqueName": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
       "projectName": "DroneRepairBeacon",
-      "projectPath": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+      "projectPath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
       "packagesPath": "/home/icebrah/.nuget/packages/",
-      "outputPath": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/",
+      "outputPath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/icebrah/.nuget/NuGet/NuGet.Config"
@@ -3077,7 +3077,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.101/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/RuntimeIdentifierGraph.json"
       }
     }
   },

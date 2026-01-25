@@ -1,4 +1,4 @@
-using static BNR.butterscotchnroses;
+/*using static BNR.butterscotchnroses;
 using BNR.patches;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -176,3 +176,4 @@ public class HologramHelper : MonoBehaviour
         transform.rotation = Quaternion.Euler(target);
     }
 }
+*/

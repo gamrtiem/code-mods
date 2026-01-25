@@ -1,7 +1,7 @@
 using System;
 using BepInEx.Configuration;
 using BNR;
-using ExamplePlugin.items;
+using BNR.items;
 using GoldenCoastPlusRevived.Buffs;
 using R2API;
 using RoR2;
@@ -9,10 +9,10 @@ using RoR2.Items;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
-using BuffBase = ExamplePlugin.items.BuffBase;
+using BuffBase = BNR.items.BuffBase;
 using ShrineHealingBehavior = On.RoR2.ShrineHealingBehavior;
 
-namespace ExamplePlugin.items;
+namespace BNR.items;
 
 public class WoodToolkit : ItemBase<WoodToolkit>
 {

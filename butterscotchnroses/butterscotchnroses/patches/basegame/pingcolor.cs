@@ -1,4 +1,4 @@
-using BNR.patches;
+/*using BNR.patches;
 using BepInEx.Configuration;
 using HarmonyLib;
 using On.RoR2.UI;
@@ -115,4 +115,4 @@ public class pingrecolor : PatchBase<pingrecolor>
     private ConfigEntry<Color> pingIndicatorInteractable;
     private ConfigEntry<Color> pingIndicatorCount;
     private ConfigEntry<bool> enabled;
-}
+}*/

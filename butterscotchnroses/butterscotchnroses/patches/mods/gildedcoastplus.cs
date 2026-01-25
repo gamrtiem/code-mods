@@ -14,7 +14,7 @@ public class gildedcoastplus : PatchBase<gildedcoastplus>
         [HarmonyPrefix]
         public static bool GoldenCoastPlusRevivedGiveBuffPreFix()
         {
-            Log.Debug("skipping reward buff !!");
+            //Log.Debug("skipping reward buff !!");
             return !skipGoldenRewards.Value; 
         }
     }

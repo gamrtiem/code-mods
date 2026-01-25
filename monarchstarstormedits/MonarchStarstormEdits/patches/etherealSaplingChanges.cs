@@ -35,7 +35,7 @@ public class etherealSaplingChanges : PatchBase<etherealSaplingChanges>
             float chance = Run.instance.runRNG.RangeFloat(0, 1);
             if (chance <= spawnChance.Value)
             {
-                Log.Debug("spawning shrine !!");
+                //Log.Debug("spawning shrine !!");
                 
                 if (sendChatMessage.Value)
                 {
@@ -48,7 +48,7 @@ public class etherealSaplingChanges : PatchBase<etherealSaplingChanges>
                 return true;
             }
             
-            Log.Debug("not spawning ethereal shrine !! ");
+            //Log.Debug("not spawning ethereal shrine !! ");
             
             return false;
         }
@@ -92,7 +92,6 @@ public class etherealSaplingChanges : PatchBase<etherealSaplingChanges>
             
             if (__instance.purchaseCount >= 1)
             {
-                CharacterBody interactorBody = interactor.GetComponent<CharacterBody>();
                 Chat.SendBroadcastChat(new Chat.SubjectFormatChatMessage
                 {
                     baseToken = "<style=cIsHealing>The gods feel as if mocked...</style>"
@@ -237,7 +236,6 @@ public class etherealSaplingChanges : PatchBase<etherealSaplingChanges>
             
             __instance.gameObject.AddComponent<EtherealShrineActivator>().interactor = interactor;
             
-            // add code to check if they interact again while the vfx is active to cancel
             return false;
         }
     }

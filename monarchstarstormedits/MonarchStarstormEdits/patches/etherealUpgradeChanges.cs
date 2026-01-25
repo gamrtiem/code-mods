@@ -12,7 +12,7 @@ public class etherealUpgradeChanges : PatchBase<etherealUpgradeChanges>
     {
         [HarmonyPatch(typeof(EtherealBehavior), "UpdateDifficulty")]
         [HarmonyPrefix]
-        public static bool BeginTradePrefix(EtherealBehavior __instance)
+        public static bool UpdateDifficultyPrefix(EtherealBehavior __instance)
         {
             DifficultyDef curDiff = DifficultyCatalog.GetDifficultyDef(__instance.run.selectedDifficulty);
             Log.Debug(curDiff + "current dif f,..,.,,. name token = " + curDiff.nameToken);

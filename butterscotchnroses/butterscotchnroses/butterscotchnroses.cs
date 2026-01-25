@@ -1,23 +1,10 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BNR.patches;
-using ExamplePlugin.items;
+using BNR.items;
 using HarmonyLib;
-using R2API;
-using RoR2;
-using UnityEngine;
-using UnityHotReloadNS;
-using RoR2.ContentManagement;
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using BepInEx.Configuration;
-using RoR2.ExpansionManagement;
 
 
 namespace BNR
@@ -30,7 +17,7 @@ namespace BNR
 
         public const string PluginAuthor = "icebro";
         public const string PluginName = "BNR";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "0.1.0";
 
         public void Awake()
         {
@@ -42,7 +29,6 @@ namespace BNR
             Logger.LogDebug("loading mod !!");
             
             Harmony harmony = new(Info.Metadata.GUID);
-            //look into items like how that works instead of individual
             var patches = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(PatchBase)));
             foreach (Type patch in patches)
             {
@@ -55,7 +41,8 @@ namespace BNR
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e);
+                    Log.Warning("failed to patch something ! probably fine if you dont have whatever mod that was attempted to be patched enabled ,..,,.");
+                    Log.Warning(e);
                 }
             }
             
@@ -67,29 +54,12 @@ namespace BNR
                 buff.AddBuff();
             }
             
-            //scan for all items
             var itemTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(ItemBase)));
 
             foreach (var itemType in itemTypes)
             {
                 ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
                 item.Init(Config);
-            }
-        }
-        
-        void Update()
-        {
-            if (Input.GetKeyUp(KeyCode.F4))
-            {
-                UnityHotReload.LoadNewAssemblyVersion(
-                    typeof(butterscotchnroses).Assembly, // The currently loaded assembly to replace.
-                    "Z:\\run\\media\\icebrah\\buh\\gale\\riskofrain2\\profiles\\debug2 awese\\BepInEx\\plugins\\MarioVsLuigi-Linux-v1.7.1.0-beta\\butterscotchnroses.dll"  // The path to the newly compiled DLL.
-                );
-            }
-            
-            if (Input.GetKeyUp(KeyCode.F1))
-            {
-                Log.Debug("asdasdasdasd");
             }
         }
     }

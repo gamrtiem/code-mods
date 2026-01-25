@@ -221,14 +221,14 @@ public class coolereclipse : PatchBase<coolereclipse>
         
         blacklistStages = config.Bind("Mods - CoolerEclipse", 
             "stage blacklist", 
-            "goldshores,bazaar,solutionalhaunt", 
+            "goldshores,bazaar,solutionalhaunt,ss2_voidshop,goldshores", 
             "eclipse stage blacklist (seperate by , !! (eg golemplains,blackbeach!!");
         BNRUtils.StringConfig(blacklistStages);
         
         
         whitelistStages = config.Bind("Mods - CoolerEclipse", 
             "stage whitelist", 
-            "golemplains,golemplains2,ss2_voidshop,goldshores", 
+            "golemplains,golemplains2", 
             "what stages to force eclipses on (seperate by , !! (eg golemplains,blackbeach!! will not work with moon2, ,..");
         BNRUtils.StringConfig(whitelistStages);
     }

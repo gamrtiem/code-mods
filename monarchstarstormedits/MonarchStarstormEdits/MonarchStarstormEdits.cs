@@ -18,7 +18,7 @@ namespace MonarchStarstormEdits
         private const string PluginGUID = PluginAuthor + "." + PluginName;
         private const string PluginAuthor = "icebro";
         private const string PluginName = "MonarchStarstormEdits";
-        private const string PluginVersion = "0.0.1";
+        private const string PluginVersion = "0.1.0";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
 

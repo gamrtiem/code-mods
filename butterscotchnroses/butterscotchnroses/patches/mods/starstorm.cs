@@ -204,7 +204,7 @@ public class starstorm : PatchBase<starstorm>
     {
         if (!applySS2.Value) return;
         harmony.CreateClassProcessor(typeof(Starstorm2ExeChanges)).Patch();
-        LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC", $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
+        //LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC", $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
         LanguageAPI.Add("SS2_ITEM_ICETOOL_DESC", $"While <style=cIsUtility>touching a wall</style>, gain <style=cIsUtility>+1</style> <style=cStack>(+1 per stack)</style> extra jump and a <style=\"cIsUtility\">{iceToolFreezeChance.Value}%</style> <style=\"cStack\">(+{iceToolFreezeChanceStack.Value}% per stack)</style> chance to <style=\"cIsUtility\">freeze enemies</style> for <style=\"cIsUtility\">{iceToolFreezeTime.Value} seconds</style> <style=\"cStack\">(+{iceToolFreezeTimeStack.Value} per stack)</style>. ");
         
         Hooks();
@@ -216,6 +216,7 @@ public class starstorm : PatchBase<starstorm>
         {
             orig(self, info);
             
+            if (!NetworkServer.active) return;
             if (!info.attacker) return;
             CharacterBody attackerbody = info.attacker.GetComponent<CharacterBody>();
             
@@ -225,7 +226,6 @@ public class starstorm : PatchBase<starstorm>
             if (stacks <= 0) return;
             
             if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
-            if (!NetworkServer.active) return;
             
             SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
             if (frozenState)
@@ -284,7 +284,7 @@ public class starstorm : PatchBase<starstorm>
         #endregion
         
         #region execution
-        
+        /*
         speedmult = config.Bind("Mods - SS2",
                 "execution speed damage multiplier",
                 10f,
@@ -339,7 +339,7 @@ public class starstorm : PatchBase<starstorm>
                     $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
             }
         }
-
+        */
         #endregion
     }
     

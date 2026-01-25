@@ -45,7 +45,7 @@ namespace DroneRepairBeacon
         {
             Log.Init(Logger);
             
-            string assetbundledir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "assettest");
+            string assetbundledir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "dronevisibilitybundle");
             assetbundle = AssetBundle.LoadFromFileAsync(assetbundledir).assetBundle;
             DroneIndicatorHologram = assetbundle.LoadAsset<GameObject>("DroneIndicatorHologram");
             DroneIndicatorVFX = assetbundle.LoadAsset<GameObject>("DroneIndicatorVFX");
@@ -90,8 +90,8 @@ namespace DroneRepairBeacon
             
             droneSprites = Config.Bind("drone repair beacon",
                 "what message sprites to use! randomizes with multiple ,..,. options in config desc !! seperate by , NEEDS RESTART !!",
-                "BeaconVFXbrokenheart,BeaconVFXCog,BeaconVFXexplain,BeaconVFXowww,BeaconVFXplead,BeaconVFXresmetwin",
-                "BeaconVFXbrokenheart,BeaconVFXCog,BeaconVFXexplain,BeaconVFXowww,BeaconVFXplead,BeaconVFXresmetwin");
+                "BeaconVFXbrokenheart,BeaconVFXCog,BeaconVFXexplain,BeaconVFXowww,BeaconVFXplead,BeaconVFXresmetwin,BeaconVFXAnar,BeaconVFXLukas",
+                "BeaconVFXbrokenheart,BeaconVFXCog,BeaconVFXexplain,BeaconVFXowww,BeaconVFXplead,BeaconVFXresmetwin,BeaconVFXAnar,BeaconVFXAnarColor,BeaconVFXLukas,BeaconVFXLukasColor");
             customDroneSprites = Config.Bind("drone repair beacon",
                 "if you have any custom images you wants to use !!! NEEDS RESTART !!",
                 false,
@@ -316,7 +316,7 @@ namespace DroneRepairBeacon
                 Log.Debug("added tracker to dead drones !!");
             }
         }
-        #endregion
+        #endregion'
 
         private void Update()
         {

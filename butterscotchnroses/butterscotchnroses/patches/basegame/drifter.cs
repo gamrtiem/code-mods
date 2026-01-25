@@ -32,37 +32,40 @@ public class drifter : PatchBase<drifter>
     {
         if (enabled.Value)
         {
-            EmptyBag.ModifyProjectile += EmptyBagOnModifyProjectile;
+            /*EmptyBag.ModifyProjectile += EmptyBagOnModifyProjectile;
             ProjectileStickOnImpact.TrySticking += ProjectileStickOnImpactOnTrySticking;
             ProjectileStickOnImpact.UpdateSticking += ProjectileStickOnImpactOnUpdateSticking;
-            DeathState.Explode += DeathStateOnExplode;
+            DeathState.Explode += DeathStateOnExplode;*/
             CharacterMaster.GetDeployableSameSlotLimit += CharacterMasterOnGetDeployableSameSlotLimit;
             Idle.OnEnter += IdleOnOnEnter;
         }
         else
         {
-            EmptyBag.ModifyProjectile -= EmptyBagOnModifyProjectile;
+            /*EmptyBag.ModifyProjectile -= EmptyBagOnModifyProjectile;
             ProjectileStickOnImpact.TrySticking -= ProjectileStickOnImpactOnTrySticking;
             ProjectileStickOnImpact.UpdateSticking -= ProjectileStickOnImpactOnUpdateSticking;
-            DeathState.Explode -= DeathStateOnExplode;
+            DeathState.Explode -= DeathStateOnExplode;*/
             CharacterMaster.GetDeployableSameSlotLimit -= CharacterMasterOnGetDeployableSameSlotLimit;
             Idle.OnEnter -= IdleOnOnEnter;
         }
     }
     
+    
     private void IdleOnOnEnter(Idle.orig_OnEnter orig, EntityStates.JunkCube.Idle self)
     {
         orig(self);
-        self.fixedAge = Mathf.NegativeInfinity; // you will live forever
+        if(neverKillCubes.Value)
+            self.fixedAge = Mathf.NegativeInfinity; // you will live forever
     }
     private int CharacterMasterOnGetDeployableSameSlotLimit(CharacterMaster.orig_GetDeployableSameSlotLimit orig, RoR2.CharacterMaster self, DeployableSlot slot)
     {
         return slot == DeployableSlot.DrifterJunkCube ? cubeCount.Value : orig(self, slot);
     }
 
+    /*
     private void DeathStateOnExplode(DeathState.orig_Explode orig, EntityStates.JunkCube.DeathState self)
     {
-        Log.Debug($"drifter - {self.transform.childCount}");
+        //Log.Debug($"drifter - {self.transform.childCount}");
         for (int i = 0; i < self.transform.childCount; i++)
         {
             if (self.transform.GetChild(i).name != "ModelBase" &&
@@ -71,15 +74,15 @@ public class drifter : PatchBase<drifter>
                 self.transform.GetChild(i).name != "JunkCubeLaunchEffect(Clone)")
                 
             {
-                Log.Debug($"drifter explode 2 - {self.transform.GetChild(i)}");
+                //Log.Debug($"drifter explode 2 - {self.transform.GetChild(i)}");
                 var child = self.transform.GetChild(i);
                 child.parent = null;
                 var layerMask = LayerMask.GetMask("World");
                 Ray someRay = new Ray(self.transform.position, Vector3.down);
                 Physics.Raycast(someRay, out RaycastHit hit, Mathf.Infinity, layerMask);
                 child.transform.position = hit.point;
-                Log.Debug($"drifter hit - {hit.point}");
-                Log.Debug($"drifter hit - {hit.point}");
+                //Log.Debug($"drifter hit - {hit.point}");
+                //Log.Debug($"drifter hit - {hit.point}");
                 child.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
 
             }
@@ -91,7 +94,7 @@ public class drifter : PatchBase<drifter>
     {
         if (self.GetComponent<driftercubebwaaa>() && self.GetComponent<driftercubebwaaa>().referencetrans != null)
         {
-            Log.Debug($"drifter - bwaaaa4");
+            //Log.Debug($"drifter - bwaaaa4");
             
 
             self.stickEvent.Invoke();
@@ -123,14 +126,12 @@ public class drifter : PatchBase<drifter>
 
         if (cubename != null)
         {
-            Log.Debug($"drifter - cubenae {cubename}");
-            Log.Debug($"drifter - {hitCollider.transform.parent.transform.parent.transform.parent.transform.parent.name}");
+            //Log.Debug($"drifter - cubenae {cubename}");
+            //Log.Debug($"drifter - {hitCollider.transform.parent.transform.parent.transform.parent.transform.parent.name}");
 
             if (hitCollider.transform.parent.transform.parent.transform.parent.transform.parent.name.Contains(
                     "JunkCube"))
-            {
-                /*
-                */
+            {                
                 self.NetworkrunStickEvent = true;
                 //self.NetworklocalPosition = transform.InverseTransformPoint(self.transform.position);
                 self.victim = self.gameObject;
@@ -214,18 +215,18 @@ public class drifter : PatchBase<drifter>
     private void EmptyBagOnModifyProjectile(EmptyBag.orig_ModifyProjectile orig, EntityStates.Drifter.EmptyBag self, ref FireProjectileInfo fireProjectileInfo)
     {
         orig(self, ref fireProjectileInfo);
-        Log.Debug($"drifter - {self.characterBody.inputBank.sprint.down}");
-        Log.Debug($"drifter - {self.characterBody.inputBank.sprint.wasDown}");
+        //Log.Debug($"drifter - {self.characterBody.inputBank.sprint.down}");
+        //Log.Debug($"drifter - {self.characterBody.inputBank.sprint.wasDown}");
         if (self.characterBody.inputBank.sprint.down)
         {
-            Log.Debug($"bwaa2 {fireProjectileInfo.force} {fireProjectileInfo.speedOverride}");
+            //Log.Debug($"bwaa2 {fireProjectileInfo.force} {fireProjectileInfo.speedOverride}");
             
             fireProjectileInfo.force = 0;
             fireProjectileInfo.speedOverride = 0;
         }
         
         
-    }
+    }*/
 
     public override void Config(ConfigFile config)
     {
@@ -241,13 +242,20 @@ public class drifter : PatchBase<drifter>
             20,
             "limit of junk cubes !!");
         BNRUtils.SliderConfig(4, 300, cubeCount);
+        
+        neverKillCubes = config.Bind("BNR - drifter",
+            "never kill cubes !!!",
+            true,
+            "byeah ,,.");
+        BNRUtils.CheckboxConfig(neverKillCubes);
     }
 
     private ConfigEntry<bool> enabled;
+    private ConfigEntry<bool> neverKillCubes;
     private ConfigEntry<int> cubeCount;
 }
 
-public class driftercubebwaaa : MonoBehaviour
+/*public class driftercubebwaaa : MonoBehaviour
 {
     public Transform referencetrans;
     public Quaternion referencerot;
@@ -264,4 +272,4 @@ public class driftercubebwaaa : MonoBehaviour
             Object.Destroy(this);
         }
     }
-}
+}*/

@@ -44,7 +44,7 @@ public class inferno : PatchBase<inferno>
     public override void Config(ConfigFile config)
     {
         applyInferno = config.Bind("Mods - Inferno",
-            "apply golden coast plus patches !!",
+            "apply inferno patches !!",
             true,
             "");
         BNRUtils.CheckboxConfig(applyInferno);

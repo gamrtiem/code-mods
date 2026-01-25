@@ -34,7 +34,7 @@ public class gamblerFix : PatchBase<gamblerFix>
                 }
                 else
                 {
-                    Log.Debug("wow ,.., okay ,.,.");
+                    //Log.Debug("wow ,.., okay ,.,.");
                 }
                 
                 __instance.pickupQueue = new Queue<RewardDropper.RewardInfo>();
@@ -108,7 +108,7 @@ public class gamblerFix : PatchBase<gamblerFix>
             "try to fix lunar gambler errors when it gives void potentials!!! disable if its fixed already .,.,", 
             true,
             "byeah ,.,");
-        injectorToCoupler = config.Bind("lunar gambler fix s,s,.,.", 
+        injectorToCoupler = config.Bind("lunar gambler tweaks !!!", 
             "add a functional coupler (if dlc3 enabled( to rewards with equipments (ones that used to have composite injector .,.,", 
             true,
             "byeah ,.,");

@@ -54,22 +54,16 @@ public class gamblerTweaks : PatchBase<gamblerTweaks>
 
     public override void Init(Harmony harmony)
     {
-        if (!gamblerTweak.Value) return;
         harmony.CreateClassProcessor(typeof(Starstorm2GamblerTweaks)).Patch();
     }
 
     public override void Config(ConfigFile config)
     {
-        gamblerTweak = config.Bind("lunar gambler tweaks !!!", 
-            "try to fix lunar gambler errors when it gives void potentials!!! disable if its fixed already .,.,", 
-            true,
-            "byeah ,.,");
         baseCloakDuration = config.Bind("lunar gambler tweaks !!!", 
             "makes cloak curse have a timer instead of always .,., i hate them so much ,.,..,,. 0 to disable !!", 
             15.0f,
             "byeah ,.,");
     }
     
-    private static ConfigEntry<bool> gamblerTweak;
     private static ConfigEntry<float> baseCloakDuration;
 }

@@ -1,4 +1,4 @@
-using BepInEx;
+/*using BepInEx;
 using BepInEx.Configuration;
 using BNR.patches;
 using HarmonyLib;
@@ -45,11 +45,11 @@ public class logoreplace : PatchBase<logoreplace>
     {
         enabled = config.Bind("BNR - replace logo",
             "enable patches for logoreplace",
-            true,
+            false,
             "replaces logo with a logo.png in the config folder (like realermodpackutils (rest in peace ,,.,.");
         BNRUtils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) => { Hook(); };
     }
 
     private ConfigEntry<bool> enabled;
-}
+}*/
