@@ -32,10 +32,10 @@ namespace BNR
             var patches = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(PatchBase)));
             foreach (Type patch in patches)
             {
-                PatchBase patchBase = (PatchBase)Activator.CreateInstance(patch);
-
                 try
                 {
+                    PatchBase patchBase = (PatchBase)Activator.CreateInstance(patch);
+
                     patchBase.Config(Config);
                     patchBase.Init(harmony);
                 }

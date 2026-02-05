@@ -2,9 +2,11 @@ using BepInEx.Configuration;
 using BNR.patches;
 using static BNR.butterscotchnroses;
 using HarmonyLib;
+using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using BossGroup = On.RoR2.BossGroup;
 
 namespace BNR;
@@ -54,6 +56,7 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
         
         GameObject blueportal = Object.Instantiate(bluePortalRef);
         blueportal.transform.position = greenportal.transform.position;
+        NetworkServer.Spawn(blueportal);
         Object.Destroy(greenportal);
     }
 

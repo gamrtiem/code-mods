@@ -91,7 +91,7 @@ public class EvilUrchinSpawner : MonoBehaviour
             ? _characterBody.inputBank.GetAimRay()
             : new Ray(transform.position, transform.rotation * Vector3.forward));
         Quaternion rotation = Quaternion.LookRotation(ray.direction);
-        GameObject gameObject3 = UnityEngine.Object.Instantiate(
+        GameObject gameObject3 = Instantiate(
             LegacyResourcesAPI.Load<GameObject>("Prefabs/CharacterMasters/UrchinTurretMaster"), position2,
             rotation);
         CharacterMaster component3 = gameObject3.GetComponent<CharacterMaster>();

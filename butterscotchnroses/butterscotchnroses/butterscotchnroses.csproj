@@ -26,6 +26,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Reference Include="AllyNames">
+	    <HintPath>..\AllyNames-nstrip.dll</HintPath>
+	  </Reference>
 	  <Reference Include="CoolerEclipse">
 	    <HintPath>..\CoolerEclipse-nstrip.dll</HintPath>
 	  </Reference>

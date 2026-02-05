@@ -11,28 +11,25 @@ public class inferno : PatchBase<inferno>
     [HarmonyPatch]
     public class InfernoChanges
     {
-        [HarmonyPatch]
-        public class InfernoHarmonyPatches
+        [HarmonyPatch(typeof(Inferno.Stat_AI.Body), "BodyChanges")]
+        [HarmonyILManipulator]
+        public static void OnEnterPostFix(ILContext il)
         {
-            [HarmonyPatch(typeof(Inferno.Stat_AI.Body), "BodyChanges")]
-            [HarmonyILManipulator]
-            public static void OnEnterPostFix(ILContext il)
+            if (!noBeetleStun.Value)
             {
-                if (!noBeetleStun.Value)
-                {
-                    return;
-                }
-                
-                Log.Debug("ilh ook hate beetle grahhhhh");
-                var c = new ILCursor(il);
+                return;
+            }
+            
+            Log.Debug("ilh ook hate beetle grahhhhh");
+            var c = new ILCursor(il);
 
-                if (c.TryGotoNext(x => x.MatchLdsfld(typeof(Inferno.Stat_AI.Body), "beetleIndex")))
-                {
-                    c.Index += 6;
-                    c.RemoveRange(3);
-                }
+            if (c.TryGotoNext(x => x.MatchLdsfld(typeof(Inferno.Stat_AI.Body), "beetleIndex")))
+            {
+                c.Index += 6;
+                c.RemoveRange(3);
             }
         }
+    
     }
 
     public override void Init(Harmony harmony)
@@ -50,7 +47,7 @@ public class inferno : PatchBase<inferno>
         BNRUtils.CheckboxConfig(applyInferno);
         
         noBeetleStun = config.Bind("Mods - Inferno", 
-            "makes beetles able to be stunned i hate beetle stun sm ,,.., ", 
+            "makes beetles able to be stunned i hate beetle stun sm ,,..,", 
             true, 
             "");
         BNRUtils.CheckboxConfig(noBeetleStun);
