@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "RB7CjURi++w=",
+  "dgSpecHash": "i4zupL4wiWE=",
   "success": true,
-  "projectFilePath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+  "projectFilePath": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
   "expectedPackageFiles": [
     "/home/icebrah/.nuget/packages/bepinex.analyzers/1.0.8/bepinex.analyzers.1.0.8.nupkg.sha512",
     "/home/icebrah/.nuget/packages/bepinex.baselib/5.4.20/bepinex.baselib.5.4.20.nupkg.sha512",
@@ -15,9 +15,10 @@
     "/home/icebrah/.nuget/packages/monomod.runtimedetour/21.12.13.1/monomod.runtimedetour.21.12.13.1.nupkg.sha512",
     "/home/icebrah/.nuget/packages/monomod.utils/21.12.13.1/monomod.utils.21.12.13.1.nupkg.sha512",
     "/home/icebrah/.nuget/packages/r2api.contentmanagement/1.0.10/r2api.contentmanagement.1.0.10.nupkg.sha512",
-    "/home/icebrah/.nuget/packages/r2api.core/5.1.6/r2api.core.5.1.6.nupkg.sha512",
+    "/home/icebrah/.nuget/packages/r2api.core/5.2.0/r2api.core.5.2.0.nupkg.sha512",
     "/home/icebrah/.nuget/packages/r2api.items/1.0.7/r2api.items.1.0.7.nupkg.sha512",
     "/home/icebrah/.nuget/packages/r2api.language/1.0.1/r2api.language.1.0.1.nupkg.sha512",
+    "/home/icebrah/.nuget/packages/r2api.networking/1.0.4/r2api.networking.1.0.4.nupkg.sha512",
     "/home/icebrah/.nuget/packages/r2api.prefab/1.1.1/r2api.prefab.1.1.1.nupkg.sha512",
     "/home/icebrah/.nuget/packages/riskofrain2.gamelibs/1.4.0-r.0/riskofrain2.gamelibs.1.4.0-r.0.nupkg.sha512",
     "/home/icebrah/.nuget/packages/ror2bepinexpack/1.36.0/ror2bepinexpack.1.36.0.nupkg.sha512",
@@ -54,10 +55,8 @@
     {
       "code": "NU1603",
       "level": "Warning",
-      "message": "DroneRepairBeacon depends on BepInEx.Analyzers (>= 1.0.0) but BepInEx.Analyzers 1.0.0 was not found. BepInEx.Analyzers 1.0.8 was resolved instead.",
-      "projectPath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
       "warningLevel": 1,
-      "filePath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+      "message": "DroneRepairBeacon depends on BepInEx.Analyzers (>= 1.0.0) but BepInEx.Analyzers 1.0.0 was not found. BepInEx.Analyzers 1.0.8 was resolved instead.",
       "libraryId": "BepInEx.Analyzers",
       "targetGraphs": [
         ".NETStandard,Version=v2.1"

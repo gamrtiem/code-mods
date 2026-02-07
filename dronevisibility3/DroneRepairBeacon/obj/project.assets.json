@@ -171,13 +171,13 @@
           }
         }
       },
-      "R2API.Core/5.1.6": {
+      "R2API.Core/5.2.0": {
         "type": "package",
         "dependencies": {
           "BepInEx.Core": "5.4.21",
-          "MMHOOK.RoR2": "2025.6.3",
-          "RiskOfRain2.GameLibs": "1.3.9-r.0",
-          "RoR2BepInExPack": "1.32.0",
+          "MMHOOK.RoR2": "2025.11.19",
+          "RiskOfRain2.GameLibs": "1.4.0-r.0",
+          "RoR2BepInExPack": "1.36.0",
           "UnityEngine.Modules": "2021.3.33"
         },
         "compile": {
@@ -230,6 +230,27 @@
         },
         "runtime": {
           "lib/netstandard2.0/R2API.Language.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "R2API.Networking/1.0.4": {
+        "type": "package",
+        "dependencies": {
+          "BepInEx.Core": "5.4.21",
+          "MMHOOK.RoR2": "2025.11.19",
+          "R2API.Core": "5.2.0",
+          "RiskOfRain2.GameLibs": "1.4.0-r.0",
+          "RoR2BepInExPack": "1.36.0",
+          "UnityEngine.Modules": "2021.3.33"
+        },
+        "compile": {
+          "lib/netstandard2.1/R2API.Networking.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/R2API.Networking.dll": {
             "related": ".xml"
           }
         }
@@ -984,16 +1005,16 @@
         "r2api.contentmanagement.nuspec"
       ]
     },
-    "R2API.Core/5.1.6": {
-      "sha512": "Pu/7JVfnVK9pvDfLIz2KX1xlbBSEcTIZ/995ns+sc/CmDTV0IfRlkatYys/dm761m35Z6zxBhKmXHD0H4ERLng==",
+    "R2API.Core/5.2.0": {
+      "sha512": "lKVT6FweZnzqg7NtWtSIThdUtqp5FG103crLwgYrV39cgERqfRTj878npChx/wWAXi0oXiXPHQ/i1kiUGYw71g==",
       "type": "package",
-      "path": "r2api.core/5.1.6",
+      "path": "r2api.core/5.2.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/R2API.Core.dll",
         "lib/netstandard2.1/R2API.Core.xml",
-        "r2api.core.5.1.6.nupkg.sha512",
+        "r2api.core.5.2.0.nupkg.sha512",
         "r2api.core.nuspec"
       ]
     },
@@ -1021,6 +1042,19 @@
         "lib/netstandard2.0/R2API.Language.xml",
         "r2api.language.1.0.1.nupkg.sha512",
         "r2api.language.nuspec"
+      ]
+    },
+    "R2API.Networking/1.0.4": {
+      "sha512": "eepL4z1lDie2LrkSJfXGA2NvDkrlORFKWlvtXm453FdWDMHJjIZkmDm9l9RsgvCg4+WvRyqSneJRkW0/aHUNRg==",
+      "type": "package",
+      "path": "r2api.networking/1.0.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.1/R2API.Networking.dll",
+        "lib/netstandard2.1/R2API.Networking.xml",
+        "r2api.networking.1.0.4.nupkg.sha512",
+        "r2api.networking.nuspec"
       ]
     },
     "R2API.Prefab/1.1.1": {
@@ -2969,6 +3003,7 @@
       "MMHOOK.RoR2 >= 2025.11.19",
       "R2API.Items >= 1.0.*",
       "R2API.Language >= 1.0.*",
+      "R2API.Networking >= 1.0.4",
       "R2API.Prefab >= 1.1.1",
       "RiskOfRain2.GameLibs >= 1.4.0-r.0",
       "RoR2BepInExPack >= 1.36.0",
@@ -2981,11 +3016,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+      "projectUniqueName": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
       "projectName": "DroneRepairBeacon",
-      "projectPath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+      "projectPath": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
       "packagesPath": "/home/icebrah/.nuget/packages/",
-      "outputPath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/",
+      "outputPath": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/icebrah/.nuget/NuGet/NuGet.Config"
@@ -3043,6 +3078,10 @@
             "target": "Package",
             "version": "[1.0.*, )"
           },
+          "R2API.Networking": {
+            "target": "Package",
+            "version": "[1.0.4, )"
+          },
           "R2API.Prefab": {
             "target": "Package",
             "version": "[1.1.1, )"
@@ -3077,7 +3116,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.101/RuntimeIdentifierGraph.json"
       }
     }
   },

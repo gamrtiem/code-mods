@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj": {}
+    "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj": {}
   },
   "projects": {
-    "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj": {
+    "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+        "projectUniqueName": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
         "projectName": "DroneRepairBeacon",
-        "projectPath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
+        "projectPath": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/DroneRepairBeacon.csproj",
         "packagesPath": "/home/icebrah/.nuget/packages/",
-        "outputPath": "/home/icebrah/Documents/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/",
+        "outputPath": "/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/icebrah/.nuget/NuGet/NuGet.Config"
@@ -69,6 +69,10 @@
               "target": "Package",
               "version": "[1.0.*, )"
             },
+            "R2API.Networking": {
+              "target": "Package",
+              "version": "[1.0.4, )"
+            },
             "R2API.Prefab": {
               "target": "Package",
               "version": "[1.1.1, )"
@@ -103,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.101/RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -17,6 +17,7 @@
 
 		<PackageReference Include="R2API.Items" Version="1.0.*" />
 		<PackageReference Include="R2API.Language" Version="1.0.*" />
+		<PackageReference Include="R2API.Networking" Version="1.0.4" />
 		<PackageReference Include="R2API.Prefab" Version="1.1.1" />
 
 		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
@@ -33,5 +34,9 @@
 	    <HintPath>..\libs\UnityHotReload.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="cp -r &quot;/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.dll&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/local/BepInEx/plugins/icebro-DroneRepairBeacon/DroneRepairBeacon.dll&quot;&#xA;cp -r &quot;/run/media/icebrah/buh/github/code-mods/dronevisibility3/DroneRepairBeacon/bin/Debug/netstandard2.1/DroneRepairBeacon.pdb&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/local/BepInEx/plugins/icebro-DroneRepairBeacon/DroneRepairBeacon.pdb&quot;" />
+	</Target>
 
 </Project>
