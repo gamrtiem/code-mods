@@ -117,7 +117,7 @@ namespace DroneRepairBeacon
             projector.displayDistance = displayDistance.Value;
             DroneIndicatorHologram.RegisterNetworkPrefab();
             
-            //NetworkingAPI.RegisterMessageType<deadDroneTracker.recieveMessageID>();
+            NetworkingAPI.RegisterMessageType<deadDroneTracker.recieveMessageID>();
         }
         
         private void ChangeSprites()
@@ -300,6 +300,10 @@ namespace DroneRepairBeacon
 
                             NetworkServer.Spawn(indicator);
                             
+                            if (NetworkServer.active)
+                            {
+                                new deadDroneTracker.recieveMessageID(indicator.GetComponent<NetworkIdentity>().netId, 2).Send(NetworkDestination.Clients);
+                            }
                             /*deadDroneTracker droneTracker = indicator.GetComponent<deadDroneTracker>();
                             if (droneIndicatorSprites.Count != 0)
                             {

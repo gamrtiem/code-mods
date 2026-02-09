@@ -1,5 +1,6 @@
 using System;
 using R2API;
+using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
@@ -24,6 +25,9 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
         {
             messageID = Random.RandomRangeInt(0, DroneRepairBeacon.droneIndicatorSprites.Count);
         }
+        Log.Debug($"own netid = {GetComponent<NetworkIdentity>().netId}");
+        
+        
     }
 
     GameObject IHologramContentProvider.GetHologramContentPrefab()
@@ -50,7 +54,7 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
                 }
             }
 
-            Log.Debug("getting prefab !");
+            Log.Debug("getting prefab !" + messageID);
 
             return field;
         }
@@ -72,8 +76,7 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
         return distance <= DroneRepairBeacon.displayDistance.Value;
     }
 
-    /*netowrking ,..,. ,grrr,. .,,..,,.,,. clients get random i dont cares anymore !!!!!!!!
-     public class recieveMessageID : INetMessage
+    public class recieveMessageID : INetMessage
     {
         NetworkInstanceId trackerNetID;
         int messageID;
@@ -108,7 +111,7 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
                 return;
             }
 
-            GameObject trackerObject = Util.FindNetworkObject(trackerNetID);
+            GameObject trackerObject = Util.FindNetworkObject(networkInstanceId: trackerNetID);
             if (!trackerObject)
             {
                 Log.Warning(
@@ -125,5 +128,5 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
 
             droneTracker.messageID = messageID;
         }
-    }*/
+    }
 }
