@@ -7,6 +7,10 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using On.RoR2.EntitlementManagement;
+using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2.Hologram;
 using UnityEngine;
@@ -16,6 +20,7 @@ using UnityEngine.Networking;
 namespace DroneRepairBeacon
 {
     [BepInDependency("iDeathHD.UnityHotReload", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(NetworkingAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class DroneRepairBeacon : BaseUnityPlugin
     {
@@ -29,6 +34,7 @@ namespace DroneRepairBeacon
         private static GameObject DroneIndicatorHologram;
         public static GameObject DroneIndicatorVFX;
         public static List<Sprite> droneIndicatorSprites = []; // this could probably be done with a dictionary but idk how to use them,. ,.,. 
+        public static List<Sprite> specificDroneIndicatorSprites = []; 
         public static Material[] droneIndicatorMaterials = [];
         public static ConfigEntry<float> displayDistance;
         public static ConfigEntry<float> helpScale;
@@ -47,9 +53,12 @@ namespace DroneRepairBeacon
             
             string assetbundledir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "dronevisibilitybundle");
             assetbundle = AssetBundle.LoadFromFileAsync(assetbundledir).assetBundle;
-            DroneIndicatorHologram = assetbundle.LoadAsset<GameObject>("DroneIndicatorHologram");
+            
             DroneIndicatorVFX = assetbundle.LoadAsset<GameObject>("DroneIndicatorVFX");
-            baseMat = DroneRepairBeacon.assetbundle.LoadAsset<Material>("HGStandard");
+            //DroneIndicatorVFX.AddComponent<NetworkIdentity>();
+            //DroneIndicatorVFX.RegisterNetworkPrefab();
+            
+            baseMat = assetbundle.LoadAsset<Material>("HGStandard");
             foreach (Material material in assetbundle.LoadAllAssets<Material>())
             {
                 if (material.name != "HGStandard") continue; // this is the only material in the asset bundle but just in case <3 
@@ -61,7 +70,7 @@ namespace DroneRepairBeacon
             #region configs
             DeathTokenConfigs = Config.Bind("drone repair beacon",
                 "silly death strings ! split with /,   ...,., set to nothing to disable !",
-                "res me twin....,,./,HELP HELP MEEE HEEEEEELP/,ough ,.,.../,babe its {TIME},,, time for your drone reviving session,.,.,.,/,im not broken! im just.... napping... indefinitely..../,REQUESTING HELP.../,LOST CONNECTION.../,YOUR WARRANTY IS 3 DAYS EXPIRED./,oof ouch my bo lts..,",
+                "res me twin....,,./,HELP HELP MEEE HEEEEEELP/,ough ,.,.../,babe its {TIME},,, time for your drone reviving session,.,.,.,/,im not broken! im just.... napping... indefinitely..../,REQUESTING HELP.../,LOST CONNECTION.../,YOUR WARRANTY IS 3 DAYS EXPIRED./,oof ouch my bo lts..,/,FUCK",
                 "byeah !");
             
             DroneSpecificDeathTokenConfigs = Config.Bind("drone repair beacon",
@@ -100,6 +109,15 @@ namespace DroneRepairBeacon
             #endregion
             
             Hook();
+            
+            DroneIndicatorHologram = assetbundle.LoadAsset<GameObject>("DroneIndicatorHologram");
+            DroneIndicatorHologram.AddComponent<NetworkIdentity>();
+            HologramProjector projector = DroneIndicatorHologram.GetComponent<HologramProjector>();
+            projector.contentProvider = DroneIndicatorHologram.AddComponent<deadDroneTracker>();
+            projector.displayDistance = displayDistance.Value;
+            DroneIndicatorHologram.RegisterNetworkPrefab();
+            
+            NetworkingAPI.RegisterMessageType<deadDroneTracker.recieveMessageID>();
         }
         
         private void ChangeSprites()
@@ -124,25 +142,36 @@ namespace DroneRepairBeacon
                 {
                     Directory.CreateDirectory(dir);
                 }
+                
+                string specificDir = System.IO.Path.Combine(dir, "Specific");
+                if (!Directory.Exists(specificDir))
+                {
+                    Directory.CreateDirectory(specificDir);
+                }
 
-                string [] fileEntries = Directory.GetFiles(dir);
+                string [] fileEntries = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
                 foreach (string fileName in fileEntries)
                 {
                     string file = System.IO.Path.Combine(dir, fileName.Trim());
+
                     
-                    if (!file.EndsWith(".png"))
+                    if (!file.EndsWith(".png") && !file.EndsWith(".psd"))
                     {
-                        if(!file.EndsWith(".psd")) // ignore template .,,. 
-                        {
-                            Log.Debug($"file {file} does not end in png ,..,,. skipping !!");
-                        }
+                        Log.Debug($"file {file} does not end in png ,..,,. skipping !!");
                         continue;
                     }
                     
                     Sprite loadedSprite = LoadSpriteFromFile(file);
                     if(loadedSprite != null)
                     {
-                        droneIndicatorSprites.Add(loadedSprite);
+                        if (file.Contains(specificDir))
+                        {
+                        
+                        }
+                        else
+                        {
+                            droneIndicatorSprites.Add(loadedSprite);
+                        }
                     }
                     else
                     {
@@ -185,6 +214,7 @@ namespace DroneRepairBeacon
         {
             On.RoR2.SummonMasterBehavior.OnEnable += SummonMasterBehaviorOnOnEnable;
             IL.EntityStates.Drone.DeathState.OnImpactServer += DeathStateOnOnImpactServer;
+            //IL.EntityStates.Drone.DeathState.FixedUpdate += DeathStateOnFixedUpdate;
             IL.RoR2.Hologram.HologramProjector.UpdateForViewer += HologramProjectorOnUpdateForViewer;
         }
 
@@ -198,9 +228,9 @@ namespace DroneRepairBeacon
             
             GameObject indicator = Instantiate(DroneIndicatorHologram, self.transform);
 
-            HologramProjector projector = indicator.GetComponent<HologramProjector>();
-            projector.contentProvider = indicator.AddComponent<deadDroneTracker>();
-            projector.displayDistance = displayDistance.Value;
+            //HologramProjector projector = indicator.GetComponent<HologramProjector>();
+            //projector.contentProvider = indicator.AddComponent<deadDroneTracker>();
+            //projector.displayDistance = displayDistance.Value;
         }
 
         private void HologramProjectorOnUpdateForViewer(ILContext il)
@@ -268,55 +298,70 @@ namespace DroneRepairBeacon
                         {
                             GameObject indicator = Instantiate(DroneIndicatorHologram, deadDrone.transform);
 
-                            HologramProjector projector = indicator.GetComponent<HologramProjector>();
-                            projector.contentProvider = indicator.AddComponent<deadDroneTracker>();
-                            projector.displayDistance = displayDistance.Value;
-                        }
-
-                        if (NetworkServer.active)
-                        {
-                            if (DeathTokenConfigs.Value == "")
-                            {
-                                return;
-                            }
+                            NetworkServer.Spawn(indicator);
                             
-                            List<string> deathTokens = DeathTokenConfigs.Value.Split("/,").ToList();
-                            string[] specificTokens = DroneSpecificDeathTokenConfigs.Value.Split(";;");
-                            for (int i = 0; i < specificTokens.Length; i++)
+                            if (NetworkServer.active)
                             {
-                                if (specificTokens[i].Trim().Replace("Body", "") != deathState.characterBody.name.Replace("Body", "").Replace("(Clone)", "")) continue;
-                                
-                                string[] specificTokensReal = specificTokens[i + 1].Split("/,");
-                                deathTokens.AddRange(specificTokensReal);
+                                new deadDroneTracker.recieveMessageID(indicator.GetComponent<NetworkIdentity>().netId, 2).Send(NetworkDestination.Clients);
                             }
-                            Log.Debug("drone name = " + deathState.characterBody.name);
-                            
-                            string deathString = deathTokens[Run.instance.runRNG.RangeInt(0, deathTokens.Count)];
-                            if (deathString.Contains("{TIME}"))
+                            /*deadDroneTracker droneTracker = indicator.GetComponent<deadDroneTracker>();
+                            if (droneIndicatorSprites.Count != 0)
                             {
-                                string time = DateTime.Now.ToString("hh") + DateTime.Now.ToString("tt");
+                                int rng = Run.instance.runRNG.RangeInt(0, droneIndicatorSprites.Count);
+                                droneTracker.messageID = rng;
                                 
-                                if (time.StartsWith("0"))
+                                NetworkIdentity identity = indicator.GetComponent<NetworkIdentity>();
+                                if (!identity)
                                 {
-                                    time = time.Substring(1, time.Length - 1);
+                                    Log.Warning("indicator did not have net id !!!");
+                                    return;
                                 }
-
-                                deathString = deathString.Replace("{TIME}", time.ToLower());
-                            }
-                            
-                            deathString = deathString.Trim();
-                            Chat.SendBroadcastChat(new Chat.SimpleChatMessage
-                            {
-                                baseToken = $"{Language.GetStringFormatted(deathState.characterBody.baseNameToken)}: {deathString}"
-                            });
+                                
+                                new deadDroneTracker.recieveMessageID(identity.netId, rng).Send(NetworkDestination.Clients);
+                            }*/
                         }
+
+                        if (DeathTokenConfigs.Value == "")
+                        {
+                            return;
+                        }
+                            
+                        List<string> deathTokens = DeathTokenConfigs.Value.Split("/,").ToList();
+                        string[] specificTokens = DroneSpecificDeathTokenConfigs.Value.Split(";;");
+                        for (int i = 0; i < specificTokens.Length; i++)
+                        {
+                            if (specificTokens[i].Trim().Replace("Body", "") != deathState.characterBody.name.Replace("Body", "").Replace("(Clone)", "")) continue;
+                                
+                            string[] specificTokensReal = specificTokens[i + 1].Split("/,");
+                            deathTokens.AddRange(specificTokensReal);
+                        }
+                        Log.Debug("drone name = " + deathState.characterBody.name);
+                            
+                        string deathString = deathTokens[Run.instance.runRNG.RangeInt(0, deathTokens.Count)];
+                        if (deathString.Contains("{TIME}"))
+                        {
+                            string time = DateTime.Now.ToString("hh") + DateTime.Now.ToString("tt");
+                                
+                            if (time.StartsWith("0"))
+                            {
+                                time = time.Substring(1, time.Length - 1);
+                            }
+
+                            deathString = deathString.Replace("{TIME}", time.ToLower());
+                        }
+                            
+                        deathString = deathString.Trim();
+                        Chat.SendBroadcastChat(new Chat.SimpleChatMessage
+                        {
+                            baseToken = $"<style=cEvent>{Language.GetStringFormatted(deathState.characterBody.baseNameToken)}: {deathString}</style>"
+                        });
                     }
                 );
 
                 Log.Debug("added tracker to dead drones !!");
             }
         }
-        #endregion'
+        #endregion
 
         private void Update()
         {
