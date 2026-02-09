@@ -1,3 +1,4 @@
+using BepInEx;
 using BepInEx.Configuration;
 using BNR.patches;
 using static BNR.butterscotchnroses;
@@ -63,8 +64,8 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
     private void GoldSiphonNearbyBodyControllerOnDrainGold(On.RoR2.GoldSiphonNearbyBodyController.orig_DrainGold orig, RoR2.GoldSiphonNearbyBodyController self)
     {
         orig(self);
-
-        if (self.isTetheredToAtLeastOneObject && scaleTime.Value && Run.instance.participatingPlayerCount <= playerCount.Value)
+        
+        if (NetworkServer.active && self.isTetheredToAtLeastOneObject && scaleTime.Value && Run.instance.participatingPlayerCount <= playerCount.Value)
         {
             Run.instance.SetRunStopwatch((Run.instance.GetRunStopwatch() + 1f / self.tickRate) * (multiplier.Value - 1));
         }
@@ -73,8 +74,8 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
     private void HalcyoniteShrineInteractableOnStart(On.RoR2.HalcyoniteShrineInteractable.orig_Start orig, HalcyoniteShrineInteractable self)
     {
         orig(self);
-        
-        if (Run.instance.participatingPlayerCount <= playerCount.Value)
+
+        if (NetworkServer.active && Run.instance.participatingPlayerCount <= playerCount.Value)
         {
             self.tickRate = startingTickRate * multiplier.Value;
         }
