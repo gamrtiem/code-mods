@@ -16,6 +16,7 @@ using RoR2.Hologram;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
+using Console = RoR2.Console;
 
 namespace DroneRepairBeacon
 {
@@ -27,25 +28,26 @@ namespace DroneRepairBeacon
         private const string PluginGUID = PluginAuthor + "." + PluginName;
         private const string PluginAuthor = "icebro";
         private const string PluginName = "DroneRepairBeacon";
-        private const string PluginVersion = "1.0.0";
+        private const string PluginVersion = "1.0.1";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
 
         private static GameObject DroneIndicatorHologram;
         public static GameObject DroneIndicatorVFX;
         public static List<Sprite> droneIndicatorSprites = []; // this could probably be done with a dictionary but idk how to use them,. ,.,. 
-        public static List<Sprite> specificDroneIndicatorSprites = []; 
         public static Material[] droneIndicatorMaterials = [];
+        public static List<Sprite> specificDroneIndicatorSprites = []; 
+        public static Material[] specificDroneIndicatorMaterials = []; 
         public static ConfigEntry<float> displayDistance;
         public static ConfigEntry<float> helpScale;
         private static ConfigEntry<string> DeathTokenConfigs;
         private static ConfigEntry<string> DroneSpecificDeathTokenConfigs;
-        private static ConfigEntry<string> droneSprites;
-        private static ConfigEntry<bool> customDroneSprites;
+        public static ConfigEntry<string> droneSprites;
+        public static ConfigEntry<bool> customDroneSprites;
         private static ConfigEntry<bool> alwaysShowHelp;
         private static ConfigEntry<bool> alwaysShowHelpAllowTurrets;
-        private static AssetBundle assetbundle;
-        private static Material baseMat;
+        public static AssetBundle assetbundle;
+        public static Material baseMat;
 
         public void Awake()
         {
@@ -75,7 +77,7 @@ namespace DroneRepairBeacon
             
             DroneSpecificDeathTokenConfigs = Config.Bind("drone repair beacon",
                 "specific drone death strings! formatting like (drone internal name);;(string,string);;!",
-                "Drone1Body;;do your own DPS instead... im done...;'.;/,pls revive i had raygun;;Drone2Body;;ill,,.,., miss you 🥺/,please don't leave me here.,.,./,I MISS_YOU ALREADY;",
+                "Drone1Body;;do your own DPS instead... im done...;'.;/,pls revive i had raygun/,drats,..,,almost had em,.,,,;;Drone2Body;;ill,,.,., miss you \ud83e\udd7a/,please don't leave me here.,.,./,I MISS_YOU ALREADY;;CopycatDrone;;i_i feel.,.., cold.,.,/,is it just me or is it f_f_freezing.,.,,;;BombardmentDrone;;ERR: HEAVY DAMAGE SUSTAINED/, RETRIEVING FINAL WISHES... UNDEFINED...;;RechargeDrone;;i've.,.,. failed you,..,./, come back,,,.. you're hurt,,.,,/,i'll always be watching over you,,...;;CleanupDrone;;cleanu;p on aisle,, 6.,.,./,what a mess i've gotten myself into.,,../,missed a spot,,,..;;EmergencyDrone;;i just wanted to protect everyone,,,...,...,,,, /, keep them safe.,,,.for me..,../,why can't we all be friends..?;;HaulerDrone;; i've,,.. lost my way..,.,/, it's the end of the road for me :(/,carry me back home, would you?;;EquipmentDrone;;i wasn't equipped to handle THIS!/,your gift was wasted on me..,../, you dropped something,..,,;;FlameDrone;;couldn't,, take the heat,,,,.,/,gimme a sec, just need to.,,,., cool down real quick,,,.,/,oohHAhothothot!!;;JailerDrone;;can't,,,, move...,./,h_hey, slow down..!/everything's so,,.,, still..,.;;JunkDrone;;i'm not junk,.,.,,,/,please don't scrap me..,.,/,wait.,.., i've still got more to give..,..;;MissileDrone;;target lost,..,,/,look's like team missile's blasting off again.,,.,,/,i can't see them, boss..,.,boss..?",
                 "you can get them from debugtoolkit or wiki (wiki ones are missing body sometimes though ! like .,., Drone1Body = gunnerdrone ,.,. Drone2Body = healing drone .,.,,..");
             
             displayDistance = Config.Bind("drone repair beacon",
@@ -105,7 +107,7 @@ namespace DroneRepairBeacon
                 "if you have any custom images you wants to use !!! NEEDS RESTART !!",
                 false,
                 "should be in bepin config directory in DroneBeacon folder .,,. just add there and will appear in rotation !! ,.,., must end in .png !!!!!!!!!!!!!");
-            ChangeSprites();
+            SpriteLoading.ChangeSprites();
             #endregion
             
             Hook();
@@ -118,96 +120,10 @@ namespace DroneRepairBeacon
             DroneIndicatorHologram.RegisterNetworkPrefab();
             
             NetworkingAPI.RegisterMessageType<deadDroneTracker.recieveMessageID>();
+            NetworkingAPI.RegisterMessageType<deadDroneTracker.sendMessageID>();
         }
         
-        private void ChangeSprites()
-        {
-            //droneIndicatorSprites.Clear();
-            foreach (string spriteName in droneSprites.Value.Split(","))
-            {
-                if (assetbundle.Contains(spriteName.Trim()))
-                {
-                    droneIndicatorSprites.Add(assetbundle.LoadAsset<Sprite>(spriteName.Trim()));
-                }
-                else
-                {
-                    Log.Error($"couldnt find sprite {spriteName.Trim()} in asset bundle !!");
-                }
-            }
-
-            if (customDroneSprites.Value)
-            {
-                string dir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Paths.ConfigPath)!, "config", "DroneBeacon");
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-                
-                string specificDir = System.IO.Path.Combine(dir, "Specific");
-                if (!Directory.Exists(specificDir))
-                {
-                    Directory.CreateDirectory(specificDir);
-                }
-
-                string [] fileEntries = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
-                foreach (string fileName in fileEntries)
-                {
-                    string file = System.IO.Path.Combine(dir, fileName.Trim());
-
-                    
-                    if (!file.EndsWith(".png") && !file.EndsWith(".psd"))
-                    {
-                        Log.Debug($"file {file} does not end in png ,..,,. skipping !!");
-                        continue;
-                    }
-                    
-                    Sprite loadedSprite = LoadSpriteFromFile(file);
-                    if(loadedSprite != null)
-                    {
-                        if (file.Contains(specificDir))
-                        {
-                        
-                        }
-                        else
-                        {
-                            droneIndicatorSprites.Add(loadedSprite);
-                        }
-                    }
-                    else
-                    {
-                        Log.Error($"couldnt find sprite {file.Trim()} in files !!");
-                    }
-                }
-            }
-
-            // foreach (var material in droneIndicatorMaterials)
-            // {
-            //     if (material != null)
-            //     {
-            //         Object.Destroy(material);
-            //     }
-            // }
-            droneIndicatorMaterials = new Material[droneIndicatorSprites.Count];
-            for (int i = 0; i < droneIndicatorMaterials.Length; i++)
-            {
-                droneIndicatorMaterials[i] = Instantiate(baseMat);
-                droneIndicatorMaterials[i].name = droneIndicatorSprites[i].name;
-                droneIndicatorMaterials[i].SetTexture("_EmTex", droneIndicatorSprites[i].texture);
-            }
-        }
         
-        private Sprite LoadSpriteFromFile(string path)
-        {
-            if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
-            
-            int sprite_width = 100;
-            int sprite_height = 100;
-            byte[] bytes = File.ReadAllBytes(path);
-            Texture2D texture = new Texture2D(sprite_width, sprite_height, TextureFormat.RGB24, false);
-            texture.LoadImage(bytes);
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-            return sprite;
-        }
         
         #region Hooks
         private void Hook()
@@ -294,16 +210,47 @@ namespace DroneRepairBeacon
                 c.EmitDelegate<Action<EntityStates.Drone.DeathState, GameObject>>(
                     (deathState, deadDrone) =>
                     {
+                        int rng = -1;
+                        bool usingSpecificSprite = false;
+                        if (droneIndicatorSprites.Count != 0 || specificDroneIndicatorSprites.Count != 0)
+                        {
+                            List<int> specificSpriteIndexes = [];
+                
+                            for(int i = 0; i < specificDroneIndicatorSprites.Count; i++)
+                            {
+                                Log.Debug("bweh " + specificDroneIndicatorSprites[i].name.Replace("Body", ""));
+                                Log.Debug(deathState.characterBody.name.Replace("Body", "").Replace("(Clone)", ""));
+                                if (specificDroneIndicatorSprites[i].name.Split("_")[0].Replace("Body", "") != deathState.characterBody.name.Replace("Body", "").Replace("(Clone)", "")) continue;
+                                Log.Debug($"adding {specificDroneIndicatorSprites[i].name}");
+                                specificSpriteIndexes.Add(i);
+                            }
+                            Log.Debug(specificSpriteIndexes.Count);
+                            if (droneIndicatorSprites.Count != 0 || specificSpriteIndexes.Count != 0)
+                            {
+                                rng = Run.instance.runRNG.RangeInt(0, droneIndicatorSprites.Count + specificSpriteIndexes.Count);
+                                if (rng >= droneIndicatorSprites.Count)
+                                {
+                                    rng = specificSpriteIndexes[Run.instance.runRNG.RangeInt(0, specificSpriteIndexes.Count)];
+                                    usingSpecificSprite = true;
+                                }
+                            
+                                Log.Debug(rng);
+                                Log.Debug(usingSpecificSprite);
+                                if (!usingSpecificSprite)
+                                {
+                                    Log.Debug(droneIndicatorSprites[rng]);
+                                }
+                            }
+                        }
+                        
                         if(!alwaysShowHelp.Value)
                         {
                             GameObject indicator = Instantiate(DroneIndicatorHologram, deadDrone.transform);
+                            deadDroneTracker tracker = indicator.GetComponent<deadDroneTracker>();
+                            tracker.messageID = rng;
+                            tracker.usingSpecificSprite = usingSpecificSprite;
 
                             NetworkServer.Spawn(indicator);
-                            
-                            if (NetworkServer.active)
-                            {
-                                new deadDroneTracker.recieveMessageID(indicator.GetComponent<NetworkIdentity>().netId, 2).Send(NetworkDestination.Clients);
-                            }
                             /*deadDroneTracker droneTracker = indicator.GetComponent<deadDroneTracker>();
                             if (droneIndicatorSprites.Count != 0)
                             {
@@ -341,7 +288,6 @@ namespace DroneRepairBeacon
                         if (deathString.Contains("{TIME}"))
                         {
                             string time = DateTime.Now.ToString("hh") + DateTime.Now.ToString("tt");
-                                
                             if (time.StartsWith("0"))
                             {
                                 time = time.Substring(1, time.Length - 1);

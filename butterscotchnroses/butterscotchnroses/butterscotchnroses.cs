@@ -5,6 +5,7 @@ using BepInEx;
 using BNR.patches;
 using BNR.items;
 using HarmonyLib;
+using UnityEngine;
 
 
 namespace BNR
@@ -17,7 +18,7 @@ namespace BNR
 
         public const string PluginAuthor = "icebro";
         public const string PluginName = "BNR";
-        public const string PluginVersion = "0.1.0";
+        public const string PluginVersion = "0.1.1";
 
         public void Awake()
         {
@@ -35,7 +36,6 @@ namespace BNR
                 try
                 {
                     PatchBase patchBase = (PatchBase)Activator.CreateInstance(patch);
-
                     patchBase.Config(Config);
                     patchBase.Init(harmony);
                 }
@@ -47,7 +47,6 @@ namespace BNR
             }
             
             var buffTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(BuffBase)));
-
             foreach (var buffType in buffTypes)
             {
                 BuffBase buff = (BuffBase)System.Activator.CreateInstance(buffType);
@@ -55,12 +54,21 @@ namespace BNR
             }
             
             var itemTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(ItemBase)));
-
             foreach (var itemType in itemTypes)
             {
                 ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
                 item.Init(Config);
             }
+        }
+        
+        private void Update()
+        {
+#if DEBUG
+            if (Input.GetKeyUp(KeyCode.F5))
+            {
+                UnityHotReloadNS.UnityHotReload.LoadNewAssemblyVersion(typeof(butterscotchnroses).Assembly, System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "butterscotchnroses.dll"));
+            }
+#endif  
         }
     }
 }
