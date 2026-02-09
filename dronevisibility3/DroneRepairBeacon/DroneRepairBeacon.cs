@@ -55,7 +55,7 @@ namespace DroneRepairBeacon
             assetbundle = AssetBundle.LoadFromFileAsync(assetbundledir).assetBundle;
             
             DroneIndicatorVFX = assetbundle.LoadAsset<GameObject>("DroneIndicatorVFX");
-            DroneIndicatorVFX.AddComponent<NetworkIdentity>();
+            //DroneIndicatorVFX.AddComponent<NetworkIdentity>();
             //DroneIndicatorVFX.RegisterNetworkPrefab();
             
             baseMat = assetbundle.LoadAsset<Material>("HGStandard");
@@ -112,13 +112,12 @@ namespace DroneRepairBeacon
             
             DroneIndicatorHologram = assetbundle.LoadAsset<GameObject>("DroneIndicatorHologram");
             DroneIndicatorHologram.AddComponent<NetworkIdentity>();
-            //DroneIndicatorHologram.RegisterNetworkPrefab();
             HologramProjector projector = DroneIndicatorHologram.GetComponent<HologramProjector>();
             projector.contentProvider = DroneIndicatorHologram.AddComponent<deadDroneTracker>();
             projector.displayDistance = displayDistance.Value;
             DroneIndicatorHologram.RegisterNetworkPrefab();
             
-            NetworkingAPI.RegisterMessageType<deadDroneTracker.SyncBaseStats>();
+            //NetworkingAPI.RegisterMessageType<deadDroneTracker.recieveMessageID>();
         }
         
         private void ChangeSprites()
@@ -298,24 +297,24 @@ namespace DroneRepairBeacon
                         if(!alwaysShowHelp.Value)
                         {
                             GameObject indicator = Instantiate(DroneIndicatorHologram, deadDrone.transform);
-                            
+
                             NetworkServer.Spawn(indicator);
                             
-                            deadDroneTracker droneTracker = indicator.GetComponent<deadDroneTracker>();
+                            /*deadDroneTracker droneTracker = indicator.GetComponent<deadDroneTracker>();
                             if (droneIndicatorSprites.Count != 0)
                             {
                                 int rng = Run.instance.runRNG.RangeInt(0, droneIndicatorSprites.Count);
                                 droneTracker.messageID = rng;
+                                
                                 NetworkIdentity identity = indicator.GetComponent<NetworkIdentity>();
                                 if (!identity)
                                 {
-                                    Log.Warning("indicator did not have a NetworkIdentity component!");
+                                    Log.Warning("indicator did not have net id !!!");
                                     return;
                                 }
                                 
-                                new deadDroneTracker.SyncBaseStats(identity.netId, rng).Send(NetworkDestination.Clients);
-                                //new deadDroneTracker.SyncBaseStats(identity.netId, rng).Send(NetworkDestination.Server);
-                            }
+                                new deadDroneTracker.recieveMessageID(identity.netId, rng).Send(NetworkDestination.Clients);
+                            }*/
                         }
 
                         if (DeathTokenConfigs.Value == "")

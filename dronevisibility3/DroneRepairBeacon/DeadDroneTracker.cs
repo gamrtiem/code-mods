@@ -1,8 +1,10 @@
+using System;
 using R2API;
 using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 namespace DroneRepairBeacon;
 
@@ -17,24 +19,15 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
         Vector3 newPos = this.gameObject.transform.position;
         newPos.y += 4f * DroneRepairBeacon.helpScale.Value;
         gameObject.transform.position = newPos;
+        
+        if (DroneRepairBeacon.droneIndicatorSprites.Count != 0)
+        {
+            messageID = Random.RandomRangeInt(0, DroneRepairBeacon.droneIndicatorSprites.Count);
+        }
     }
 
     GameObject IHologramContentProvider.GetHologramContentPrefab()
     {
-        /*Log.Debug("bwaa,.");
-        SpriteRenderer spriteRenderer = hologramContentPrefab.GetComponent<SpriteRenderer>();
-        if (messageID != -1)
-        {
-            Log.Debug("bwbwww");
-            spriteRenderer.sprite = DroneRepairBeacon.droneIndicatorSprites[messageID];
-            spriteRenderer.SetMaterial(DroneRepairBeacon.droneIndicatorMaterials[messageID]);
-        }
-        else
-        {
-            Log.Debug("message id -1 ");
-            spriteRenderer.gameObject.SetActive(false);
-        }*/
-
         return hologramContentPrefab;
     }
 
@@ -46,7 +39,7 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
         {
             if (!field)
             {
-                field = Instantiate(DroneRepairBeacon.DroneIndicatorVFX);
+                field = DroneRepairBeacon.DroneIndicatorVFX.InstantiateClone("Drone Repair Beacon Hologram", false);
 
                 Log.Debug("spawning new !" + messageID);
                 if (messageID != -1)
@@ -55,12 +48,6 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
                     spriteRenderer.sprite = DroneRepairBeacon.droneIndicatorSprites[messageID];
                     spriteRenderer.SetMaterial(DroneRepairBeacon.droneIndicatorMaterials[messageID]);
                 }
-
-
-                // if (NetworkServer.active)
-                // {
-                //     NetworkServer.Spawn(field);
-                // }
             }
 
             Log.Debug("getting prefab !");
@@ -85,31 +72,32 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
         return distance <= DroneRepairBeacon.displayDistance.Value;
     }
 
-    public class SyncBaseStats : INetMessage
+    /*netowrking ,..,. ,grrr,. .,,..,,.,,. clients get random i dont cares anymore !!!!!!!!
+     public class recieveMessageID : INetMessage
     {
-        NetworkInstanceId bodyNetId;
+        NetworkInstanceId trackerNetID;
         int messageID;
 
-        public SyncBaseStats(NetworkInstanceId netId, int num)
+        public recieveMessageID(NetworkInstanceId netId, int num)
         {
-            bodyNetId = netId;
+            trackerNetID = netId;
             messageID = num;
         }
 
-        public SyncBaseStats()
+        public recieveMessageID()
         {
 
         }
 
         public void Serialize(NetworkWriter writer)
         {
-            writer.Write(bodyNetId);
+            writer.Write(trackerNetID);
             writer.Write(messageID);
         }
 
         public void Deserialize(NetworkReader reader)
         {
-            bodyNetId = reader.ReadNetworkId();
+            trackerNetID = reader.ReadNetworkId();
             messageID = reader.ReadInt32();
         }
 
@@ -120,23 +108,22 @@ public class deadDroneTracker : MonoBehaviour, IHologramContentProvider
                 return;
             }
 
-            GameObject bodyObject = Util.FindNetworkObject(bodyNetId);
-            if (!bodyObject)
+            GameObject trackerObject = Util.FindNetworkObject(trackerNetID);
+            if (!trackerObject)
             {
                 Log.Warning(
-                    $"{typeof(SyncBaseStats).FullName}: Could not retrieve GameObject with network ID {bodyNetId}");
+                    $"{typeof(recieveMessageID).FullName}: Could not retrieve GameObject with network ID {trackerNetID}");
             }
 
-            Log.Debug($"{bodyObject}");
-            deadDroneTracker droneTracker = bodyObject.GetComponent<deadDroneTracker>();
+            Log.Debug($"{trackerObject}");
+            deadDroneTracker droneTracker = trackerObject.GetComponent<deadDroneTracker>();
             if (!droneTracker)
             {
-                Log.Warning(
-                    $"{typeof(SyncBaseStats).FullName}: Retrieved GameObject {bodyObject} but the GameObject does not have a deadDroneTracker");
+                Log.Warning($"{typeof(recieveMessageID).FullName}: Retrieved GameObject {trackerObject} but the GameObject does not have a deadDroneTracker");
                 return;
             }
 
             droneTracker.messageID = messageID;
         }
-    }
+    }*/
 }
