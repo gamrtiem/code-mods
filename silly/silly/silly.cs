@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
+using Newtonsoft.Json;
 using R2API;
 using R2API.Utils;
 using RoR2;
@@ -21,6 +24,7 @@ namespace ExamplePlugin
         private const string PluginVersion = "1.0.0";
 
         private static ConfigEntry<string> editPrefabs;
+        private static List<Edit> editList;
         
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
         
@@ -35,57 +39,86 @@ namespace ExamplePlugin
                 "Edited Prefabs", 
                 "RoR2/DLC3/Drifter/DrifterBody.prefab;AddComponent:", 
                 "test");
+            
+            using (StreamReader r = new StreamReader("file.json"))
+            {
+                string json = r.ReadToEnd();
+                editList = JsonConvert.DeserializeObject<List<Edit>>(json);
+            }
 
             // these can also be GUIDs ideally, but for nows lets just work with addressable paths ,..,
-            foreach (string prefabPath in editPrefabs.Value.Split(","))
+            foreach (Edit edit in editList)
             {
                 try
                 {
-                    string[] edits = prefabPath.Split(";");
-                    Addressables.LoadAssetAsync<GameObject>(edits[0]).Completed += delegate(AsyncOperationHandle<GameObject> handle)
+                    Addressables.LoadAssetAsync<GameObject>(edit.prefabName).Completed += delegate(AsyncOperationHandle<GameObject> handle)
                     {
-                        for (int i = 1; i < edits.Length; i++)
+                        switch (edit.editType)
                         {
-                            string[] editParameters = edits[i].Split("::");
-                            string editType = editParameters[0];
-
-                            switch (editType)
-                            {
-                                case "AddComponent":
-                                    string addComponent = editParameters[1];
-                                    handle.Result.AddComponent(Type.GetType(addComponent));
-                                    break;
-                                case "GetComponent":
-                                    string getComponent = editParameters[1];
-                                    string operation = editParameters[2];
-                                    string fieldName = editParameters[3];
-                                    string operationArgument = editParameters[4];
-                                    Log.Debug(getComponent);
-                                    var obtainedComponent = handle.Result.AddComponent(Type.GetType(getComponent));
-                                    var field = obtainedComponent.GetType().GetFieldCached(fieldName);
-
-                                    // switch (operation)
-                                    // {
-                                    //     case "Replace":
-                                    //         
-                                    //         field.SetValueDirect();
-                                    // }
-                                    break;
-                                default:
-                                    throw new Exception($"unknown edit type {editType}!!");
-                            }
-                            
-                            
+                            case "AddComponent":
+                                string addComponent = edit.editParameters[1];
+                                handle.Result.AddComponent(Type.GetType(addComponent));
+                                break;
+                            case "GetComponent":
+                                string getComponent = edit.editParameters[1];
+                                string operation = edit.editParameters[2];
+                                string fieldName = edit.editParameters[3];
+                                string operationArgument = edit.editParameters[4];
+                                Log.Debug(getComponent);
+                                var obtainedComponent = handle.Result.AddComponent(Type.GetType(getComponent));
+                                switch (operation)
+                                {
+                                    case "Replace":
+                                        obtainedComponent.GetType().SetFieldValue(fieldName, Addressables.LoadAssetAsync<Type.GetType(getComponent)>(operationArgument).WaitForCompletion());
+                                        break;
+                                }
+                                
+                                // switch (operation)
+                                // {
+                                //     case "Replace":
+                                //         
+                                //         field.SetValueDirect();
+                                // }
+                                break;
+                            default:
+                                throw new Exception($"unknown edit type {edit.editType}!!");
                         }
                         Log.Debug(handle.Result.name);
                     };
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"failed to edit prefab of path {prefabPath} !! error below .,,. ");
+                    Log.Error($"failed to edit prefab of path {edit.prefabName} !! error below .,,. ");
                     Log.Error(e.Message);
                 }
             }
+        }
+
+        // [
+        //   {
+        //     "prefabName": "RoR2/DLC3/Drifter/DrifterBody.prefab",
+        //     "editType": "AddComponent",
+        //     "editParameters": [
+        //       "MeshRenderer"
+        //     ]
+        //   }
+        //   {
+        //     "prefabName": "RoR2/DLC3/Drifter/DrifterBody.prefab",
+        //     "editType": "GetComponent",
+        //     "editParameters": [
+        //       "MeshRenderer",
+        //       "Replace",
+        //       "material",
+        //       "Load::efb87e4ca777db44da34e51807b9e3ee"
+        //     ]
+        //   }
+        // ]
+        // efb87e4ca777db44da34e51807b9e3ee is guid for matIsShocked
+        private class Edit
+        {
+            public string prefabName;
+            public string editType;
+            public string[] editParameters;
         }
         private void Update()
         {
