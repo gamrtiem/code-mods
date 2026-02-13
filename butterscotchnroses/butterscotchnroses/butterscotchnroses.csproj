@@ -19,6 +19,7 @@
 
 		<PackageReference Include="R2API.Core" Version="5.3.0" />
 		<PackageReference Include="R2API.Language" Version="1.1.0" />
+		<PackageReference Include="R2API.Prefab" Version="1.1.1" />
 		<PackageReference Include="Rune580.Mods.RiskOfRain2.RiskOfOptions" Version="2.8.5" />
 
 		<PackageReference Include="UnityEngine.Modules" Version="6000.3.7" IncludeAssets="compile" />
@@ -41,6 +42,9 @@
 	  <Reference Include="LittleGameplayTweaks">
 	    <HintPath>..\LittleGameplayTweaks-nstrip.dll</HintPath>
 	  </Reference>
+	  <Reference Include="ShaderSwapper">
+	    <HintPath>..\ShaderSwapper.dll</HintPath>
+	  </Reference>
 	  <!--Reference Include="MiscModpackUtils">
 	    <HintPath>..\MiscModpackUtils-nstrip.dll</HintPath>
 	  </Reference-->
@@ -56,6 +60,6 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.dll&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug2 awese/BepInEx/plugins/MarioVsLuigi-Linux-v1.7.1.0-beta/butterscotchnroses.dll&quot;&#xA;cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.pdb&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug2 awese/BepInEx/plugins/MarioVsLuigi-Linux-v1.7.1.0-beta/butterscotchnroses.pdb&quot;" />
+	  <Exec Command="cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.dll&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug 3/BepInEx/plugins/icebro-ButterscotchandRosesBaseMod/butterscotchnroses.dll&quot;&#xA;cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.pdb&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug 3/BepInEx/plugins/icebro-ButterscotchandRosesBaseMod/butterscotchnroses.pdb&quot;" />
 	</Target>
 </Project>

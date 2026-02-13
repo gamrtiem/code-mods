@@ -1,12 +1,17 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using AK.Wwise;
 using BepInEx;
 using BNR.patches;
 using BNR.items;
 using HarmonyLib;
+using RoR2;
+using SS2.Items;
 using UnityEngine;
-
+using UnityEngine.AddressableAssets;
+using SceneDirector = On.RoR2.SceneDirector;
+using ShaderSwapper;
 
 namespace BNR
 {
@@ -20,6 +25,7 @@ namespace BNR
         public const string PluginName = "BNR";
         public const string PluginVersion = "0.1.1";
 
+        public static AssetBundle carvingKitBundle;
         public void Awake()
         {
             //TODO add making inferno + ESBM config not give them double jumps TT 
@@ -28,7 +34,9 @@ namespace BNR
             //TODO main menu pink color option like wolfo qol 
             Log.Init(Logger);
             Logger.LogDebug("loading mod !!");
-            
+            carvingKitBundle = AssetBundle.LoadFromFile(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "carvingkit_assets"));
+            StartCoroutine(carvingKitBundle.UpgradeStubbedShadersAsync());
+
             Harmony harmony = new(Info.Metadata.GUID);
             var patches = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(PatchBase)));
             foreach (Type patch in patches)
@@ -60,7 +68,7 @@ namespace BNR
                 item.Init(Config);
             }
         }
-        
+
         private void Update()
         {
 #if DEBUG
