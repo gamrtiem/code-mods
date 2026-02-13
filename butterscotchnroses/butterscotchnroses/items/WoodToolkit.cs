@@ -71,6 +71,13 @@ public class WoodToolkit : ItemBase<WoodToolkit>
         gameObject.transform.rotation = Quaternion.Euler(target);
         
         mushroomWardPrefab.RegisterNetworkPrefab();
+
+        var mdlParams = ItemDef.pickupModelPrefab.AddComponent<ModelPanelParameters>();
+        mdlParams.focusPointTransform = new GameObject("FocusPoint").transform;
+        mdlParams.focusPointTransform.SetParent(ItemDef.pickupModelPrefab.transform);
+
+        mdlParams.cameraPositionTransform = new GameObject("CameraPosition").transform;
+        mdlParams.cameraPositionTransform.SetParent(ItemDef.pickupModelPrefab.transform);
     }
     
     public override void CreateConfig(ConfigFile config)
@@ -84,7 +91,162 @@ public class WoodToolkit : ItemBase<WoodToolkit>
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()
     {
-        return new ItemDisplayRuleDict();
+        var displayRules = new ItemDisplayRuleDict(null);
+        displayRules.Add("mdlRailGunner", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Backpack",
+                    localPos = new Vector3(0.05974F, 0.44328F, -0.06713F),
+                    localAngles = new Vector3(322.9341F, 287.1909F, 355.0089F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlCommandoDualies", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Chest",
+                    localPos = new Vector3(-0.15616F, 0.02484F, 0.21744F),
+                    localAngles = new Vector3(24.75113F, 154.4478F, 29.14743F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlHuntress", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Chest",
+                    localPos = new Vector3(0.10213F, 0.28557F, -0.08592F),
+                    localAngles = new Vector3(313.4707F, 238.9671F, 9.71181F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlBandit2", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Head",
+                    localPos = new Vector3(0.12409F, 0.12659F, 0.00633F),
+                    localAngles = new Vector3(338.8037F, 208.6288F, 359.9354F),
+                    localScale = new Vector3(1.25F, 1.25F, 1.25F)
+                }
+            });
+        displayRules.Add("mdlToolbot", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Head",
+                    localPos = new Vector3(-2.09321F, -1.18081F, 0.19419F),
+                    localAngles = new Vector3(11.66639F, 34.73956F, 22.98347F),
+                    localScale = new Vector3(15F, 15F, 15F)
+                }
+            });
+        displayRules.Add("mdlEngi", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "MuzzleLeft",
+                    localPos = new Vector3(0.21246F, 0.03726F, -0.1504F),
+                    localAngles = new Vector3(46.88489F, 146.3901F, 28.93377F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlMage", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Chest",
+                    localPos = new Vector3(0.13556F, 0.37115F, -0.16788F),
+                    localAngles = new Vector3(40.53942F, 286.7667F, 12.42073F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlMerc", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Pelvis",
+                    localPos = new Vector3(0.23807F, 0.16043F, -0.06301F),
+                    localAngles = new Vector3(16.28232F, 337.8073F, 173.7221F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlLoader", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Stomach",
+                    localPos = new Vector3(-0.00141F, -0.01828F, 0.16358F),
+                    localAngles = new Vector3(50.62165F, 260.8247F, 202.5894F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlCaptain", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "ThighL",
+                    localPos = new Vector3(0.14932F, 0.23036F, 0.05693F),
+                    localAngles = new Vector3(45.22392F, 147.0988F, 33.90025F),
+                    localScale = new Vector3(1.5F, 1.5F, 1.5F)
+                }
+            });
+        displayRules.Add("mdlVoidSurvivor", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Chest",
+                    localPos = new Vector3(0.12025F, 0.28464F, -0.28027F),
+                    localAngles = new Vector3(331.8245F, 17.92445F, 5.85052F),
+                    localScale = new Vector3(1F, 1F, 1F)
+                }
+            });
+        displayRules.Add("mdlSeeker", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "ThighL",
+                    localPos = new Vector3(0.15079F, 0.10885F, -0.06823F),
+                    localAngles = new Vector3(38.52636F, 250.9131F, 49.66542F),
+                    localScale = new Vector3(1F, 1F, 1F)
+                }
+            });
+        displayRules.Add("mdlDroneTech", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "Backpack",
+                    localPos = new Vector3(-0.14376F, 0.3951F, -0.15703F),
+                    localAngles = new Vector3(338.5279F, 44.73534F, 33.90535F),
+                    localScale = new Vector3(-1.25F, 1.25F, 1.25F)
+                }
+            });
+        displayRules.Add("mdlDrifter", new RoR2.ItemDisplayRule[]{
+                new RoR2.ItemDisplayRule
+                {
+                    ruleType = ItemDisplayRuleType.ParentedPrefab,
+                    followerPrefab = BNR.butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab"),
+                    childName = "BagFrontPocket",
+                    localPos = new Vector3(-0.13831F, 0.50942F, 0.03021F),
+                    localAngles = new Vector3(351.2845F, 87.4438F, 42.2401F),
+                    localScale = new Vector3(-1.5F, 1.5F, 1.5F)
+                }
+            });
+        return displayRules;
     }
 
     public override void Hooks()
