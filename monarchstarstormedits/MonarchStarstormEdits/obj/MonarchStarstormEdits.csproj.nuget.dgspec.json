@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj": {}
+    "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj": {}
   },
   "projects": {
-    "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj": {
+    "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
+        "projectUniqueName": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
         "projectName": "MonarchStarstormEdits",
-        "projectPath": "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
+        "projectPath": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
         "packagesPath": "/home/icebrah/.nuget/packages/",
-        "outputPath": "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/obj/",
+        "outputPath": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/icebrah/.nuget/NuGet/NuGet.Config"
@@ -99,7 +99,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.101/RuntimeIdentifierGraph.json"
         }
       }
     }

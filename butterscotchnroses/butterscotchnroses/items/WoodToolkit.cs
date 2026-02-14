@@ -256,7 +256,7 @@ public class WoodToolkit : ItemBase<WoodToolkit>
 
     private void SceneDirectorOnonPostPopulateSceneServer(SceneDirector obj)
     {
-        if ((!SceneInfo.instance.countsAsStage && !SceneInfo.instance.sceneDef.allowItemsToSpawnObjects) || SceneInfo.instance.sceneDef.cachedName == "moon2") 
+        if (!SceneInfo.instance.countsAsStage && !SceneInfo.instance.sceneDef.allowItemsToSpawnObjects)
         {
             return;
         }
@@ -276,16 +276,36 @@ public class WoodToolkit : ItemBase<WoodToolkit>
             return;
         }
         
-        GameObject gameObject = DirectorCore.instance.TrySpawnObject(new DirectorSpawnRequest(spawnCard, new DirectorPlacementRule
+        if (SceneInfo.instance.sceneDef.cachedName == "moon2")
         {
-            placementMode = DirectorPlacementRule.PlacementMode.Random
-        }, rng));
-        if (gameObject == null) return;
+            GameObject gameObject = DirectorCore.instance.TrySpawnObject(new DirectorSpawnRequest(spawnCard, new DirectorPlacementRule
+            {
+                placementMode = DirectorPlacementRule.PlacementMode.Random
+            }, rng));
+            if (gameObject == null) return;
         
-        if (gameObject.TryGetComponent(out PurchaseInteraction interaction))
-        {
-            interaction.Networkcost = Run.instance.GetDifficultyScaledCost(0);
+            if (gameObject.TryGetComponent(out PurchaseInteraction interaction))
+            {
+                interaction.Networkcost = Run.instance.GetDifficultyScaledCost(0);
+            }
+            gameObject.transform.position = new Vector3(-261.1643f, 497.2451f, -173.4794f);
+
         }
+        else
+        {
+            GameObject gameObject = DirectorCore.instance.TrySpawnObject(new DirectorSpawnRequest(spawnCard, new DirectorPlacementRule
+            {
+                placementMode = DirectorPlacementRule.PlacementMode.Random
+            }, rng));
+            if (gameObject == null) return;
+        
+            if (gameObject.TryGetComponent(out PurchaseInteraction interaction))
+            {
+                interaction.Networkcost = Run.instance.GetDifficultyScaledCost(0);
+            }
+        }
+        
+        
     }
     
     public sealed class Behavior : BaseItemBodyBehavior

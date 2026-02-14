@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "zxsuLVIQ7Ls=",
+  "dgSpecHash": "MLjBDsDBIy0=",
   "success": true,
-  "projectFilePath": "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
+  "projectFilePath": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
   "expectedPackageFiles": [
     "/home/icebrah/.nuget/packages/bepinex.analyzers/1.0.8/bepinex.analyzers.1.0.8.nupkg.sha512",
     "/home/icebrah/.nuget/packages/bepinex.baselib/5.4.20/bepinex.baselib.5.4.20.nupkg.sha512",
@@ -54,9 +54,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "MonarchStarstormEdits depends on BepInEx.Analyzers (>= 1.0.0) but BepInEx.Analyzers 1.0.0 was not found. BepInEx.Analyzers 1.0.8 was resolved instead.",
-      "projectPath": "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
+      "projectPath": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
       "warningLevel": 1,
-      "filePath": "/home/icebrah/Documents/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
+      "filePath": "/run/media/icebrah/buh/github/code-mods/monarchstarstormedits/MonarchStarstormEdits/MonarchStarstormEdits.csproj",
       "libraryId": "BepInEx.Analyzers",
       "targetGraphs": [
         ".NETStandard,Version=v2.1"

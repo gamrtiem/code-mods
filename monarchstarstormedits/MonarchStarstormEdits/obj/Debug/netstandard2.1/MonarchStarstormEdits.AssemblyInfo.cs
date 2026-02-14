@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MonarchStarstormEdits")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f780b2975b74dd6b513d6333dac2d631340cf77c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+294c0d34d5ed19e144847b51a97e58890a1a20c1")]
 [assembly: System.Reflection.AssemblyProductAttribute("MonarchStarstormEdits")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MonarchStarstormEdits")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

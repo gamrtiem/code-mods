@@ -30,6 +30,9 @@
 	  <Reference Include="ShaderSwapper">
 	    <HintPath>libs\ShaderSwapper.dll</HintPath>
 	  </Reference>
+	  <Reference Include="Starstorm2">
+	    <HintPath>..\libs\Starstorm2-nstrip.dll</HintPath>
+	  </Reference>
 	  <Reference Include="UnityHotReload">
 	    <HintPath>..\libs\UnityHotReload.dll</HintPath>
 	  </Reference>

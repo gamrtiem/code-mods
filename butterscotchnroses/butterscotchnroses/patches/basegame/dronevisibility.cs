@@ -107,7 +107,7 @@ public class dronevisibility : PatchBase<dronevisibility>
     {
         enabled = config.Bind("BNR - Drone Visibility",
             "enable patches for drone visibility",
-            true,
+            false,
             "");
         BNRUtils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
@@ -159,7 +159,7 @@ public class HologramHelper : MonoBehaviour
         transform.localPosition = new Vector3(0, 0, 0);
         transform.position = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z);
         
-        Log.Debug("" + hologram.gameObject.name);
+        //Log.Debug("" + hologram.gameObject.name);
     }
 
     public void FixedUpdate()

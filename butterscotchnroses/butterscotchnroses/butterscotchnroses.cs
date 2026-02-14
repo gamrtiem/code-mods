@@ -23,7 +23,7 @@ namespace BNR
 
         public const string PluginAuthor = "icebro";
         public const string PluginName = "BNR";
-        public const string PluginVersion = "0.1.1";
+        public const string PluginVersion = "0.1.2";
 
         public static AssetBundle carvingKitBundle;
         public void Awake()
@@ -67,6 +67,8 @@ namespace BNR
                 ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
                 item.Init(Config);
             }
+            
+            
         }
 
         private void Update()

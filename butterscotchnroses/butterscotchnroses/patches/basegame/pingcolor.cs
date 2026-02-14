@@ -43,7 +43,7 @@ public class pingrecolor : PatchBase<pingrecolor>
 
     private void recolorPingIndicator(RoR2.UI.PingIndicator pingIndicator)
     {
-        Log.Debug(pingIndicator.pingColor + "bwaa ");
+        //Log.Debug(pingIndicator.pingColor + "bwaa ");
         pingIndicator.defaultPingColor = pingIndicatorDefault.Value;
         pingIndicator.enemyPingColor = pingIndicatorEnemy.Value;
         pingIndicator.interactablePingColor = pingIndicatorInteractable.Value;
@@ -62,7 +62,7 @@ public class pingrecolor : PatchBase<pingrecolor>
         pingIndicator.positionIndicator.alwaysVisibleObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = pingIndicatorDefault.Value;
         pingIndicator.positionIndicator.alwaysVisibleObject.transform.GetChild(1).GetComponent<SpriteRenderer>().color = pingIndicatorEnemy.Value;
         pingIndicator.positionIndicator.alwaysVisibleObject.transform.GetChild(2).GetComponent<SpriteRenderer>().color = pingIndicatorInteractable.Value;
-        Log.Debug(pingIndicator.positionIndicator.alwaysVisibleObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color + " bwaa2 ");
+        //Log.Debug(pingIndicator.positionIndicator.alwaysVisibleObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color + " bwaa2 ");
     }
 
     public override void Config(ConfigFile config)

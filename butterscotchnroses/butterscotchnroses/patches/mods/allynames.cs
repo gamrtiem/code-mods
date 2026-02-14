@@ -38,10 +38,10 @@ public class allynames : PatchBase<allynames>
             
             foreach (var VARIABLE in NamesList.configBodyIndexes)
             {
-                Log.Debug(VARIABLE.categories);
-                Log.Debug(VARIABLE.names);
-                Log.Debug(VARIABLE.bodyIndex);
-                Log.Debug(VARIABLE.realName);
+                //Log.Debug(VARIABLE.categories);
+                //Log.Debug(VARIABLE.names);
+                //Log.Debug(VARIABLE.bodyIndex);
+                //Log.Debug(VARIABLE.realName);
             }
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
+using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using On.RoR2.EntitlementManagement;
@@ -20,6 +21,7 @@ using Console = RoR2.Console;
 
 namespace DroneRepairBeacon
 {
+    [BepInDependency("com.TeamMoonstorm", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("iDeathHD.UnityHotReload", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(NetworkingAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
@@ -31,8 +33,9 @@ namespace DroneRepairBeacon
         private const string PluginVersion = "1.0.1";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
+        private static bool SS2Installed => Chainloader.PluginInfos.ContainsKey("com.TeamMoonstorm");
 
-        private static GameObject DroneIndicatorHologram;
+        public static GameObject DroneIndicatorHologram;
         public static GameObject DroneIndicatorVFX;
         public static List<Sprite> droneIndicatorSprites = []; // this could probably be done with a dictionary but idk how to use them,. ,.,. 
         public static Material[] droneIndicatorMaterials = [];
@@ -67,6 +70,15 @@ namespace DroneRepairBeacon
                 
                 material.shader = Addressables.LoadAssetAsync<Shader>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Shaders.HGStandard_shader).WaitForCompletion();
                 Log.Debug("swapped drone notif shader !");
+            }
+            
+            Log.Debug(" ss 2 install ");
+            Log.Debug(Chainloader.PluginInfos.ContainsKey("com.TeamMoonstorm"));
+            if (SS2Installed)
+            {
+                Log.Debug("ss2 !!");
+                Harmony harmony = new(Info.Metadata.GUID);
+                new SS2Support().initCompat(harmony);
             }
 
             #region configs
@@ -130,7 +142,6 @@ namespace DroneRepairBeacon
         {
             On.RoR2.SummonMasterBehavior.OnEnable += SummonMasterBehaviorOnOnEnable;
             IL.EntityStates.Drone.DeathState.OnImpactServer += DeathStateOnOnImpactServer;
-            //IL.EntityStates.Drone.DeathState.FixedUpdate += DeathStateOnFixedUpdate;
             IL.RoR2.Hologram.HologramProjector.UpdateForViewer += HologramProjectorOnUpdateForViewer;
         }
 
@@ -142,11 +153,35 @@ namespace DroneRepairBeacon
                 return;
             }
             
-            GameObject indicator = Instantiate(DroneIndicatorHologram, self.transform);
+            int rng = -1;
+            bool usingSpecificSprite = false;
+            if (droneIndicatorSprites.Count != 0 || specificDroneIndicatorSprites.Count != 0)
+            {
+                List<int> specificSpriteIndexes = [];
+    
+                for(int i = 0; i < specificDroneIndicatorSprites.Count; i++)
+                {
+                    if (specificDroneIndicatorSprites[i].name.Split("_")[0].Replace("Body", "") != self.masterPrefab.GetComponent<CharacterMaster>().bodyPrefab.GetComponent<CharacterBody>().name.Replace("Body", "").Replace("(Clone)", "")) continue;
+                    Log.Debug($"adding {specificDroneIndicatorSprites[i].name}");
+                    specificSpriteIndexes.Add(i);
+                }
+                if (droneIndicatorSprites.Count != 0 || specificSpriteIndexes.Count != 0)
+                {
+                    rng = Run.instance.runRNG.RangeInt(0, droneIndicatorSprites.Count + specificSpriteIndexes.Count);
+                    if (rng >= droneIndicatorSprites.Count)
+                    {
+                        rng = specificSpriteIndexes[Run.instance.runRNG.RangeInt(0, specificSpriteIndexes.Count)];
+                        usingSpecificSprite = true;
+                    }
+                }
+            }
+            
+            GameObject indicator = Instantiate(DroneIndicatorHologram, self.gameObject.transform);
+            deadDroneTracker tracker = indicator.GetComponent<deadDroneTracker>();
+            tracker.messageID = rng;
+            tracker.usingSpecificSprite = usingSpecificSprite;
 
-            //HologramProjector projector = indicator.GetComponent<HologramProjector>();
-            //projector.contentProvider = indicator.AddComponent<deadDroneTracker>();
-            //projector.displayDistance = displayDistance.Value;
+            NetworkServer.Spawn(indicator);
         }
 
         private void HologramProjectorOnUpdateForViewer(ILContext il)
@@ -224,7 +259,7 @@ namespace DroneRepairBeacon
                                 Log.Debug($"adding {specificDroneIndicatorSprites[i].name}");
                                 specificSpriteIndexes.Add(i);
                             }
-                            Log.Debug(specificSpriteIndexes.Count);
+                            //Log.Debug(specificSpriteIndexes.Count);
                             if (droneIndicatorSprites.Count != 0 || specificSpriteIndexes.Count != 0)
                             {
                                 rng = Run.instance.runRNG.RangeInt(0, droneIndicatorSprites.Count + specificSpriteIndexes.Count);
@@ -234,12 +269,12 @@ namespace DroneRepairBeacon
                                     usingSpecificSprite = true;
                                 }
                             
-                                Log.Debug(rng);
-                                Log.Debug(usingSpecificSprite);
-                                if (!usingSpecificSprite)
-                                {
-                                    Log.Debug(droneIndicatorSprites[rng]);
-                                }
+                                //Log.Debug(rng);
+                                //Log.Debug(usingSpecificSprite);
+                                //if (!usingSpecificSprite)
+                                //{
+                                //    Log.Debug(droneIndicatorSprites[rng]);
+                                //}
                             }
                         }
                         
@@ -251,21 +286,6 @@ namespace DroneRepairBeacon
                             tracker.usingSpecificSprite = usingSpecificSprite;
 
                             NetworkServer.Spawn(indicator);
-                            /*deadDroneTracker droneTracker = indicator.GetComponent<deadDroneTracker>();
-                            if (droneIndicatorSprites.Count != 0)
-                            {
-                                int rng = Run.instance.runRNG.RangeInt(0, droneIndicatorSprites.Count);
-                                droneTracker.messageID = rng;
-                                
-                                NetworkIdentity identity = indicator.GetComponent<NetworkIdentity>();
-                                if (!identity)
-                                {
-                                    Log.Warning("indicator did not have net id !!!");
-                                    return;
-                                }
-                                
-                                new deadDroneTracker.recieveMessageID(identity.netId, rng).Send(NetworkDestination.Clients);
-                            }*/
                         }
 
                         if (DeathTokenConfigs.Value == "")

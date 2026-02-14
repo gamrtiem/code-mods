@@ -42,6 +42,9 @@
 	  <Reference Include="LittleGameplayTweaks">
 	    <HintPath>..\LittleGameplayTweaks-nstrip.dll</HintPath>
 	  </Reference>
+	  <Reference Include="Nautilus">
+	    <HintPath>..\..\Nautilus-nstrip.dll</HintPath>
+	  </Reference>
 	  <Reference Include="ShaderSwapper">
 	    <HintPath>..\ShaderSwapper.dll</HintPath>
 	  </Reference>
