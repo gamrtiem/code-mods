@@ -4,9 +4,12 @@ using System.Linq;
 using System.Reflection;
 using AK.Wwise;
 using BepInEx;
+using BepInEx.Configuration;
 using BNR.patches;
 using BNR.items;
 using HarmonyLib;
+using RiskOfOptions;
+using RiskOfOptions.Options;
 using RoR2;
 using SS2.Items;
 using UnityEngine;
@@ -26,9 +29,11 @@ namespace BNR
 
         public const string PluginAuthor = "icebro";
         public const string PluginName = "BNR";
-        public const string PluginVersion = "0.1.2";
+        public const string PluginVersion = "0.1.3";
 
         public static AssetBundle carvingKitBundle;
+        
+        private static ConfigEntry<Color> skyboxColor;
         public void Awake()
         {
             //TODO add making inferno + ESBM config not give them double jumps TT 
@@ -72,6 +77,8 @@ namespace BNR
             }
             
             On.RoR2.SceneDirector.Start += SceneDirectorOnStart;
+            skyboxColor = Config.Bind("BNR - testscene", "skyboxColor", BNRUtils.Color255(152, 122, 144, 255), "tint of skybox in testscene !!!");
+            ModSettingsManager.AddOption(new ColorOption(skyboxColor));
         }
 
         public static Material skyboxMaterial;
@@ -85,7 +92,7 @@ namespace BNR
                 if (skyboxMaterial != null)
                 {
                     skyboxMaterial = Object.Instantiate(RenderSettings.skybox);
-                    skyboxMaterial.SetColor("_Tint", BNRUtils.Color255(152, 122, 144, 255));
+                    skyboxMaterial.SetColor("_Tint", skyboxColor.Value);
                 }
                 
                 RenderSettings.skybox = skyboxMaterial;
@@ -130,7 +137,12 @@ namespace BNR
         [ConCommand(commandName = "spawn_effect", flags = ConVarFlags.None, helpText = "play an effect !!!!!")]
         public static void spawnEffect(ConCommandArgs args)
         {
-            Debug.Log("args = " + args[0] + " " + args[1]);
+            float scale = 1;
+            if (args.Count > 1)
+            {
+                scale = Convert.ToSingle(args[1]);
+            }
+            Debug.Log("args = " + args[0] + " " + scale);
             
             EffectDef effect = null;
             foreach (EffectDef effectDef in EffectCatalog.entries)
@@ -150,7 +162,7 @@ namespace BNR
             EffectManager.SpawnEffect(effect.index, new EffectData
             {
                 origin = args.senderBody.transform.position,
-                scale = Convert.ToSingle(args[1]),
+                scale = scale,
                 rotation = Util.QuaternionSafeLookRotation(Vector3.up)
             }, true);
         }
