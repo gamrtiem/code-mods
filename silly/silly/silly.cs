@@ -7,6 +7,8 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using Newtonsoft.Json;
 using R2API.Utils;
+using RoR2;
+using silly;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -14,8 +16,9 @@ using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using Object = UnityEngine.Object;
+using Path = System.IO.Path;
 
-namespace ExamplePlugin
+namespace silly
 {
     [BepInDependency("iDeathHD.UnityHotReload", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
@@ -26,84 +29,32 @@ namespace ExamplePlugin
         private const string PluginName = "silly";
         private const string PluginVersion = "1.0.0";
 
-        private static List<Edit> editList;
-        private static Dictionary<string, string> assetPathsToNames;
+        private static List<GenericEdit> genericEditList;
+        private static List<ItemEdit> itemCatalogEditList;
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
-
-        public static List<GameObject> GetInstances<T>()
-        {
-        }
 
         public void Awake()
         {
             Log.Init(Logger);
 
-            #region assetPathNameLoading
-            //https://gist.github.com/xiaoxiao921/499361341751761f12514caaec8afb7b
-            //stealings this function sorry !! 
-            static bool IsLoadableAsset(IResourceLocation key)
+            On.RoR2.RoR2Application.OnLoad += (orig, self) =>
             {
-                return key.ResourceType != typeof(SceneInstance) &&
-                       key.ResourceType != typeof(IAssetBundleResource) &&
-                       key.ProviderId != "UnityEngine.ResourceManagement.ResourceProviders.LegacyResourcesProvider" &&
-                       typeof(Object).IsAssignableFrom(key.ResourceType);
-            }
+                AssetPaths.UpdateAssetPathsToNames();
+                return orig(self);
+            };
             
-            foreach (IResourceLocator resource in Addressables.ResourceLocators)
-            {
-                if (resource != typeof(ResourceLocationMap))
-                {
-                    Log.Debug(resource + " not a rlm !! continue ,..,");
-                    continue;
-                };
-                
-                HashSet<IResourceLocation> assetLocationsHash = [];
-                ResourceLocationMap rlm = (ResourceLocationMap)resource;
-                foreach (var resourceLocations in rlm.Locations)
-                {
-                    foreach (var location in resourceLocations.Value)
-                    {
-                        if (location.ResourceType != typeof(IAssetBundleResource))
-                        {
-                            assetLocationsHash.Add(location);
-                        }
-                    }
-                }
-
-                IResourceLocation[] assetLocationsArray = assetLocationsHash.ToArray();
-                foreach (var assetPath in assetLocationsArray)
-                {
-                    try
-                    {
-                        if (IsLoadableAsset(assetPath))
-                        {
-                            var asset = Addressables.LoadAssetAsync<Object>(assetPath).WaitForCompletion();
-                            
-                            Log.Debug($"yay loaded asset {asset.name} !!");
-                            assetPathsToNames.Add(asset.name, assetPath.PrimaryKey);
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        Log.Debug($"failed to get asset path for {assetPath} !!! printing error ,.,,. ");
-                        Log.Debug(e);
-                    }
-                }
-            }
-            #endregion
-            
-            using (StreamReader r = new StreamReader("file.json"))
+            using (StreamReader r = new StreamReader("genericEdits.json"))
             {
                 string json = r.ReadToEnd();
-                editList = JsonConvert.DeserializeObject<List<Edit>>(json);
+                genericEditList = JsonConvert.DeserializeObject<List<GenericEdit>>(json);
             }
 
             // these can also be GUIDs ideally, but for nows lets just work with addressable paths ,..,
-            foreach (Edit edit in editList)
+            foreach (GenericEdit edit in genericEditList)
             {
-                try
+                Addressables.LoadAssetAsync<Object>(edit.prefabName).Completed += delegate(AsyncOperationHandle<Object> handle)
                 {
-                    Addressables.LoadAssetAsync<Object>(edit.prefabName).Completed += delegate(AsyncOperationHandle<Object> handle)
+                    try
                     {
                         switch (edit.editType)
                         {
@@ -111,61 +62,95 @@ namespace ExamplePlugin
                                 GameObject addComponentGameObject = handle.Result as GameObject;
                                 if (addComponentGameObject == null)
                                 {
-                                    Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
+                                    Log.Error(
+                                        $"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
                                     return;
                                 }
-                                
-                                string addComponent = edit.editParameters[1];
+
+                                string addComponent = edit.editParameters[0];
                                 addComponentGameObject.AddComponent(Type.GetType(addComponent));
                                 break;
                             case "GetComponent":
                                 GameObject getComponentGameObject = handle.Result as GameObject;
                                 if (getComponentGameObject == null)
                                 {
-                                    Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
                                     return;
                                 }
-                                
-                                string getComponent = edit.editParameters[1];
-                                string operation = edit.editParameters[2];
-                                string fieldName = edit.editParameters[3];
-                                string operationArgument = edit.editParameters[4];
+
+                                string getComponent = edit.editParameters[0];
+                                string operation = edit.editParameters[1];
+                                string fieldName = edit.editParameters[2];
+                                string operationArgument = edit.editParameters[3];
                                 Log.Debug(getComponent);
-                                
+
                                 var obtainedComponent = getComponentGameObject.GetComponent(Type.GetType(getComponent));
                                 switch (operation)
                                 {
                                     case "Replace":
-                                        string operationType = operationArgument.Split("::")[0];
-                                        string operationValue = operationArgument.Split("::")[1];
-                                        switch (operationType)
-                                        {
-                                            case("Load"):
-                                                obtainedComponent.GetType().SetFieldValue(fieldName, Addressables.LoadAssetAsync<Object>(operationValue).WaitForCompletion());
-                                                break;
-                                            case("int"):
-                                                obtainedComponent.GetType().SetFieldValue(fieldName, int.Parse(operationValue));
-                                                break;
-                                        }
+                                        Utils.replaceField(obtainedComponent, fieldName, operationArgument);
                                         break;
                                 }
+
                                 break;
                             default:
                                 Log.Error($"unknown edit type {edit.editType}!!");
                                 break;
                         }
-                        
+
                         Log.Debug(handle.Result.name);
-                    };
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"failed to edit prefab of path {edit.prefabName} !! error below .,,. ");
+                        Log.Error(e.Message);
+                    }
+                };
+            }
+            
+            ItemCatalog.availability.onAvailable += AvailabilityOnonAvailable;
+        }
+
+        private void AvailabilityOnonAvailable()
+        {
+            using (StreamReader r = new StreamReader("itemCatalog.json"))
+            {
+                string json = r.ReadToEnd();
+                itemCatalogEditList = JsonConvert.DeserializeObject<List<ItemEdit>>(json);
+            }
+
+            foreach (ItemEdit edit in itemCatalogEditList)
+            {
+                try
+                {
+                    ItemDef editItem = ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex(edit.internalName));
+                    if (editItem == null) continue;
+                    
+                    for (int i = 0; i < edit.editParameters.Length; i += 2)
+                    {
+                        string editField = edit.editParameters[i];
+                        string editReplacement = edit.editParameters[i + 1];
+                        
+                        Utils.replaceField(editItem, editField, editReplacement);
+                        // switch (editField)
+                        // {
+                        //     case ("Load"):
+                        //         editItem.SetFieldValue(editField, editReplacement);
+                        //         break;
+                        //     case ("File"):
+                        //         editItem.SetFieldValue(editField, Utils.Load(Path.Combine(Paths.ConfigPath, editReplacement)));
+                        //         break;
+                        // }
+                    }
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"failed to edit prefab of path {edit.prefabName} !! error below .,,. ");
+                    Log.Error($"failed to edit item with internal name {edit.internalName} !! error below .,,. ");
                     Log.Error(e.Message);
                 }
             }
         }
 
+        // eg. GenericEdits.json
         // [
         //   {
         //     "prefabName": "RoR2/DLC3/Drifter/DrifterBody.prefab",
@@ -173,7 +158,7 @@ namespace ExamplePlugin
         //     "editParameters": [
         //       "MeshRenderer"
         //     ]
-        //   }
+        //   },
         //   {
         //     "prefabName": "RoR2/DLC3/Drifter/DrifterBody.prefab",
         //     "editType": "GetComponent",
@@ -186,16 +171,39 @@ namespace ExamplePlugin
         //   }
         // ]
         // efb87e4ca777db44da34e51807b9e3ee is guid for matIsShocked
-        private class Edit
+        private class GenericEdit
         {
             public string prefabName;
             public string editType;
             public string[] editParameters;
         }
 
-        public static bool isGameObject()
+        // eg. ItemCatalogEdits.json (uses itemcatalog, specific to modded stuff) (maybe hook onto RoR2.onload for modded prefabs if possible to get? look into later ,.,.
+        // [
+        //   {
+        //     "internalName": "Bear",
+        //     "editFields": [
+        //       "pickupIconSprite",
+        //       "Load::(guid for icon here)"
+        //     ]
+        //   }
+        // ]
+        // efb87e4ca777db44da34e51807b9e3ee is guid for matIsShocked
+        private class ItemEdit : GenericEdit
         {
+            public string internalName;
+            public string[] editFields; // edit fields will always be even, one for what the param is and the replace value
         }
+
+        // public static bool isGameObject(Object maybeGameObject)
+        // {
+        //     if (maybeGameObject as GameObject != null)
+        //     {
+        //         return true;
+        //     }
+        //     Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
+        //     return false;
+        // }
         private void Update()
         {
 #if DEBUG

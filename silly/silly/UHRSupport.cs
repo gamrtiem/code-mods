@@ -1,7 +1,7 @@
 #if DEBUG
 using System.Reflection;
 
-namespace ExamplePlugin;
+namespace silly;
 
 internal static class UHRSupport
 {
