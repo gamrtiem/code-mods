@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using BepInEx;
 using R2API.Utils;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Color = UnityEngine.Color;
+using Component = UnityEngine.Component;
+using Object = System.Object;
 
 namespace silly
 {
@@ -43,38 +47,100 @@ namespace silly
             return Sprite.Create(texture, new Rect(0, 0, size.Width, size.Height), new Vector2(0.5f, 0.5f), 3f);
         }
 
-        public static void replaceField(object component, string type, string argument)
+        public static void replaceField(UnityEngine.Object component, string variableName, string argument)
         {
             try
             {
                 string operationType = argument.Split("::")[0];
                 string operationValue = argument.Split("::")[1];
-
+                
+                Log.Debug($"field type = \"{variableName}\", operation type = \"{operationType}\", operation value = \"{operationValue}\"");
+                //component.getfi
+                //test.material = Material.GetDefaultMaterial();
+                
                 switch (operationType)
                 {
                     //you might need to GetType() before set field value .,,. unsure ! 
                     case ("Load"):
-                        component.SetFieldValue(type, Addressables.LoadAssetAsync<UnityEngine.Object>(operationValue).WaitForCompletion());
+                        /*if (component as Component)
+                        {
+                            try
+                            {
+                                Log.Debug($"is component null ? {component == null}");
+                                Log.Debug($"component type ? {component.GetType()}");
+                                Log.Debug($"component name ? {component.name}");
+                                Log.Debug($"material name ? {component.GetType().GetFieldValue<Material>("material").name}");
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
+                            
+                        }
+
+                        try
+                        {
+                            if (component as MeshRenderer)
+                            {
+                                //MeshRenderer nes = (component.GetType())component;
+                                //nes.material
+                                Log.Debug($"material name ? {component.GetFieldValue<Material>("material").name}");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }*/
+
+                        // stackoverflow.com/questions/6445045/getting-all-the-properties-of-an-object
+                        // var properties = GetProperties(component);
+                        // foreach (var p in properties)
+                        // {
+                        //     string name = p.Name;
+                        //     Log.Debug(name);
+                        //     var value = p.GetValue(component, null);
+                        // }
+                        // static PropertyInfo[] GetProperties(object obj)
+                        // {
+                        //     return obj.GetType().GetProperties();
+                        // }
+                        
+                        var loadAsset = Addressables.LoadAssetAsync<object>(operationValue).WaitForCompletion();
+                        Log.Debug((UnityEngine.Object)loadAsset);
+
+                        TypeConverter converter = TypeDescriptor.GetConverter(loadAsset);
+                        if(converter.CanConvertTo(loadAsset.GetType())) {
+                            var value = converter.ConvertTo(loadAsset, loadAsset.GetType()); 
+                            component.SetPropertyValue(variableName, value);
+                        }
+                        else
+                        {
+                            Log.Debug($"erm .,., cant convert {loadAsset} to {loadAsset.GetType()}");
+                        }
+               
+                        
+                        //component.GetType().SetFieldValue(type, ));
                         break;
                     case ("File"):
-                        component.SetFieldValue(type, Load(Path.Combine(Paths.ConfigPath, argument)));
+                        component.GetType().SetFieldValue(variableName, Load(Path.Combine(Paths.ConfigPath, argument)));
                         break;
 
                     case ("int"):
-                        component.SetFieldValue(type, int.Parse(operationValue));
+                        component.GetType().SetFieldValue(variableName, operationValue);
+                        component.GetType().SetFieldValue(variableName, int.Parse(operationValue));
                         break;
                     case ("float"):
-                        component.SetFieldValue(type, float.Parse(operationValue));
+                        component.GetType().SetFieldValue(variableName, float.Parse(operationValue));
                         break;
                     case ("string"):
-                        component.SetFieldValue(type, operationValue);
+                        component.GetType().SetFieldValue(variableName, operationValue);
                         break;
                 }
             }
             catch (Exception e)
             {
                 Log.Error("error while replacing field !!");
-                Log.Error(e.Message);
+                Log.Error(e);
             }
         }
     }

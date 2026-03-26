@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets.ResourceLocators;
+using UnityEngine.AddressableAssets.Utility;
 using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using Object = UnityEngine.Object;
@@ -28,6 +29,7 @@ namespace silly
         private const string PluginAuthor = "icebro";
         private const string PluginName = "silly";
         private const string PluginVersion = "1.0.0";
+        
 
         private static List<GenericEdit> genericEditList;
         private static List<ItemEdit> itemCatalogEditList;
@@ -36,6 +38,8 @@ namespace silly
         public void Awake()
         {
             Log.Init(Logger);
+           // AssetBundle testbundle = new AssetBundle();
+            //testbundle.GetAllScenePaths();
 
             On.RoR2.RoR2Application.OnLoad += (orig, self) =>
             {
@@ -43,7 +47,7 @@ namespace silly
                 return orig(self);
             };
             
-            using (StreamReader r = new StreamReader("genericEdits.json"))
+            using (StreamReader r = new StreamReader(Path.Combine(Paths.ConfigPath, "genericEdits.json")))
             {
                 string json = r.ReadToEnd();
                 genericEditList = JsonConvert.DeserializeObject<List<GenericEdit>>(json);
@@ -62,8 +66,7 @@ namespace silly
                                 GameObject addComponentGameObject = handle.Result as GameObject;
                                 if (addComponentGameObject == null)
                                 {
-                                    Log.Error(
-                                        $"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
+                                    Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
                                     return;
                                 }
 
@@ -83,6 +86,10 @@ namespace silly
                                 string operationArgument = edit.editParameters[3];
                                 Log.Debug(getComponent);
 
+                                Type typeRenderer = typeof(MeshRenderer);
+                                
+                                // Print the assembly qualified name.
+                                Log.Debug($"Assembly qualified name:\n   {typeRenderer.AssemblyQualifiedName}.");
                                 var obtainedComponent = getComponentGameObject.GetComponent(Type.GetType(getComponent));
                                 switch (operation)
                                 {
@@ -97,7 +104,7 @@ namespace silly
                                 break;
                         }
 
-                        Log.Debug(handle.Result.name);
+                        Log.Debug(handle.Result.name + " finished ,..,");
                     }
                     catch (Exception e)
                     {
@@ -112,7 +119,7 @@ namespace silly
 
         private void AvailabilityOnonAvailable()
         {
-            using (StreamReader r = new StreamReader("itemCatalog.json"))
+            using (StreamReader r = new StreamReader(Path.Combine(Paths.ConfigPath, "itemCatalog.json")))
             {
                 string json = r.ReadToEnd();
                 itemCatalogEditList = JsonConvert.DeserializeObject<List<ItemEdit>>(json);
