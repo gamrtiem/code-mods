@@ -1,0 +1,13 @@
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.csproj.AssemblyReference.cache
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.AssemblyInfoInputs.cache
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.AssemblyInfo.cs
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.csproj.CoreCompileInputs.cache
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.sourcelink.json
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/bin/Debug/netstandard2.1/AlloyHunterSurprise.deps.json
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/bin/Debug/netstandard2.1/AlloyHunterSurprise.dll
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/bin/Debug/netstandard2.1/AlloyHunterSurprise.pdb
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/bin/Debug/netstandard2.1/UnityHotReload.dll
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHun.38B024ED.Up2Date
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.dll
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AlloyHunterSurprise/obj/Debug/netstandard2.1/AlloyHunterSurprise.pdb

@@ -1,0 +1,9 @@
+{
+    "name": "AlloyHunterSurprise",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/gamrtiem/code-mods/tree/main/alloyhuntersurprise",
+    "description": "alloy hunter surprise ,.,.., alloy hunter can killsteal bosses not on conduit canyon now !!! very configurable ,.,. i pinky promise .,.,.,",
+    "dependencies": [
+        "tristanmcpherson-R2API-5.0.5"
+    ]
+}

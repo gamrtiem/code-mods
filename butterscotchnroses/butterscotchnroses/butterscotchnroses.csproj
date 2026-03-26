@@ -42,11 +42,17 @@
 	  <Reference Include="LittleGameplayTweaks">
 	    <HintPath>..\LittleGameplayTweaks-nstrip.dll</HintPath>
 	  </Reference>
+	  <Reference Include="MysticsRisky2Utils">
+	    <HintPath>..\MysticsRisky2Utils-nstrip.dll</HintPath>
+	  </Reference>
 	  <Reference Include="Nautilus">
 	    <HintPath>..\..\Nautilus-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="ShaderSwapper">
 	    <HintPath>..\ShaderSwapper.dll</HintPath>
+	  </Reference>
+	  <Reference Include="SkillsmasPlugin">
+	    <HintPath>..\SkillsmasPlugin-nstrip.dll</HintPath>
 	  </Reference>
 	  <!--Reference Include="MiscModpackUtils">
 	    <HintPath>..\MiscModpackUtils-nstrip.dll</HintPath>

@@ -1,0 +1,13 @@
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/bin/Debug/netstandard2.1/AllyHunterSurprise.deps.json
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/bin/Debug/netstandard2.1/AllyHunterSurprise.dll
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/bin/Debug/netstandard2.1/AllyHunterSurprise.pdb
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/bin/Debug/netstandard2.1/UnityHotReload.dll
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.csproj.AssemblyReference.cache
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.AssemblyInfoInputs.cache
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.AssemblyInfo.cs
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.csproj.CoreCompileInputs.cache
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.sourcelink.json
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunt.DEBD9120.Up2Date
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.dll
+/run/media/icebrah/buh/github/code-mods/alloyhuntersurprise/AllyHunterSurprise/obj/Debug/netstandard2.1/AllyHunterSurprise.pdb

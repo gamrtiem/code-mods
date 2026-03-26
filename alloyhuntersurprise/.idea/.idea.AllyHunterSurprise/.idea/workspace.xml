@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7ec6379c-f706-4f43-a1fe-53a854d0b605" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/AlloyHunterSurprise/AlloyHunterSurprise.csproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AlloyHunterSurprise/bin/Debug/netstandard2.1/AlloyHunterSurprise.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AlloyHunterSurprise/bin/Debug/netstandard2.1/AlloyHunterSurprise.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../butterscotchnroses/butterscotchnroses/butterscotchnroses.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../butterscotchnroses/butterscotchnroses/butterscotchnroses.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="3B328ZEFnk7Oth2fziEof5iAi6y" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="runtimes">
+        <list />
+      </option>
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityProjectDiscoverer">
+    <option name="hasUnityReference" value="true" />
+  </component>
+</project>

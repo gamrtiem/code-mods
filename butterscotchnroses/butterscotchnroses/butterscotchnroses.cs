@@ -77,11 +77,11 @@ namespace BNR
             }
             
             On.RoR2.SceneDirector.Start += SceneDirectorOnStart;
-            skyboxColor = Config.Bind("BNR - testscene", "skyboxColor", BNRUtils.Color255(152, 122, 144, 255), "tint of skybox in testscene !!!");
+            skyboxColor = Config.Bind("BNR - testscene", "skyboxColor", BNRUtils.Color255(152, 122, 144), "tint of skybox in testscene !!!");
             ModSettingsManager.AddOption(new ColorOption(skyboxColor));
         }
 
-        public static Material skyboxMaterial;
+        private static Material skyboxMaterial;
         private void SceneDirectorOnStart(SceneDirector.orig_Start orig, RoR2.SceneDirector self)
         {
             orig(self);
@@ -89,7 +89,7 @@ namespace BNR
             {
                 Log.Debug($"new scene !! {RenderSettings.skybox} {SceneManager.GetActiveScene().name}");
                 
-                if (skyboxMaterial != null)
+                if (skyboxMaterial == null)
                 {
                     skyboxMaterial = Object.Instantiate(RenderSettings.skybox);
                     skyboxMaterial.SetColor("_Tint", skyboxColor.Value);

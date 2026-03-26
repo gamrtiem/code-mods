@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<RootNamespace>AlloyHunterSurprise</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Analyzers" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
+
+		<PackageReference Include="MMHOOK.RoR2" Version="2025.12.9" />
+
+		<PackageReference Include="R2API" Version="5.0.5" />
+
+		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
+		<PackageReference Include="RoR2BepInExPack" Version="1.36.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="UnityHotReload">
+	    <HintPath>..\libs\UnityHotReload.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+</Project>
