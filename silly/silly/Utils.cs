@@ -6,12 +6,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using Newtonsoft.Json.Linq;
 using R2API.Utils;
+using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Color = UnityEngine.Color;
 using Component = UnityEngine.Component;
+using Console = System.Console;
 using Object = System.Object;
+using Path = System.IO.Path;
 
 namespace silly
 {
@@ -93,17 +97,20 @@ namespace silly
                         }*/
 
                         // stackoverflow.com/questions/6445045/getting-all-the-properties-of-an-object
-                        // var properties = GetProperties(component);
-                        // foreach (var p in properties)
-                        // {
-                        //     string name = p.Name;
-                        //     Log.Debug(name);
-                        //     var value = p.GetValue(component, null);
-                        // }
-                        // static PropertyInfo[] GetProperties(object obj)
-                        // {
-                        //     return obj.GetType().GetProperties();
-                        // }
+                        try
+                        {
+                            JObject json = JObject.FromObject(component);
+                            foreach (JProperty property in json.Properties())
+                                Log.Debug(property.Name + " - " + property.Value);
+
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Debug(e);
+                        }
+                        
+                        Type objType = typeof(Highlight);
+                        Log.Debug($"Assembly qualified name2:\n   {objType.AssemblyQualifiedName}.");
                         
                         var loadAsset = Addressables.LoadAssetAsync<object>(operationValue).WaitForCompletion();
                         Log.Debug((UnityEngine.Object)loadAsset);

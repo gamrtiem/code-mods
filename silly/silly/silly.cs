@@ -89,7 +89,7 @@ namespace silly
                                 Type typeRenderer = typeof(MeshRenderer);
                                 
                                 // Print the assembly qualified name.
-                                Log.Debug($"Assembly qualified name:\n   {typeRenderer.AssemblyQualifiedName}.");
+                                //Log.Debug($"Assembly qualified name:\n   {typeRenderer.AssemblyQualifiedName}.");
                                 var obtainedComponent = getComponentGameObject.GetComponent(Type.GetType(getComponent));
                                 switch (operation)
                                 {
