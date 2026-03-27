@@ -11,6 +11,7 @@ using R2API.Utils;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Color = UnityEngine.Color;
 using Component = UnityEngine.Component;
 using Console = System.Console;
@@ -19,6 +20,10 @@ using Path = System.IO.Path;
 
 namespace silly
 {
+    public static class CastHelper
+    {
+        public static T Cast<T>(object value) => (T)Convert.ChangeType(value, typeof(T));
+    }
     public class Utils
     {
         public static Color TRANSPARENT = new(0, 0, 0, 0);
@@ -66,66 +71,29 @@ namespace silly
                 {
                     //you might need to GetType() before set field value .,,. unsure ! 
                     case ("Load"):
-                        /*if (component as Component)
+                        string typeName = argument.Split("::")[2];
+                        
+                        Type objType = Type.GetType(typeName);
+                        Log.Debug($"Assembly qualified name2:\n   {objType.AssemblyQualifiedName}.");
+                        
+                        static object CastTo(object value, Type targetType)
                         {
-                            try
-                            {
-                                Log.Debug($"is component null ? {component == null}");
-                                Log.Debug($"component type ? {component.GetType()}");
-                                Log.Debug($"component name ? {component.name}");
-                                Log.Debug($"material name ? {component.GetType().GetFieldValue<Material>("material").name}");
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                            }
-                            
-                        }
-
-                        try
-                        {
-                            if (component as MeshRenderer)
-                            {
-                                //MeshRenderer nes = (component.GetType())component;
-                                //nes.material
-                                Log.Debug($"material name ? {component.GetFieldValue<Material>("material").name}");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }*/
-
-                        // stackoverflow.com/questions/6445045/getting-all-the-properties-of-an-object
-                        try
-                        {
-                            JObject json = JObject.FromObject(component);
-                            foreach (JProperty property in json.Properties())
-                                Log.Debug(property.Name + " - " + property.Value);
-
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Debug(e);
+                            var method = typeof(CastHelper).GetMethod(nameof(CastHelper.Cast)).MakeGenericMethod(targetType);
+                            return method.Invoke(null, new[] { value });
                         }
                         
-                        Type objType = typeof(Highlight);
-                        Log.Debug($"Assembly qualified name2:\n   {objType.AssemblyQualifiedName}.");
+                        
+                        MethodInfo genericMethod = typeof(Addressables)
+                            .GetMethod("LoadAssetAsync", new[] { typeof(object) })
+                            .MakeGenericMethod(objType);
+                        
+                        
                         
                         var loadAsset = Addressables.LoadAssetAsync<object>(operationValue).WaitForCompletion();
                         Log.Debug((UnityEngine.Object)loadAsset);
-
-                        TypeConverter converter = TypeDescriptor.GetConverter(loadAsset);
-                        if(converter.CanConvertTo(loadAsset.GetType())) {
-                            var value = converter.ConvertTo(loadAsset, loadAsset.GetType()); 
-                            component.SetPropertyValue(variableName, value);
-                        }
-                        else
-                        {
-                            Log.Debug($"erm .,., cant convert {loadAsset} to {loadAsset.GetType()}");
-                        }
-               
+                        //dynamic d = Convert.ChangeType(loadAsset, objType);
                         
+                        component.SetPropertyValue(variableName, genericMethod.Invoke(null, new[] { operationValue }));
                         //component.GetType().SetFieldValue(type, ));
                         break;
                     case ("File"):

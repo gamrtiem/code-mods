@@ -85,8 +85,6 @@ namespace silly
                                 string fieldName = edit.editParameters[2];
                                 string operationArgument = edit.editParameters[3];
                                 Log.Debug(getComponent);
-
-                                Type typeRenderer = typeof(MeshRenderer);
                                 
                                 // Print the assembly qualified name.
                                 //Log.Debug($"Assembly qualified name:\n   {typeRenderer.AssemblyQualifiedName}.");
@@ -201,16 +199,7 @@ namespace silly
             public string internalName;
             public string[] editFields; // edit fields will always be even, one for what the param is and the replace value
         }
-
-        // public static bool isGameObject(Object maybeGameObject)
-        // {
-        //     if (maybeGameObject as GameObject != null)
-        //     {
-        //         return true;
-        //     }
-        //     Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
-        //     return false;
-        // }
+        
         private void Update()
         {
 #if DEBUG
