@@ -77,6 +77,7 @@ namespace silly
                                 GameObject getComponentGameObject = handle.Result as GameObject;
                                 if (getComponentGameObject == null)
                                 {
+                                    Log.Error($"tried to get component on a non gameobject .,,. {edit.prefabName}");
                                     return;
                                 }
 
@@ -88,13 +89,18 @@ namespace silly
                                 
                                 // Print the assembly qualified name.
                                 //Log.Debug($"Assembly qualified name:\n   {typeRenderer.AssemblyQualifiedName}.");
-                                var obtainedComponent = getComponentGameObject.GetComponent(Type.GetType(getComponent));
+                                
+                                Log.Debug($"getting component {Utils.GetType(getComponent)} in {getComponentGameObject}");
+                                var obtainedComponent = getComponentGameObject.GetComponent(Utils.GetType(getComponent));
                                 switch (operation)
                                 {
                                     case "Replace":
                                         Utils.replaceField(obtainedComponent, fieldName, operationArgument);
                                         break;
                                 }
+
+                                //Highlight test = new();
+                                //test.highlightColor = 1;
 
                                 break;
                             default:
@@ -215,6 +221,13 @@ namespace silly
                 }
             }
 #endif  
+        }
+        
+        [ConCommand(commandName = "type_test", flags = ConVarFlags.None, helpText = "bwaa")]
+        public static void typetest(ConCommandArgs args)
+        {
+            Log.Debug("args = " + args[0]);
+            Log.Debug($"type !! = {Utils.GetType(args[0]).Name}");
         }
     }
 }

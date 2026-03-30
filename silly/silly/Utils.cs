@@ -12,6 +12,7 @@ using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
 using Color = UnityEngine.Color;
 using Component = UnityEngine.Component;
 using Console = System.Console;
@@ -72,43 +73,62 @@ namespace silly
                     //you might need to GetType() before set field value .,,. unsure ! 
                     case ("Load"):
                         string typeName = argument.Split("::")[2];
+                        Type objType = GetType(typeName);
                         
-                        Type objType = Type.GetType(typeName);
-                        Log.Debug($"Assembly qualified name2:\n   {objType.AssemblyQualifiedName}.");
+                        var location = Addressables.LoadResourceLocationsAsync(operationValue).WaitForCompletion().FirstOrDefault();
+                        var method = typeof(Addressables).GetMethods().First(m => m.Name == "LoadAssetAsync" && m.IsGenericMethod);
+                        var genericMethod = method.MakeGenericMethod(objType).Invoke(null, [location]);
+                        var result = genericMethod.GetType().GetMethod("WaitForCompletion").Invoke(genericMethod, null);
                         
-                        static object CastTo(object value, Type targetType)
-                        {
-                            var method = typeof(CastHelper).GetMethod(nameof(CastHelper.Cast)).MakeGenericMethod(targetType);
-                            return method.Invoke(null, new[] { value });
-                        }
-                        
-                        
-                        MethodInfo genericMethod = typeof(Addressables)
-                            .GetMethod("LoadAssetAsync", new[] { typeof(object) })
-                            .MakeGenericMethod(objType);
-                        
-                        
-                        
-                        var loadAsset = Addressables.LoadAssetAsync<object>(operationValue).WaitForCompletion();
-                        Log.Debug((UnityEngine.Object)loadAsset);
+                        //var loadAsset = Addressables.LoadAssetAsync<object>(operationValue).WaitForCompletion();
+                        Log.Debug((UnityEngine.Object)result);
+                        Log.Debug(component);
+                        Log.Debug(component.GetType());
+                        Log.Debug(variableName);
                         //dynamic d = Convert.ChangeType(loadAsset, objType);
                         
-                        component.SetPropertyValue(variableName, genericMethod.Invoke(null, new[] { operationValue }));
+                        component.SetFieldValue(variableName, result);
                         //component.GetType().SetFieldValue(type, ));
                         break;
-                    case ("File"):
-                        component.GetType().SetFieldValue(variableName, Load(Path.Combine(Paths.ConfigPath, argument)));
+                    case ("file"): // works !! 
+                        string spriteOrTexture = argument.Split("::")[2];
+                        
+                        Sprite sprite = Load(Path.Combine(Paths.ConfigPath, operationValue));
+                        if (sprite == null)
+                        {
+                            Log.Error("sprite is null !!!");
+                            break;
+                        }
+                        
+                        if (spriteOrTexture == "sprite")
+                        {
+                            component.SetFieldValue(variableName, sprite);
+                        }
+                        else
+                        {
+                            //Log.Debug(component.GetType());
+                            //Log.Debug(component.GetFieldValue<Texture>("portraitIcon") == null);
+                            component.SetFieldValue(variableName, sprite.texture);
+                        }
                         break;
 
                     case ("int"):
-                        component.GetType().SetFieldValue(variableName, operationValue);
-                        component.GetType().SetFieldValue(variableName, int.Parse(operationValue));
+                        component.SetFieldValue(variableName, int.Parse(operationValue));
+                        break;
+                    case ("bool"):
+                        component.SetFieldValue(variableName, (bool.Parse(operationValue) || operationValue == "true"));
                         break;
                     case ("float"):
-                        component.GetType().SetFieldValue(variableName, float.Parse(operationValue));
+                        component.SetFieldValue(variableName, float.Parse(operationValue));
                         break;
                     case ("string"):
-                        component.GetType().SetFieldValue(variableName, operationValue);
+                        component.SetFieldValue(variableName, operationValue);
+                        break;
+                    
+                    case ("enum"):
+                        string enumTypeName = argument.Split("::")[2];
+                        RoR2.Highlight.HighlightColor test = Highlight.HighlightColor.custom;
+                        component.SetFieldValue(variableName, Enum.ToObject(GetType(enumTypeName), int.Parse(operationValue)));
                         break;
                 }
             }
@@ -118,6 +138,23 @@ namespace silly
                 Log.Error(e);
             }
         }
+        
+        // Source - https://stackoverflow.com/a/11811046
+        // Posted by peyman, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-03-30, License - CC BY-SA 4.0
+        public static Type GetType(string typeName)
+        {
+            var type = Type.GetType(typeName);
+            if (type != null) return type;
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                type = a.GetType(typeName);
+                if (type != null)
+                    return type;
+            }
+            return null;
+        }
+
     }
     public static class ImageHelper // stackoverflow GO
     {
