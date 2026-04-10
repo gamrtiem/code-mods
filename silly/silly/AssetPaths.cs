@@ -71,5 +71,6 @@ public class AssetPaths
                 Log.Error("error when rebuilding asset paths !! " + e.Message);
             }
         }
+        Log.Debug(assetPathsToNames);
     }
 }

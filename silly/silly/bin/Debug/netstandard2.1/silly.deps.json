@@ -11,6 +11,7 @@
         "dependencies": {
           "BepInEx.Core": "5.4.21",
           "MMHOOK.RoR2": "2025.11.19",
+          "Microsoft.CSharp": "4.7.0",
           "R2API": "5.0.5",
           "R2API.Language": "1.1.0",
           "RiskOfRain2.GameLibs": "1.4.0-r.0",
@@ -43,6 +44,14 @@
           "lib/netstandard2.0/0Harmony.dll": {
             "assemblyVersion": "2.7.0.0",
             "fileVersion": "2.7.0.0"
+          }
+        }
+      },
+      "Microsoft.CSharp/4.7.0": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.CSharp.dll": {
+            "assemblyVersion": "4.0.5.0",
+            "fileVersion": "4.700.19.56404"
           }
         }
       },
@@ -729,6 +738,13 @@
       "sha512": "sha512-lec/SkduQspMa3Pi/nM/NSvA84Za8HCCWA8ybdToKiTqnBZa+JC5g6rxoFQCg/1vNuYcvjy77edePZzIEsRmvw==",
       "path": "harmonyx/2.7.0",
       "hashPath": "harmonyx.2.7.0.nupkg.sha512"
+    },
+    "Microsoft.CSharp/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
+      "path": "microsoft.csharp/4.7.0",
+      "hashPath": "microsoft.csharp.4.7.0.nupkg.sha512"
     },
     "MMHOOK.RoR2/2025.11.19": {
       "type": "package",

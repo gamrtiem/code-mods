@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
+using HarmonyLib;
+using MonoMod.Cil;
 using Newtonsoft.Json;
 using R2API.Utils;
 using RoR2;
@@ -60,25 +63,50 @@ namespace silly
                 {
                     try
                     {
+                        GameObject hierarchy = null;
+                        if (edit.hierarchy != null)
+                        {
+                            hierarchy = handle.Result as GameObject;
+                            foreach (string t in edit.hierarchy)
+                            {
+                                if (int.TryParse(t, out int hierarchyIndex))
+                                {
+                                    hierarchy = hierarchy.transform.GetChild(hierarchyIndex).gameObject;
+                                }
+                                else
+                                {
+                                    hierarchy = hierarchy.transform.Find(t).gameObject;
+                                }
+                            }
+                        }
+                         
                         switch (edit.editType)
                         {
                             case "AddComponent":
-                                GameObject addComponentGameObject = handle.Result as GameObject;
-                                if (addComponentGameObject == null)
+                                if (hierarchy == null)
                                 {
-                                    Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
-                                    return;
+                                    hierarchy = handle.Result as GameObject;
+                                    
+                                    if (hierarchy == null)
+                                    {
+                                        Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
+                                        return;
+                                    }
                                 }
 
                                 string addComponent = edit.editParameters[0];
-                                addComponentGameObject.AddComponent(Type.GetType(addComponent));
+                                hierarchy.AddComponent(Type.GetType(addComponent));
                                 break;
                             case "GetComponent":
-                                GameObject getComponentGameObject = handle.Result as GameObject;
-                                if (getComponentGameObject == null)
+                                if (hierarchy == null)
                                 {
-                                    Log.Error($"tried to get component on a non gameobject .,,. {edit.prefabName}");
-                                    return;
+                                    hierarchy = handle.Result as GameObject;
+                                    
+                                    if (hierarchy == null)
+                                    {
+                                        Log.Error($"tried to addcomponent to something not a gameobject ,.,. {edit.prefabName}");
+                                        return;
+                                    }
                                 }
 
                                 string getComponent = edit.editParameters[0];
@@ -87,21 +115,15 @@ namespace silly
                                 string operationArgument = edit.editParameters[3];
                                 Log.Debug(getComponent);
                                 
-                                // Print the assembly qualified name.
-                                //Log.Debug($"Assembly qualified name:\n   {typeRenderer.AssemblyQualifiedName}.");
-                                
-                                Log.Debug($"getting component {Utils.GetType(getComponent)} in {getComponentGameObject}");
-                                var obtainedComponent = getComponentGameObject.GetComponent(Utils.GetType(getComponent));
+                                Log.Debug($"getting component {Utils.GetType(getComponent)} in {hierarchy}");
+                                var obtainedComponent = hierarchy.GetComponent(Utils.GetType(getComponent));
                                 switch (operation)
                                 {
                                     case "Replace":
                                         Utils.replaceField(obtainedComponent, fieldName, operationArgument);
                                         break;
                                 }
-
-                                //Highlight test = new();
-                                //test.highlightColor = 1;
-
+                                
                                 break;
                             default:
                                 Log.Error($"unknown edit type {edit.editType}!!");
@@ -118,10 +140,10 @@ namespace silly
                 };
             }
             
-            ItemCatalog.availability.onAvailable += AvailabilityOnonAvailable;
+            ItemCatalog.availability.onAvailable += AvailabilityOnAvailable;
         }
 
-        private void AvailabilityOnonAvailable()
+        private void AvailabilityOnAvailable()
         {
             using (StreamReader r = new StreamReader(Path.Combine(Paths.ConfigPath, "itemCatalog.json")))
             {
@@ -172,6 +194,7 @@ namespace silly
         //   },
         //   {
         //     "prefabName": "RoR2/DLC3/Drifter/DrifterBody.prefab",
+        //     "hierarchy": "test::test2::test3"
         //     "editType": "GetComponent",
         //     "editParameters": [
         //       "MeshRenderer",
@@ -186,6 +209,7 @@ namespace silly
         {
             public string prefabName;
             public string editType;
+            public string[] hierarchy;
             public string[] editParameters;
         }
 
