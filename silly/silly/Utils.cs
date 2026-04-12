@@ -1,35 +1,202 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using BepInEx;
-using Mono.Cecil.Cil;
-using MonoMod.Utils;
-using Newtonsoft.Json.Linq;
 using R2API.Utils;
-using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
 using Color = UnityEngine.Color;
-using Component = UnityEngine.Component;
-using Console = System.Console;
-using Object = System.Object;
 using Path = System.IO.Path;
 
 namespace silly
 {
-    public static class CastHelper
-    {
-        public static T Cast<T>(object value) => (T)Convert.ChangeType(value, typeof(T));
-    }
     public class Utils
+    {
+        public static void replaceField(object component, string variableName, string argument)
+        {
+            try
+            {
+                string operationType = argument.Split("::")[0];
+                string operationValue = argument.Split("::")[1];
+                Log.Debug($"field type = \"{variableName}\", operation type = \"{operationType}\", operation value = \"{operationValue}\"");
+
+                //handle cases where we're editing an entry in an array
+                Array savedArray = null;
+                int arrayIndex = 0;
+                object originalComponent = component;
+                string arrayName = "";
+                if (variableName.Contains("[") && variableName.Contains("]"))
+                {
+                    Log.Debug("bwaa !");
+                    if (int.TryParse(variableName.Split('[', ']')[1], out arrayIndex))
+                    {
+                        arrayName = variableName.Split('[')[0];
+                        savedArray = component.GetFieldValue<Array>(arrayName);
+                        Log.Debug(savedArray.GetValue(arrayIndex));
+                        component = savedArray.GetValue(arrayIndex);
+                    }
+                    else
+                    {
+                        Log.Debug("gorp .,,.");
+                    }
+                }
+                
+                //handle cases where we're editing a variable of a variable (scary ,.,.
+                Stack stack = new Stack();
+                if (variableName.Contains(".."))
+                {
+                    string[] varPath = variableName.Split("..");
+                    for (int i = 1; i < varPath.Length - 1; i++) // this loop goes through the path to the one lowest down, we dont really need to unless its above 3 variables deep though .,,.
+                    {
+                        Log.Debug($"variable name : {variableName} - splitting {varPath[i]}");
+                        string varName = varPath[i].Split(":")[0];
+                        string typeName = varPath[i].Split(":")[1];
+
+                        stack.Push(varName);
+                        stack.Push(component);
+
+                        var method = typeof(Reflection).GetMethods().First(m => m.Name == "GetFieldValue" && m.IsGenericMethod);
+                        component = (UnityEngine.Object)method.MakeGenericMethod(GetType(typeName)).Invoke(null, [component, varName]);
+                        Log.Debug($"new component - {component}");
+                    }
+                    variableName = varPath[^1].Split(":")[0]; // set the variable name to the deepest name in the path
+                }
+                
+                //if we're editing a property instead of a field 
+                string fieldOrProperty = "SetFieldValue";
+                if (variableName.Contains("::"))
+                {
+                    fieldOrProperty = "SetPropertyValue";
+                    variableName = variableName.Split("::")[0];
+                }
+                var setFieldPropertyValue = typeof(Reflection).GetMethod(fieldOrProperty);
+                
+                
+                switch (operationType.ToLower())
+                {
+                    case ("load"):
+                        string typeName = argument.Split("::")[2];
+                        Type objType = GetType(typeName);
+
+                        //this is effectively running this function, but since we cant put a type variable inside <> we need to do some trickery first .,.,
+                        //Addressables.LoadAssetAsync<objType>(location);
+                        var location = Addressables.LoadResourceLocationsAsync(operationValue).WaitForCompletion().FirstOrDefault();
+                        var method = typeof(Addressables).GetMethods().First(m => m.Name == "LoadAssetAsync" && m.IsGenericMethod);
+                        var genericMethod = method.MakeGenericMethod(objType).Invoke(null, [location]);
+                        var result = genericMethod.GetType().GetMethod("WaitForCompletion")?.Invoke(genericMethod, null);
+
+                        Log.Debug("load - " + ((UnityEngine.Object)result).GetType());
+                        setFieldPropertyValue.Invoke(null, [component, variableName, result]);
+                        break;
+                    case ("file"): // works !! 
+                        string spriteOrTexture = argument.Split("::")[2];
+                        
+                        Sprite sprite = ImageHelper.Load(Path.Combine(Paths.ConfigPath, operationValue));
+                        if (sprite == null)
+                        {
+                            Log.Error("sprite is null !!!");
+                            break;
+                        }
+                        
+                        if (spriteOrTexture == "sprite")
+                        {
+                            setFieldPropertyValue.Invoke(null, [component, variableName, sprite]);
+                        }
+                        else
+                        {
+                            setFieldPropertyValue.Invoke(null, [component, variableName, sprite.texture]);
+                        }
+                        break;
+
+                    case ("int"):
+                        setFieldPropertyValue.Invoke(null, [component, variableName, int.Parse(operationValue)]);
+                        break;
+                    case ("bool"):
+                        setFieldPropertyValue.Invoke(null, [component, variableName, (bool.Parse(operationValue) || operationValue == "true")]);
+                        break;
+                    case ("float"):
+                        setFieldPropertyValue.Invoke(null, [component, variableName, float.Parse(operationValue)]);
+                        break;
+                    case ("string"):
+                        setFieldPropertyValue.Invoke(null, [component, variableName, operationValue]);
+                        break;
+                    
+                    case ("enum"):
+                        string enumTypeName = argument.Split("::")[2];
+
+                        if (!int.TryParse(argument.Split("::")[1], out int enumValue))
+                        {
+                            Log.Debug("failed to get enum as int!! using string.,,.");
+                            string[] enums = Enum.GetNames(GetType(enumTypeName));
+                            for (int i = 0; i < enums.Length; i++)
+                            {
+                                if (enums[i] != operationValue) continue;
+                                
+                                enumValue = i;
+                                Log.Debug($"found enum !! {enums[i]} + index {enumValue}");
+                                break;
+                            }
+                        }
+                        Log.Debug($"setting {variableName} to {enumValue}");
+                        
+                        setFieldPropertyValue.Invoke(null, [component, variableName, enumValue]);
+
+                        break;
+                    
+                    case ("color"):
+                        string hexColor = argument.Split("::")[1];
+                        ColorUtility.TryParseHtmlString( hexColor , out Color color );
+                        Log.Debug($"{hexColor}");
+                        Log.Debug($"setting {variableName} to {color}");
+                        component.SetFieldValue(variableName, color);
+                        break;
+                }
+                
+                //if we replaced a variable of a variable, go back up the stack to the parent and change their value as well
+                while (stack.Count > 0)
+                {
+                    UnityEngine.Object parent = (UnityEngine.Object)stack.Pop();
+                    string parentVarName = (string)stack.Pop();
+                    
+                    parent.SetFieldValue(parentVarName, component);
+                    component = parent;
+                }
+                
+                //save the entry if we modified an array
+                if (savedArray != null)
+                {
+                    savedArray.SetValue(component, arrayIndex);
+                    originalComponent.SetFieldValue(arrayName, savedArray);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("error while replacing value !!");
+                Log.Error(e);
+            }
+        }
+        
+        // Source - https://stackoverflow.com/a/11811046
+        // Posted by peyman, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-03-30, License - CC BY-SA 4.0
+        public static Type GetType(string typeName)
+        {
+            var type = Type.GetType(typeName);
+            if (type != null) return type;
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                type = a.GetType(typeName);
+                if (type != null)
+                    return type;
+            }
+            return null;
+        }
+    }
+    
+    public static class ImageHelper // stackoverflow GO
     {
         public static Color TRANSPARENT = new(0, 0, 0, 0);
         public static Sprite GetComposite(Texture2D bg, Texture2D fg)
@@ -60,263 +227,7 @@ namespace silly
             texture.LoadImage(bytes);
             return Sprite.Create(texture, new Rect(0, 0, size.Width, size.Height), new Vector2(0.5f, 0.5f), 3f);
         }
-
-        public static void replaceField(object component, string variableName, string argument)
-        {
-            try
-            {
-                Array savedArray = null;
-                int arrayIndex = 0;
-                string operationType = argument.Split("::")[0];
-                string operationValue = argument.Split("::")[1];
-                
-                Log.Debug($"field type = \"{variableName}\", operation type = \"{operationType}\", operation value = \"{operationValue}\"");
-
-                string varType = "field";
-                if (variableName.Contains("::"))
-                {
-                    varType = variableName.Split("::")[1];
-                    Log.Debug("changing var type to " + varType);
-                    variableName = variableName.Split("::")[0];
-                }
-
-                object originalComponent = component;
-                string arrayName = "";
-                if (variableName.Contains("[") && variableName.Contains("]"))
-                {
-                    Log.Debug("bwaa !");
-                    if (int.TryParse(variableName.Split('[', ']')[1], out arrayIndex))
-                    {
-                        arrayName = variableName.Split('[')[0];
-                        savedArray = component.GetFieldValue<Array>(arrayName);
-                        Log.Debug(savedArray.GetValue(arrayIndex));
-                        component = savedArray.GetValue(arrayIndex);
-                    }
-                    else
-                    {
-                        Log.Debug("gorp .,,.");
-                    }
-                }
-                
-                Stack stack = new Stack();
-                if (variableName.Contains(".."))
-                {
-                    string[] varPath = variableName.Split("..");
-                    for (int i = 1; i < varPath.Length - 1; i++) // this loop goes through the path to the one lowest down, we dont really need to unless its above 3 variables deep though .,,.
-                    {
-                        Log.Debug($"variable name : {variableName} - splitting {varPath[i]}");
-                        string varName = varPath[i].Split(":")[0];
-                        string typeName = varPath[i].Split(":")[1];
-
-                        stack.Push(varName);
-                        stack.Push(component);
-                        Log.Debug(varName);
-                        Log.Debug(component);
-                        Log.Debug(typeName);
-                        Log.Debug(GetType(typeName));
-                        //R2API.Utils.Reflection.GetFieldValue<typeName>(component, variableName);
-                        //R2API.Utils.Reflection.GetFieldValue<CharacterModel.RendererInfo>(component, variableName);
-                        var method = typeof(Reflection).GetMethods().First(m => m.Name == "GetFieldValue" && m.IsGenericMethod);
-                        Log.Debug(method);
-                        component = (UnityEngine.Object)method.MakeGenericMethod(GetType(typeName)).Invoke(null, [component, varName]);
-                        Log.Debug($"new component - {component}");
-                    }
-                    variableName = varPath[^1].Split(":")[0];
-                }
-
-                //ItemDisplay test;
-                //test.rendererInfos[0].defaultMaterial
-                
-                //component.getfi
-                //test.material = Material.GetDefaultMaterial();
-                object replacement = null;
-                switch (operationType.ToLower())
-                {
-                    //you might need to GetType() before set field value .,,. unsure ! 
-                    case ("load"):
-                        string typeName = argument.Split("::")[2];
-                        Type objType = GetType(typeName);
-
-                        //Addressables.LoadAssetAsync<objType>(location).WaitForCompletion();
-                        var location = Addressables.LoadResourceLocationsAsync(operationValue).WaitForCompletion().FirstOrDefault();
-                        var method = typeof(Addressables).GetMethods().First(m => m.Name == "LoadAssetAsync" && m.IsGenericMethod);
-                        var genericMethod = method.MakeGenericMethod(objType).Invoke(null, [location]);
-                        var result = genericMethod.GetType().GetMethod("WaitForCompletion")?.Invoke(genericMethod, null);
-
-                        Log.Debug("load - " + ((UnityEngine.Object)result).GetType());
-                        Log.Debug("load - " + component);
-                        Log.Debug("load - " + component.GetType());
-                        Log.Debug("load - " + variableName);
-                        //
-                        //MeshRenderer test;
-                        //test.materials
-                        replacement = result;
-                        //component.SetFieldValue(variableName, result);
-                        break;
-                    case ("file"): // works !! 
-                        string spriteOrTexture = argument.Split("::")[2];
-                        
-                        Sprite sprite = Load(Path.Combine(Paths.ConfigPath, operationValue));
-                        if (sprite == null)
-                        {
-                            Log.Error("sprite is null !!!");
-                            break;
-                        }
-                        
-                        if (spriteOrTexture == "sprite")
-                        {
-                            replacement = sprite;
-                            //component.SetFieldValue(variableName, sprite);
-                        }
-                        else
-                        {
-                            replacement = sprite.texture;
-                            //component.SetFieldValue(variableName, sprite.texture);
-                        }
-                        break;
-
-                    case ("int"):
-                        if (varType == "field")
-                        {
-                            component.SetFieldValue(variableName, int.Parse(operationValue));
-                        }
-                        else
-                        {
-                            component.SetPropertyValue(variableName, int.Parse(operationValue));
-                        }
-                        
-                        break;
-                    case ("bool"):
-                        if (varType == "field")
-                        {
-                            component.SetFieldValue(variableName, (bool.Parse(operationValue) || operationValue == "true"));
-                        }
-                        else
-                        {
-                            component.SetPropertyValue(variableName, (bool.Parse(operationValue) || operationValue == "true"));
-                        }
-                        
-                        break;
-                    case ("float"):
-                        if (varType == "field")
-                        {
-                            component.SetFieldValue(variableName, float.Parse(operationValue));
-                        }
-                        else
-                        {
-                            component.SetPropertyValue(variableName, float.Parse(operationValue));
-                        }
-                        break;
-                    case ("string"):
-                        if (varType == "field")
-                        {
-                            component.SetFieldValue(variableName, operationValue);
-                        }
-                        else
-                        {
-                            component.SetPropertyValue(variableName, operationValue);
-                        }
-                        break;
-                    
-                    case ("enum"):
-                        string enumTypeName = argument.Split("::")[2];
-
-                        if (!int.TryParse(argument.Split("::")[1], out int enumValue))
-                        {
-                            Log.Debug("failed to get enum as int!! using string.,,.");
-                            string[] enums = Enum.GetNames(GetType(enumTypeName));
-                            for (int i = 0; i < enums.Length; i++)
-                            {
-                                if (enums[i] != operationValue) continue;
-                                
-                                enumValue = i;
-                                Log.Debug($"found enum !! {enums[i]} + index {enumValue}");
-                                break;
-                            }
-                        }
-                        Log.Debug($"setting {variableName} to {enumValue}");
-                        
-                        if (varType == "field")
-                        {
-                            component.SetFieldValue(variableName, enumValue);
-                        }
-                        else
-                        {
-                            component.SetPropertyValue(variableName, enumValue);
-                        }
-                        break;
-                    
-                    case ("color"):
-                        string hexColor = argument.Split("::")[1];
-                        ColorUtility.TryParseHtmlString( hexColor , out Color color );
-                        Log.Debug($"{hexColor}");
-                        Log.Debug($"setting {variableName} to {color}");
-                        component.SetFieldValue(variableName, color);
-                        break;
-                }
-
-                if (replacement != null)
-                {
-                    if (varType == "field")
-                    {
-                        Log.Debug(variableName);
-                        Log.Debug(replacement);
-                        Log.Debug(component);
-                        component.SetFieldValue(variableName, replacement);
-                        Log.Debug($"set {variableName} to {replacement} on {component}");
-                    }
-                    else
-                    {
-                        component.SetPropertyValue(variableName, replacement);
-                    }
-                }
-                
-                while (stack.Count > 0)
-                {
-                    UnityEngine.Object parent = (UnityEngine.Object)stack.Pop();
-                    string parentVarName = (string)stack.Pop();
-                    
-                    parent.SetFieldValue(parentVarName, component);
-                    component = parent;
-                }
-                
-                if (savedArray != null)
-                {
-                    Log.Debug($"saving array component- {component}");
-                   
-                    Log.Debug($"saving array arrayIndex - {arrayIndex}");
-                    //object test = savedArray.GetValue(arrayIndex);
-                    savedArray.SetValue(component, arrayIndex);
-                    originalComponent.SetFieldValue(arrayName, savedArray);
-                    Log.Debug($"saving array savedArray - {savedArray}");
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Error("error while replacing field !!");
-                Log.Error(e);
-            }
-        }
         
-        // Source - https://stackoverflow.com/a/11811046
-        // Posted by peyman, modified by community. See post 'Timeline' for change history
-        // Retrieved 2026-03-30, License - CC BY-SA 4.0
-        public static Type GetType(string typeName)
-        {
-            var type = Type.GetType(typeName);
-            if (type != null) return type;
-            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                type = a.GetType(typeName);
-                if (type != null)
-                    return type;
-            }
-            return null;
-        }
-    }
-    
-    public static class ImageHelper // stackoverflow GO
-    {
         const string errorMessage = "Could not recognize image format.";
 
         private static Dictionary<byte[], Func<BinaryReader, Size>> imageFormatDecoders = new Dictionary<byte[], Func<BinaryReader, Size>>()

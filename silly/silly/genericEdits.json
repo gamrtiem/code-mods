@@ -75,7 +75,7 @@
             "portraitIcon",
             "file::kitty1k.png::texture"
         ]
-    },
+    }/*,
     {
         "prefabName": "RoR2/DLC3/Drifter/mdlDrifter.fbx",
         "editType": "GetComponent",
@@ -85,5 +85,5 @@
             "material",
             "Load::efb87e4ca777db44da34e51807b9e3ee::UnityEngine.Material"
         ]
-    }
+    }*/
 ]
