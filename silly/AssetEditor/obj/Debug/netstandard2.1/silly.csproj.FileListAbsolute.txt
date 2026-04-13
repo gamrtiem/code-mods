@@ -1,0 +1,13 @@
+/run/media/icebrah/buh/github/code-mods/silly/silly/bin/Debug/netstandard2.1/silly.deps.json
+/run/media/icebrah/buh/github/code-mods/silly/silly/bin/Debug/netstandard2.1/silly.dll
+/run/media/icebrah/buh/github/code-mods/silly/silly/bin/Debug/netstandard2.1/silly.pdb
+/run/media/icebrah/buh/github/code-mods/silly/silly/bin/Debug/netstandard2.1/UnityHotReload.dll
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.csproj.AssemblyReference.cache
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.AssemblyInfoInputs.cache
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.AssemblyInfo.cs
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.csproj.CoreCompileInputs.cache
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.sourcelink.json
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.csproj.Up2Date
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.dll
+/run/media/icebrah/buh/github/code-mods/silly/silly/obj/Debug/netstandard2.1/silly.pdb

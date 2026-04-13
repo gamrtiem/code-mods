@@ -11,7 +11,7 @@ using UnityEngine.AddressableAssets;
 using Color = UnityEngine.Color;
 using Path = System.IO.Path;
 
-namespace silly
+namespace AssetEditor
 {
     public class Utils
     {
@@ -72,8 +72,7 @@ namespace silly
                     fieldOrProperty = "SetPropertyValue";
                     variableName = variableName.Split("::")[0];
                 }
-                var setFieldPropertyValue = typeof(Reflection).GetMethod(fieldOrProperty);
-                
+                var setFieldPropertyValue = typeof(R2API.Utils.Reflection).GetMethods().First(m => m.Name == fieldOrProperty && m.IsGenericMethod);
                 
                 switch (operationType.ToLower())
                 {
@@ -89,9 +88,11 @@ namespace silly
                         var result = genericMethod.GetType().GetMethod("WaitForCompletion")?.Invoke(genericMethod, null);
 
                         Log.Debug("load - " + ((UnityEngine.Object)result).GetType());
-                        setFieldPropertyValue.Invoke(null, [component, variableName, result]);
+                        
+                        var loadMethod = setFieldPropertyValue.MakeGenericMethod(objType);
+                        loadMethod.Invoke(null, [component, variableName, result]);
                         break;
-                    case ("file"): // works !! 
+                    case ("file"):
                         string spriteOrTexture = argument.Split("::")[2];
                         
                         Sprite sprite = ImageHelper.Load(Path.Combine(Paths.ConfigPath, operationValue));
@@ -103,25 +104,31 @@ namespace silly
                         
                         if (spriteOrTexture == "sprite")
                         {
-                            setFieldPropertyValue.Invoke(null, [component, variableName, sprite]);
+                            var spriteMethod = setFieldPropertyValue.MakeGenericMethod(typeof(Sprite));
+                            spriteMethod.Invoke(null, [component, variableName, sprite]);
                         }
                         else
                         {
-                            setFieldPropertyValue.Invoke(null, [component, variableName, sprite.texture]);
+                            var textureMethod = setFieldPropertyValue.MakeGenericMethod(typeof(Texture2D));
+                            textureMethod.Invoke(null, [component, variableName, sprite.texture]);
                         }
                         break;
 
                     case ("int"):
-                        setFieldPropertyValue.Invoke(null, [component, variableName, int.Parse(operationValue)]);
+                        var intMethod = setFieldPropertyValue.MakeGenericMethod(typeof(int));
+                        intMethod.Invoke(null, [component, variableName, int.Parse(operationValue)]);
                         break;
                     case ("bool"):
-                        setFieldPropertyValue.Invoke(null, [component, variableName, (bool.Parse(operationValue) || operationValue == "true")]);
+                        var boolMethod = setFieldPropertyValue.MakeGenericMethod(typeof(bool));
+                        boolMethod.Invoke(null, [component, variableName, (bool.Parse(operationValue) || operationValue == "true")]);
                         break;
                     case ("float"):
-                        setFieldPropertyValue.Invoke(null, [component, variableName, float.Parse(operationValue)]);
+                        var floatMethod = setFieldPropertyValue.MakeGenericMethod(typeof(float));
+                        floatMethod.Invoke(null, [component, variableName, float.Parse(operationValue)]);
                         break;
                     case ("string"):
-                        setFieldPropertyValue.Invoke(null, [component, variableName, operationValue]);
+                        var stringMethod = setFieldPropertyValue.MakeGenericMethod(typeof(string));
+                        stringMethod.Invoke(null, [component, variableName, operationValue]);
                         break;
                     
                     case ("enum"):
@@ -142,16 +149,16 @@ namespace silly
                         }
                         Log.Debug($"setting {variableName} to {enumValue}");
                         
-                        setFieldPropertyValue.Invoke(null, [component, variableName, enumValue]);
-
+                        var enumMethod = setFieldPropertyValue.MakeGenericMethod(GetType(enumTypeName));
+                        enumMethod.Invoke(null, [component, variableName, enumValue]);
                         break;
                     
                     case ("color"):
                         string hexColor = argument.Split("::")[1];
                         ColorUtility.TryParseHtmlString( hexColor , out Color color );
-                        Log.Debug($"{hexColor}");
                         Log.Debug($"setting {variableName} to {color}");
-                        component.SetFieldValue(variableName, color);
+                        var colorMethod = setFieldPropertyValue.MakeGenericMethod(typeof(Color));
+                        colorMethod.Invoke(null, [component, variableName, color]);
                         break;
                 }
                 
@@ -196,7 +203,8 @@ namespace silly
         }
     }
     
-    public static class ImageHelper // stackoverflow GO
+    //code from ImageHelper is borrowed from another project and was not originally written by me.
+    public static class ImageHelper
     {
         public static Color TRANSPARENT = new(0, 0, 0, 0);
         public static Sprite GetComposite(Texture2D bg, Texture2D fg)

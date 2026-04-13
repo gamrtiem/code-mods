@@ -3,23 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using BepInEx;
 using Newtonsoft.Json;
-using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using static silly.Edits;
 using Object = UnityEngine.Object;
 using Path = System.IO.Path;
 
-namespace silly;
+namespace AssetEditor;
 
 public class Edits
 {
     private static List<GenericEdit> genericEditList;
-    private static List<ItemEdit> itemCatalogEditList;
     public static void addEdits()
     {
-        ItemCatalog.availability.onAvailable += AvailabilityOnAvailable;
         using (StreamReader r = new StreamReader(Path.Combine(Paths.ConfigPath, "genericEdits.json")))
         {
             string json = r.ReadToEnd();
@@ -33,6 +29,9 @@ public class Edits
             {
                 try
                 {
+                    Log.Debug($"---------- {handle.Result.name} running edit ,.., ----------");
+                    
+                    //handle hierarchy if it exists .,,.
                     GameObject hierarchy = null;
                     if (edit.hierarchy != null)
                     {
@@ -50,6 +49,7 @@ public class Edits
                         }
                     }
 
+                    //handle component editing ,.,.
                     if (edit.editType.Contains("Component"))
                     {
                         if (hierarchy == null)
@@ -95,54 +95,15 @@ public class Edits
                             break;
                     }
 
-                    Log.Debug($"{handle.Result.name} edit finished ,..,");
+                    Log.Debug($"---------- {handle.Result.name} edit finished ,.., ----------");
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"failed to edit prefab of path {edit.prefabName} !! error below .,,. ");
+                    Log.Error($"---------- failed to edit prefab of path {edit.prefabName} !! error below .,,. ----------");
                     Log.Error(e.Message);
+                    Log.Error($"----------");
                 }
             };
-        }
-    }
-
-    private static void AvailabilityOnAvailable()
-    {
-        using (StreamReader r = new StreamReader(Path.Combine(Paths.ConfigPath, "itemCatalog.json")))
-        {
-            string json = r.ReadToEnd();
-            itemCatalogEditList = JsonConvert.DeserializeObject<List<ItemEdit>>(json);
-        }
-
-        foreach (ItemEdit edit in itemCatalogEditList)
-        {
-            try
-            {
-                ItemDef editItem = ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex(edit.internalName));
-                if (editItem == null) continue;
-                    
-                for (int i = 0; i < edit.editParameters.Length; i += 2)
-                {
-                    string editField = edit.editParameters[i];
-                    string editReplacement = edit.editParameters[i + 1];
-                        
-                    Utils.replaceField(editItem, editField, editReplacement);
-                    // switch (editField)
-                    // {
-                    //     case ("Load"):
-                    //         editItem.SetFieldValue(editField, editReplacement);
-                    //         break;
-                    //     case ("File"):
-                    //         editItem.SetFieldValue(editField, Utils.Load(Path.Combine(Paths.ConfigPath, editReplacement)));
-                    //         break;
-                    // }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Error($"failed to edit item with internal name {edit.internalName} !! error below .,,. ");
-                Log.Error(e.Message);
-            }
         }
     }
     
@@ -174,22 +135,5 @@ public class Edits
         public string editType;
         public string[] hierarchy;
         public string[] editParameters;
-    }
-
-    // eg. ItemCatalogEdits.json (uses itemcatalog, specific to modded stuff) (maybe hook onto RoR2.onload for modded prefabs if possible to get? look into later ,.,.
-    // [
-    //   {
-    //     "internalName": "Bear",
-    //     "editFields": [
-    //       "pickupIconSprite",
-    //       "Load::(guid for icon here)"
-    //     ]
-    //   }
-    // ]
-    // efb87e4ca777db44da34e51807b9e3ee is guid for matIsShocked
-    private class ItemEdit : GenericEdit
-    {
-        public string internalName;
-        public string[] editFields; // edit fields will always be even, one for what the param is and the replace value
     }
 }

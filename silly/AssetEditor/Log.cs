@@ -1,6 +1,6 @@
 using BepInEx.Logging;
 
-namespace silly
+namespace AssetEditor
 {
     internal static class Log
     {
