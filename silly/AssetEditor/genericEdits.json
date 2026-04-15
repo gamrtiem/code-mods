@@ -1,0 +1,89 @@
+[
+    {
+        "prefabName": "RoR2/DLC3/Drifter/mdlDrifter.fbx",
+        "editType": "AddComponent",
+        "editParameters": [
+            "RoR2.Highlight"
+        ]
+    },
+    {
+        "prefabName": "RoR2/DLC3/Drifter/mdlDrifter.fbx",
+        "editType": "GetComponent",
+        "editParameters": [
+            "RoR2.Highlight",
+            "Replace",
+            "isOn",
+            "bool::true"
+        ]
+    },
+    {
+        "prefabName": "RoR2/Base/Teleporters/Teleporter1.prefab",
+        "editType": "GetComponent",
+        "editParameters": [
+            "RoR2.Highlight",
+            "Replace",
+            "isOn",
+            "bool::true"
+        ]
+    },
+    {
+        "prefabName": "RoR2/Base/Teleporters/Teleporter1.prefab",
+        "editType": "GetComponent",
+        "editParameters": [
+            "RoR2.Highlight",
+            "Replace",
+            "isOn",
+            "bool::true"
+        ]
+    },
+    {
+        "prefabName": "RoR2/Base/Teleporters/Teleporter1.prefab",
+        "editType": "GetComponent",
+        "editParameters": [
+            "RoR2.Highlight",
+            "Replace",
+            "highlightColor",
+            "enum::3::RoR2.Highlight.HighlightColor"
+        ]
+    },
+    {
+        "prefabName": "RoR2/DLC3/Drifter/mdlDrifter.fbx",
+        "editType": "GetComponent",
+        "editParameters": [
+            "RoR2.CharacterModel",
+            "Replace",
+            "_isDoppelganger",
+            "bool::true"
+        ]
+    },
+    {
+        "prefabName": "RoR2/DLC3/Drifter/mdlDrifter.fbx",
+        "editType": "GetComponent",
+        "editParameters": [
+            "RoR2.CharacterModel",
+            "Replace",
+            "isDoppelganger",
+            "bool::true"
+        ]
+    },
+    {
+        "prefabName": "RoR2/Base/Commando/CommandoBody.prefab",
+        "editType": "GetComponent",
+        "editParameters": [
+            "RoR2.CharacterBody",
+            "Replace",
+            "portraitIcon",
+            "file::kitty1k.png::texture"
+        ]
+    }/*,
+    {
+        "prefabName": "RoR2/DLC3/Drifter/mdlDrifter.fbx",
+        "editType": "GetComponent",
+        "editParameters": [
+            "UnityEngine.MeshRenderer",
+            "Replace",
+            "material",
+            "Load::efb87e4ca777db44da34e51807b9e3ee::UnityEngine.Material"
+        ]
+    }*/
+]

@@ -1,3 +1,4 @@
+using System.Linq;
 using AllyNames;
 using static BNR.butterscotchnroses;
 using BNR.patches;
@@ -7,6 +8,7 @@ using Mono.Cecil.Cil;
 using RoR2;
 using UnityEngine;
 using MonoMod.Cil;
+using CharacterBody = On.RoR2.CharacterBody;
 
 namespace BNR;
 
@@ -23,6 +25,15 @@ public class allynames : PatchBase<allynames>
             {
                 if (string.IsNullOrEmpty(body)) continue;
                 string[] split = body.Split(',');
+                for (int i = 0; i < split.Length; i++)
+                {
+                    split[i] = split[i].Trim();
+                    if (split[i].EndsWith("Body"))
+                    {
+                        split[i] = split[i][..(split[i].Length - 4)];
+                    }
+                }
+                
                 string customNames = "";
                 if (split.Length >= 4)
                 {
@@ -52,6 +63,15 @@ public class allynames : PatchBase<allynames>
         harmony.CreateClassProcessor(typeof(AllyNamesChanges)).Patch();
         NamesList.InitConfig();
         NamesList.BuildNamesByBodyName();
+        
+        AllyNames.AllyNames.instance.AddTokens();
+        On.RoR2.CharacterBody.Start += CharacterBodyOnStart;
+    }
+
+    private void CharacterBodyOnStart(CharacterBody.orig_Start orig, RoR2.CharacterBody self)
+    {
+        orig(self);
+        Log.Debug($"test - {RoR2.BodyCatalog.GetBodyName(self.bodyIndex)}");
     }
 
     public override void Config(ConfigFile config)
@@ -71,10 +91,10 @@ public class allynames : PatchBase<allynames>
             "CleanupDrone,Cleanup Drone,Default;Drones,Roomba|" +
             "CopycatDrone,Freeze Drone,Default;Drones,Frozone|" +
             "HaulerDrone,Transport Drone,Default;Drones|" +
-            "DTGunnerDroneBody,CROSSHAIRS,Default;Drones,Ruxin|" +
-            "DTHealingDroneBody,DOC,Default;Drones,Bunny|" +
-            "DTHaulerDroneBody,CHIRP,Default;Drones,Moose|" +
-            "FriendUnitBody,Best Buddy,Default,Friend Inside Me;Stupid Baby;Son|" +
+            "DTGunnerDrone,CROSSHAIRS,Default;Drones,Ruxin|" +
+            "DTHealingDrone,DOC,Default;Drones,Bunny|" +
+            "DTHaulerDrone,CHIRP,Default;Drones,Moose|" +
+            "FriendUnit,Best Buddy,Default,Friend Inside Me;Stupid Baby;Son|" +
             "DroneBomber,Lt. Droneboy,Default,Lt. Beep Boop",
             "add custom !! use bodynamewithoutBody,realname,category1;category2,customname1;customname2|seconditem format to add custom names !!");
         BNRUtils.StringConfig(bodyNames);
