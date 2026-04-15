@@ -30,7 +30,6 @@ namespace AssetEditor
                 string arrayName = "";
                 if (variableName.Contains("[") && variableName.Contains("]"))
                 {
-                    Log.Debug("bwaa !");
                     if (int.TryParse(variableName.Split('[', ']')[1], out arrayIndex))
                     {
                         arrayName = variableName.Split('[')[0];
@@ -40,7 +39,7 @@ namespace AssetEditor
                     }
                     else
                     {
-                        Log.Debug("gorp .,,.");
+                        Log.Debug("error while trying to parse as an array .,,.");
                     }
                 }
                 
@@ -86,8 +85,6 @@ namespace AssetEditor
                         var method = typeof(Addressables).GetMethods().First(m => m.Name == "LoadAssetAsync" && m.IsGenericMethod);
                         var genericMethod = method.MakeGenericMethod(objType).Invoke(null, [location]);
                         var result = genericMethod.GetType().GetMethod("WaitForCompletion")?.Invoke(genericMethod, null);
-
-                        Log.Debug("load - " + ((UnityEngine.Object)result).GetType());
                         
                         var loadMethod = setFieldPropertyValue.MakeGenericMethod(objType);
                         loadMethod.Invoke(null, [component, variableName, result]);
@@ -165,7 +162,7 @@ namespace AssetEditor
                 //if we replaced a variable of a variable, go back up the stack to the parent and change their value as well
                 while (stack.Count > 0)
                 {
-                    UnityEngine.Object parent = (UnityEngine.Object)stack.Pop();
+                    object parent = stack.Pop();
                     string parentVarName = (string)stack.Pop();
                     
                     parent.SetFieldValue(parentVarName, component);
