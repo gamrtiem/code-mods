@@ -1,0 +1,13 @@
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/bin/Debug/netstandard2.1/ExamplePlugin.deps.json
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/bin/Debug/netstandard2.1/ExamplePlugin.dll
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/bin/Debug/netstandard2.1/ExamplePlugin.pdb
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/bin/Debug/netstandard2.1/UnityHotReload.dll
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.csproj.AssemblyReference.cache
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfoInputs.cache
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfo.cs
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.csproj.CoreCompileInputs.cache
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.sourcelink.json
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExampleP.1424FD9D.Up2Date
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.dll
+/run/media/icebrah/buh/github/code-mods/template/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.pdb
