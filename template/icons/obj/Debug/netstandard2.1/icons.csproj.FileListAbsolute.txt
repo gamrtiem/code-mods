@@ -1,0 +1,13 @@
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.csproj.AssemblyReference.cache
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.AssemblyInfoInputs.cache
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.AssemblyInfo.cs
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.csproj.CoreCompileInputs.cache
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.sourcelink.json
+/run/media/icebrah/buh/github/code-mods/template/icons/bin/Debug/netstandard2.1/icons.deps.json
+/run/media/icebrah/buh/github/code-mods/template/icons/bin/Debug/netstandard2.1/icons.dll
+/run/media/icebrah/buh/github/code-mods/template/icons/bin/Debug/netstandard2.1/icons.pdb
+/run/media/icebrah/buh/github/code-mods/template/icons/bin/Debug/netstandard2.1/UnityHotReload.dll
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.csproj.Up2Date
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.dll
+/run/media/icebrah/buh/github/code-mods/template/icons/obj/Debug/netstandard2.1/icons.pdb

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="60465ac2-024b-406a-9599-cda39460d427" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/icons/icons.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfoInputs.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.assets.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/icons/obj/project.packagespec.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/icons/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/icons/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../butterscotchnroses/butterscotchnroses/butterscotchnroses.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../butterscotchnroses/butterscotchnroses/butterscotchnroses.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ExamplePlugin/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ExamplePlugin/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ExamplePlugin/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ExamplePlugin/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ExamplePlugin/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin.sln" beforeDir="false" afterPath="$PROJECT_DIR$/icons.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/ExamplePlugin.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/ExamplePlugin.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/icons/icons.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/Log.cs" beforeDir="false" afterPath="$PROJECT_DIR$/icons/Log.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/UHRSupport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/icons/UHRSupport.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/bin/Debug/netstandard2.1/ExamplePlugin.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/icons/bin/Debug/netstandard2.1/ExamplePlugin.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/bin/Debug/netstandard2.1/ExamplePlugin.dll" beforeDir="false" afterPath="$PROJECT_DIR$/icons/bin/Debug/netstandard2.1/icons.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/bin/Debug/netstandard2.1/ExamplePlugin.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/icons/bin/Debug/netstandard2.1/icons.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/bin/Debug/netstandard2.1/UnityHotReload.dll" beforeDir="false" afterPath="$PROJECT_DIR$/icons/bin/Debug/netstandard2.1/UnityHotReload.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExampleP.1424FD9D.Up2Date" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExampleP.1424FD9D.Up2Date" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.AssemblyInfoInputs.cache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.assets.cache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.dll" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/Debug/netstandard2.1/ExamplePlugin.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/Debug/netstandard2.1/ExamplePlugin.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/ExamplePlugin.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/ExamplePlugin.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/ExamplePlugin.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/ExamplePlugin.csproj.nuget.g.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/ExamplePlugin.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/ExamplePlugin.csproj.nuget.g.targets" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/icons/obj/project.nuget.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/project.packagespec.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/rider.project.model.nuget.info" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExamplePlugin/obj/rider.project.restore.info" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/icons/icons.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="3CTLSeTVOBEagOvaLvEOX9tAspy" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="runtimes">
+        <list />
+      </option>
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityProjectDiscoverer">
+    <option name="hasUnityReference" value="true" />
+  </component>
+</project>
