@@ -65,15 +65,8 @@ public class allynames : PatchBase<allynames>
         NamesList.BuildNamesByBodyName();
         
         AllyNames.AllyNames.instance.AddTokens();
-        On.RoR2.CharacterBody.Start += CharacterBodyOnStart;
     }
-
-    private void CharacterBodyOnStart(CharacterBody.orig_Start orig, RoR2.CharacterBody self)
-    {
-        orig(self);
-        Log.Debug($"test - {RoR2.BodyCatalog.GetBodyName(self.bodyIndex)}");
-    }
-
+ 
     public override void Config(ConfigFile config)
     {
         enabled = config.Bind("BNR - allynames",

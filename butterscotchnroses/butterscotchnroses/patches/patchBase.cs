@@ -27,5 +27,7 @@ namespace BNR.patches
         public abstract void Config(ConfigFile config);
         
         public virtual void Hooks() { }
+        
+        public virtual void FixedUpdate() { }
     }
 }

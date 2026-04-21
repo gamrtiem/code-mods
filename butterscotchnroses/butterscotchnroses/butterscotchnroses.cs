@@ -18,6 +18,7 @@ using SceneDirector = On.RoR2.SceneDirector;
 using ShaderSwapper;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
+using Patch = HarmonyLib.Patch;
 
 namespace BNR
 {
@@ -25,17 +26,19 @@ namespace BNR
 
     public class butterscotchnroses : BaseUnityPlugin
     {
-        public const string PluginGUID = "zzz" + PluginAuthor + "." + PluginName;
+        private const string PluginGUID = "zzz" + PluginAuthor + "." + PluginName;
 
-        public const string PluginAuthor = "icebro";
-        public const string PluginName = "BNR";
-        public const string PluginVersion = "0.1.3";
+        private const string PluginAuthor = "icebro";
+        private const string PluginName = "BNR";
+        private const string PluginVersion = "0.1.3";
 
         public static AssetBundle carvingKitBundle;
+        public static butterscotchnroses instance;
+        public static List<PatchBase> patchBases = []; 
         
-        private static ConfigEntry<Color> skyboxColor;
         public void Awake()
         {
+            instance = this;
             //TODO add making inferno + ESBM config not give them double jumps TT 
             //TODO add mod options button (uses something different i think idk( and highlighted text color change configfs 
             //TODO cleanesthud color force instead of survivor color 
@@ -54,6 +57,7 @@ namespace BNR
                     PatchBase patchBase = (PatchBase)Activator.CreateInstance(patch);
                     patchBase.Config(Config);
                     patchBase.Init(harmony);
+                    patchBases.Add(patchBase);
                 }
                 catch (Exception e)
                 {
@@ -75,29 +79,6 @@ namespace BNR
                 ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
                 item.Init(Config);
             }
-            
-            On.RoR2.SceneDirector.Start += SceneDirectorOnStart;
-            skyboxColor = Config.Bind("BNR - testscene", "skyboxColor", BNRUtils.Color255(152, 122, 144), "tint of skybox in testscene !!!");
-            ModSettingsManager.AddOption(new ColorOption(skyboxColor));
-        }
-
-        private static Material skyboxMaterial;
-        private void SceneDirectorOnStart(SceneDirector.orig_Start orig, RoR2.SceneDirector self)
-        {
-            orig(self);
-            if (SceneManager.GetActiveScene().name == "testscene")
-            {
-                Log.Debug($"new scene !! {RenderSettings.skybox} {SceneManager.GetActiveScene().name}");
-                
-                if (skyboxMaterial == null)
-                {
-                    skyboxMaterial = Object.Instantiate(RenderSettings.skybox);
-                    skyboxMaterial.SetColor("_Tint", skyboxColor.Value);
-                }
-                
-                RenderSettings.skybox = skyboxMaterial;
-            }
-            
         }
 
         private void Update()
@@ -108,6 +89,14 @@ namespace BNR
                 UnityHotReloadNS.UnityHotReload.LoadNewAssemblyVersion(typeof(butterscotchnroses).Assembly, System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "butterscotchnroses.dll"));
             }
 #endif  
+        }
+
+        private void FixedUpdate()
+        {
+            foreach (PatchBase patch in patchBases)
+            {
+                patch.FixedUpdate();
+            }
         }
         
         private static List<uint> sounds = [];
