@@ -33,13 +33,13 @@ public class allyhealthred : PatchBase<allyhealthred>
         Addressables.LoadAssetAsync<Material>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Parent.matParentTeleportPortal_mat).Completed += handle =>
         {
             hurtOverlayMat = Object.Instantiate(handle.Result);
-            hurtOverlayMat.SetVector("_CutoffScroll", new Vector4(5, 0, 0, 0));
-            hurtOverlayMat.SetColor("_TintColor", new Color(1, 1, 1, 0));
-            hurtOverlayMat.SetFloat("_AlphaBias", 0);
+            hurtOverlayMat.SetVector(CutoffScroll, new Vector4(5, 0, 0, 0));
+            hurtOverlayMat.SetColor(TintColor, new Color(1, 1, 1, 0));
+            hurtOverlayMat.SetFloat(AlphaBias, 0);
             
             Addressables.LoadAssetAsync<Texture>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Common.texRampDeathBomb_png).Completed += handle =>
             {
-                hurtOverlayMat.SetTexture("_RemapTex", handle.Result);
+                hurtOverlayMat.SetTexture(RemapTex, handle.Result);
             };
         };
         
@@ -95,6 +95,7 @@ public class allyhealthred : PatchBase<allyhealthred>
             newObject.transform.SetParent(self.portraitIconImage.transform, false);
             newObject.transform.SetSiblingIndex(0);
             
+            // add these to a stack instead
             IconController.cards.Add(newImage.material, self.cachedHealthComponent);
         }
     }
@@ -103,15 +104,16 @@ public class allyhealthred : PatchBase<allyhealthred>
     {
         if (!enabled.Value) return;
         
-        foreach ((Material icon, HealthComponent health) in IconController.cards.ToArray())
+        //update cards with stack here ,., 
+        foreach ((Material icon, HealthComponent health) in IconController.cards)
         {
             if (icon != null && health != null)
             {
-                Color current = icon.GetColor("_TintColor");
+                Color current = icon.GetColor(TintColor);
                 current.a = 1 - health.healthFraction;
                 current.a *= 2;
                 current.a = Math.Clamp(current.a, 0, 1);
-                icon.SetColor("_TintColor", current);
+                icon.SetColor(TintColor, current);
                 //icon.material.mainTexture = icon.material.mainTexture;
             }
             else
@@ -147,4 +149,8 @@ public class allyhealthred : PatchBase<allyhealthred>
     }
     
     private ConfigEntry<bool> enabled;
+    private static readonly int TintColor = Shader.PropertyToID("_TintColor"); // rider is telling me to do this <//3 ,.., 
+    private static readonly int CutoffScroll = Shader.PropertyToID("_CutoffScroll");
+    private static readonly int AlphaBias = Shader.PropertyToID("_AlphaBias");
+    private static readonly int RemapTex = Shader.PropertyToID("_RemapTex"); 
 }
