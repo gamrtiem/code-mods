@@ -1,19 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using BNR.patches;
 using BepInEx.Configuration;
 using HarmonyLib;
-using On.RoR2;
-using On.RoR2.UI;
-using R2API;
-using RiskOfOptions;
-using RiskOfOptions.Options;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Color = UnityEngine.Color;
 using HealthComponent = RoR2.HealthComponent;
 using Object = UnityEngine.Object;
 
@@ -21,12 +15,20 @@ namespace BNR;
 
 public class allyhealthred : PatchBase<allyhealthred>
 {
-    public static class IconController
+    private static class IconController
     {
-        public static Dictionary<Material, RoR2.HealthComponent> cards = [];
-    }
+        public static List<allyObject> cardObjects = [];
+        public static Stack addQueue = new();
+        public static Stack removeQueue = new();
 
-    public static Material hurtOverlayMat;
+        internal class allyObject(Material newHurtMat, HealthComponent newHealthComponent, RoR2.UI.AllyCardController newAllyCard)
+        {
+            public Material hurtMat = newHurtMat;
+            public HealthComponent healthComponent = newHealthComponent;
+            public RoR2.UI.AllyCardController allyCard = newAllyCard;
+        }
+    }
+    
     
     public override void Init(Harmony harmony)
     {
@@ -34,7 +36,7 @@ public class allyhealthred : PatchBase<allyhealthred>
         {
             hurtOverlayMat = Object.Instantiate(handle.Result);
             hurtOverlayMat.SetVector(CutoffScroll, new Vector4(5, 0, 0, 0));
-            hurtOverlayMat.SetColor(TintColor, new Color(1, 1, 1, 0));
+            hurtOverlayMat.SetColor(TintColor, new Color(1, 0, 0, 0));
             hurtOverlayMat.SetFloat(AlphaBias, 0);
             
             Addressables.LoadAssetAsync<Texture>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Common.texRampDeathBomb_png).Completed += handle =>
@@ -65,74 +67,80 @@ public class allyhealthred : PatchBase<allyhealthred>
         }
     }
 
-    private void AllyCardControllerOnUpdateInfo(AllyCardController.orig_UpdateInfo orig, RoR2.UI.AllyCardController self)
+    private static void AllyCardControllerOnUpdateInfo(On.RoR2.UI.AllyCardController.orig_UpdateInfo orig, RoR2.UI.AllyCardController self)
     {
         orig(self);
-        
-        Log.Debug("bwa");
-
 
         if (true)
         {
+            Log.Debug($"adding new !!");
             GameObject newObject = new GameObject("healthoverlay");
             Image newImage = newObject.AddComponent<Image>();
         
-            Log.Debug($"texture null ? {self.portraitIconImage.texture == null}");
-            Vector2 pivot = new Vector2(0.5f, 0.5f);
             Texture2D realIcon = (self.portraitIconImage.texture as Texture2D);
-            Log.Debug($"silly nre ? {realIcon == null}");
+            Vector2 pivot = new Vector2(0.5f, 0.5f);
             Rect tRect = new Rect(0,0, realIcon.width, realIcon.height);
             Sprite spriteOveride = Sprite.Create( realIcon, tRect, pivot);
-            Log.Debug($"sprite override ? {spriteOveride}");
             
             newImage.sprite = spriteOveride;
             newImage.overrideSprite = spriteOveride;
-            
-            newObject.GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 1);
             
             newImage.material = Object.Instantiate(hurtOverlayMat);
             newImage.UpdateMaterial();
             newObject.transform.SetParent(self.portraitIconImage.transform, false);
             newObject.transform.SetSiblingIndex(0);
+            newObject.GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 1);
             
-            // add these to a stack instead
-            IconController.cards.Add(newImage.material, self.cachedHealthComponent);
+            IconController.addQueue.Push(new IconController.allyObject(newImage.material, self.cachedHealthComponent, self));
         }
     }
 
     public override void FixedUpdate()
     {
         if (!enabled.Value) return;
-        
-        //update cards with stack here ,., 
-        foreach ((Material icon, HealthComponent health) in IconController.cards)
-        {
-            if (icon != null && health != null)
-            {
-                Color current = icon.GetColor(TintColor);
-                current.a = 1 - health.healthFraction;
-                current.a *= 2;
-                current.a = Math.Clamp(current.a, 0, 1);
-                icon.SetColor(TintColor, current);
-                //icon.material.mainTexture = icon.material.mainTexture;
-            }
-            else
-            { 
-                IconController.cards.Remove(icon);
-                
-                if (health == null)
-                {
-                    Object.Destroy(icon);
-                }
 
+        while (IconController.addQueue.Count != 0)
+        {
+            IconController.allyObject newCard = (IconController.allyObject)IconController.addQueue.Pop();
+            
+            //allyObject existingCard = IconController.cardObjects.Find(allyCard => allyCard.allyCard == newCard.allyCard);
+            
+            //incase ally card exists (i dunno why i coded this it shouldnt be necessary .,,.
+            //if (existingCard != null)
+            //{
+            //    IconController.cardObjects.Remove(existingCard);
+            //}
+            
+            IconController.cardObjects.Add(newCard);
+        }
+        
+        foreach (var card in IconController.cardObjects)
+        {
+            if (!card.allyCard)
+            {
+                IconController.removeQueue.Push(card);
+                Object.Destroy(card.hurtMat);
+                continue;
             }
+            
+            Color current = card.hurtMat.GetColor(TintColor);
+            current.a = 1 - card.healthComponent.healthFraction;
+            current.a *= 2;
+            current.a = Math.Clamp(current.a, 0, 1.5f);
+            card.hurtMat.SetColor(TintColor, current);
+        }
+        
+        while (IconController.removeQueue.Count != 0)
+        {
+            IconController.cardObjects.Remove((IconController.allyObject)IconController.removeQueue.Pop());
         }
     }
     
-    private void ScoreboardStripOnEnterStrip(ScoreboardStrip.orig_EnterStrip orig, RoR2.UI.ScoreboardStrip self)
+    private static void ScoreboardStripOnEnterStrip(On.RoR2.UI.ScoreboardStrip.orig_EnterStrip orig, RoR2.UI.ScoreboardStrip self)
     {
         orig(self);
         
+        //add them here too
     }
 
     public override void Config(ConfigFile config)
@@ -147,10 +155,11 @@ public class allyhealthred : PatchBase<allyhealthred>
             applyHooks();
         };
     }
-    
-    private ConfigEntry<bool> enabled;
+
+    private static Material hurtOverlayMat;
     private static readonly int TintColor = Shader.PropertyToID("_TintColor"); // rider is telling me to do this <//3 ,.., 
     private static readonly int CutoffScroll = Shader.PropertyToID("_CutoffScroll");
     private static readonly int AlphaBias = Shader.PropertyToID("_AlphaBias");
     private static readonly int RemapTex = Shader.PropertyToID("_RemapTex"); 
+    private ConfigEntry<bool> enabled;
 }
