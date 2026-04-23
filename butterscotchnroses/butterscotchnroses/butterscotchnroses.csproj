@@ -33,6 +33,9 @@
 	  <Reference Include="CoolerEclipse">
 	    <HintPath>..\CoolerEclipse-nstrip.dll</HintPath>
 	  </Reference>
+	  <Reference Include="DebuggingPlains">
+	    <HintPath>..\DebuggingPlains-nstrip.dll</HintPath>
+	  </Reference>
 	  <Reference Include="GoldenCoastPlusRevived">
 	    <HintPath>..\GoldenCoastPlusRevived-nstrip.dll</HintPath>
 	  </Reference>
@@ -47,6 +50,9 @@
 	  </Reference>
 	  <Reference Include="Nautilus">
 	    <HintPath>..\..\Nautilus-nstrip.dll</HintPath>
+	  </Reference>
+	  <Reference Include="PhotoMode">
+	    <HintPath>..\PhotoMode-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="ShaderSwapper">
 	    <HintPath>..\ShaderSwapper.dll</HintPath>

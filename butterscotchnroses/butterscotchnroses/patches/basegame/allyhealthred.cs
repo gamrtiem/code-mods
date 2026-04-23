@@ -15,34 +15,35 @@ namespace BNR;
 
 public class allyhealthred : PatchBase<allyhealthred>
 {
-    private static class IconController
+    public static class IconController
     {
         public static List<allyObject> cardObjects = [];
         public static Stack addQueue = new();
         public static Stack removeQueue = new();
 
-        internal class allyObject(Material newHurtMat, HealthComponent newHealthComponent, RoR2.UI.AllyCardController newAllyCard)
+        public class allyObject(Material newHurtMat, HealthComponent newHealthComponent, object newAllyCard)
         {
             public Material hurtMat = newHurtMat;
             public HealthComponent healthComponent = newHealthComponent;
-            public RoR2.UI.AllyCardController allyCard = newAllyCard;
+            public object allyCard = newAllyCard;
         }
     }
     
     
     public override void Init(Harmony harmony)
     {
-        Addressables.LoadAssetAsync<Material>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Parent.matParentTeleportPortal_mat).Completed += handle =>
+        //RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Parent.matParentTeleportPortal_mat
+        Addressables.LoadAssetAsync<Material>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_DLC3_SolusAmalgamator.matSolusAmalgamatorBombCoreExplode_mat).Completed += handle =>
         {
             hurtOverlayMat = Object.Instantiate(handle.Result);
-            hurtOverlayMat.SetVector(CutoffScroll, new Vector4(5, 0, 0, 0));
+            //hurtOverlayMat.SetVector(CutoffScroll, new Vector4(5, 0, 0, 0));
             hurtOverlayMat.SetColor(TintColor, new Color(1, 0, 0, 0));
-            hurtOverlayMat.SetFloat(AlphaBias, 0);
+            //hurtOverlayMat.SetFloat(AlphaBias, 0);
             
-            Addressables.LoadAssetAsync<Texture>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Common.texRampDeathBomb_png).Completed += handle =>
-            {
-                hurtOverlayMat.SetTexture(RemapTex, handle.Result);
-            };
+            //Addressables.LoadAssetAsync<Texture>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Common.texRampDeathBomb_png).Completed += handle =>
+            //{
+            //    hurtOverlayMat.SetTexture(RemapTex, handle.Result);
+            //};
         };
         
         applyHooks();
@@ -78,6 +79,12 @@ public class allyhealthred : PatchBase<allyhealthred>
             Image newImage = newObject.AddComponent<Image>();
         
             Texture2D realIcon = (self.portraitIconImage.texture as Texture2D);
+            if (realIcon == null)
+            {
+                Object.DestroyImmediate(newImage);
+                return;
+            }
+            
             Vector2 pivot = new Vector2(0.5f, 0.5f);
             Rect tRect = new Rect(0,0, realIcon.width, realIcon.height);
             Sprite spriteOveride = Sprite.Create( realIcon, tRect, pivot);
@@ -116,7 +123,7 @@ public class allyhealthred : PatchBase<allyhealthred>
         
         foreach (var card in IconController.cardObjects)
         {
-            if (!card.allyCard)
+            if (card.allyCard == null)
             {
                 IconController.removeQueue.Push(card);
                 Object.Destroy(card.hurtMat);
@@ -125,7 +132,7 @@ public class allyhealthred : PatchBase<allyhealthred>
             
             Color current = card.hurtMat.GetColor(TintColor);
             current.a = 1 - card.healthComponent.healthFraction;
-            current.a *= 2;
+            //current.a *= 1.5f;
             current.a = Math.Clamp(current.a, 0, 1.5f);
             card.hurtMat.SetColor(TintColor, current);
         }
@@ -140,7 +147,26 @@ public class allyhealthred : PatchBase<allyhealthred>
     {
         orig(self);
         
-        //add them here too
+        
+        Log.Debug($"adding new !!");
+        GameObject newObject = new GameObject("healthoverlay");
+        Image newImage = newObject.AddComponent<Image>();
+        
+        Texture2D realIcon = (self.classIcon.texture as Texture2D);
+        Vector2 pivot = new Vector2(0.5f, 0.5f);
+        Rect tRect = new Rect(0,0, realIcon.width, realIcon.height);
+        Sprite spriteOveride = Sprite.Create( realIcon, tRect, pivot);
+            
+        newImage.sprite = spriteOveride;
+        newImage.overrideSprite = spriteOveride;
+            
+        newImage.material = Object.Instantiate(hurtOverlayMat);
+        newImage.UpdateMaterial();
+        newObject.transform.SetParent(self.classIcon.transform, false);
+        newObject.transform.SetSiblingIndex(0);
+        newObject.GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 1);
+            
+        IconController.addQueue.Push(new IconController.allyObject(newImage.material, self.master.GetBody().healthComponent, self));
     }
 
     public override void Config(ConfigFile config)

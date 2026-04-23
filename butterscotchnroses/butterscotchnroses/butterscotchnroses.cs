@@ -17,12 +17,14 @@ using UnityEngine.AddressableAssets;
 using SceneDirector = On.RoR2.SceneDirector;
 using ShaderSwapper;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using Patch = HarmonyLib.Patch;
 
 namespace BNR
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInDependency("com.Viliger.EnemiesReturns", BepInDependency.DependencyFlags.SoftDependency)]
 
     public class butterscotchnroses : BaseUnityPlugin
     {
@@ -79,6 +81,8 @@ namespace BNR
                 ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
                 item.Init(Config);
             }
+
+            RoR2.Console.CheatsConVar.instance.boolValue = true;
         }
 
         private void Update()
@@ -87,6 +91,14 @@ namespace BNR
             if (Input.GetKeyUp(KeyCode.F5))
             {
                 UnityHotReloadNS.UnityHotReload.LoadNewAssemblyVersion(typeof(butterscotchnroses).Assembly, System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "butterscotchnroses.dll"));
+            }
+
+            if (Input.GetKeyUp(KeyCode.F4))
+            {
+                foreach (var cards in allyhealthred.IconController.cardObjects)
+                {
+                    (cards.allyCard as GameObject).GetComponent<Image>().UpdateMaterial();
+                }
             }
 #endif  
         }
