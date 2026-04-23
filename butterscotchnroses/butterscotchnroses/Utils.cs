@@ -108,20 +108,24 @@ public class BNRUtils
         return myTexture2D;
     }
 
-    public static Texture2D hueShiftTexture(Texture2D texture, float hueShift)
+    public static Texture2D hsvModifyTexture(Texture2D texture, float hueShift, float saturation = 0, float vIdkWhatVStandsFor = 0)
     {
         Texture2D readableTex = makeReadable(texture);
         Color[] texPixels = readableTex.GetPixels(0, 0, readableTex.width, readableTex.height);
-				
+
         for (int i = 0; i < texPixels.Length; i++)
         {
             Color pixelColor = texPixels[i];
             Color.RGBToHSV(pixelColor, out float h, out float s, out float v);
-            h = (h + hueShift/360f) % 1f;
+            h = (h + hueShift / 360f) % 1f;
             if (h < 0f) h += 1f;
+            s = (s + saturation / 360f) % 1f;
+            if (s < 0f) s += 1f;
+            v = (v + vIdkWhatVStandsFor / 360f) % 1f;
+            if (v < 0f) v += 1f;
             texPixels[i] = Color.HSVToRGB(h, s, v);
         }
-            
+
         readableTex.SetPixels(texPixels);
         readableTex.Apply();
         readableTex.name = "newtex";

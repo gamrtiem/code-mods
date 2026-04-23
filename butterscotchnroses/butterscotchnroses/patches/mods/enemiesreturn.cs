@@ -44,7 +44,7 @@ public class enemiesreturn : PatchBase<enemiesreturn>
         {
             //BodyCatalog.availability.CallWhenAvailable(AddDrifterBodyLiTDrifterSkin);
             //RoR2.RoR2Application.onLoad += AddDrifterBodyLiTDrifterSkin;
-            BodyCatalog.availability.onAvailable += AddDrifterBodyLiTDrifterSkin;
+            BodyCatalog.availability.onAvailable += AddAnointedPink;
             RoR2.CharacterBody.onBodyStartGlobal += CharacterBodyOnonBodyStartGlobal;
             ItemCatalog.availability.onAvailable += () => { annointedItemDef = ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex("HiddenAnointed")); };
         }
@@ -88,15 +88,14 @@ public class enemiesreturn : PatchBase<enemiesreturn>
                 if (!replacedCrown)
                 {
                     replacedCrown = UnityEngine.Object.Instantiate(crownRenderer.material);
-                    replacedCrown.SetTexture(MainTex, BNRUtils.hueShiftTexture(replacedCrown.GetTexture(MainTex) as Texture2D, 100f));
-                    replacedCrown.SetTexture(EmTex, BNRUtils.hueShiftTexture(replacedCrown.GetTexture(EmTex) as Texture2D, 100f));
+                    replacedCrown.SetTexture(MainTex, BNRUtils.hsvModifyTexture(replacedCrown.GetTexture(MainTex) as Texture2D, 100f));
+                    replacedCrown.SetTexture(EmTex, BNRUtils.hsvModifyTexture(replacedCrown.GetTexture(EmTex) as Texture2D, 100f));
                     replacedCrown.SetColor(EmColor, BNRUtils.Color255(255, 195, 185));
                 }
                 
                 display.GetComponent<ItemDisplay>().rendererInfos[0].defaultMaterial = replacedCrown;
                 crownRenderer.material = replacedCrown;
             }
-
             
             runOnce = true;
         }
@@ -124,16 +123,7 @@ public class enemiesreturn : PatchBase<enemiesreturn>
         }
     }
 
-    public override void FixedUpdate()
-    {
-        if (Input.GetKeyUp(KeyCode.F7))
-        {
-            AddDrifterBodyLiTDrifterSkin();
-        }
-
-    }
-
-    private void AddDrifterBodyLiTDrifterSkin()
+    private void AddAnointedPink()
     {
         var bodyName = "CommandoBody";
         var skinName = "testSkin";
@@ -161,8 +151,6 @@ public class enemiesreturn : PatchBase<enemiesreturn>
                 return;
             }
             
-            
-            
             foreach (SkinDef skinDefs in skinController.skins)
             {
                 Log.Info(skinDefs.name);
@@ -171,15 +159,15 @@ public class enemiesreturn : PatchBase<enemiesreturn>
             SkinDef skinDef = UnityEngine.Object.Instantiate(skinController.skins.First(skindef => skindef.name == "skinCommandoJudgementHidden"));
             
             //recolor
-            Texture2D newIcon = BNRUtils.hueShiftTexture(skinDef.icon.texture, 100f);
+            Texture2D newIcon = BNRUtils.hsvModifyTexture(skinDef.icon.texture, 100f);
             Sprite newIconSprite = Sprite.Create(newIcon, new Rect(0, 0, newIcon.width, newIcon.height), new Vector2(newIcon.width / 2, newIcon.height / 2));
             skinDef.icon = newIconSprite;
             
             //////////////////////////////////////////
 
             Material newMat = UnityEngine.Object.Instantiate(skinDef.skinDefParams.rendererInfos[0].defaultMaterial);
-            newMat.SetTexture(MainTex, BNRUtils.hueShiftTexture(newMat.GetTexture(MainTex) as Texture2D, 100f));
-            newMat.SetTexture(EmTex, BNRUtils.hueShiftTexture(newMat.GetTexture(EmTex) as Texture2D, 100f));
+            newMat.SetTexture(MainTex, BNRUtils.hsvModifyTexture(newMat.GetTexture(MainTex) as Texture2D, 100f));
+            newMat.SetTexture(EmTex, BNRUtils.hsvModifyTexture(newMat.GetTexture(EmTex) as Texture2D, 100f));
             newMat.SetColor(EmColor, BNRUtils.Color255(255, 0, 185));
             
             var newParams = UnityEngine.Object.Instantiate(skinDef.skinDefParams);
