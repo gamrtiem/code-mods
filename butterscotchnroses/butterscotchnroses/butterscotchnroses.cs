@@ -63,8 +63,8 @@ namespace BNR
                 }
                 catch (Exception e)
                 {
-                    Log.Warning("failed to patch something ! probably fine if you dont have whatever mod that was attempted to be patched enabled ,..,,.");
-                    Log.Warning(e);
+                    //Log.Warning("failed to patch something ! probably fine if you dont have whatever mod that was attempted to be patched enabled ,..,,.");
+                    //Log.Warning(e);
                 }
             }
             
