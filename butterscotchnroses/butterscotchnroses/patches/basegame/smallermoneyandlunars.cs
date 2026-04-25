@@ -11,7 +11,7 @@ namespace BNR;
 
 public class smallermoneyandlunars : PatchBase<smallermoneyandlunars>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!enabled.Value)
         {
@@ -48,7 +48,7 @@ public class smallermoneyandlunars : PatchBase<smallermoneyandlunars>
             "make currency thing smaller", 
             true, 
             "make the thing that has coins and lunar coins in the top left smaller like pre sotv (i miss you ,.,."); 
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             if (enabled.Value)

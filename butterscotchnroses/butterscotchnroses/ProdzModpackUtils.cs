@@ -8,7 +8,7 @@ using Color = UnityEngine.Color;
 
 namespace ProdzModpackUtils
 {
-    public class Utils
+    public class ProdzUtils
     {
         public static Color TRANSPARENT = new(0, 0, 0, 0);
         public static Sprite GetComposite(Texture2D bg, Texture2D fg)

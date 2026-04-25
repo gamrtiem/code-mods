@@ -14,7 +14,7 @@ namespace BNR;
 
 public class dronevisibility : PatchBase<dronevisibility>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         //replace with actual operator material later ,.,.
         operatorMat = Object.Instantiate(Addressables.LoadAssetAsync<Material>("RoR2/DLC3/Drone Tech/matDroneTechCarryRings.mat").WaitForCompletion());
@@ -109,7 +109,7 @@ public class dronevisibility : PatchBase<dronevisibility>
             "enable patches for drone visibility",
             false,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             Hook();
@@ -119,17 +119,17 @@ public class dronevisibility : PatchBase<dronevisibility>
             "use silly materials for indicator !!",
             true,
             "");
-        BNRUtils.CheckboxConfig(useSillyMaterials);
+        Utils.CheckboxConfig(useSillyMaterials);
         
         sillyMaterialColor = config.Bind("BNR - Drone Visibility",
             "colors for silly sprite hologram thing material !!",
-            BNRUtils.Color255(191, 126, 211),
+            Utils.Color255(191, 126, 211),
             "");
         ModSettingsManager.AddOption(new ColorOption(sillyMaterialColor));
         
         operatorIndicatorColor = config.Bind("BNR - Drone Visibility",
             "colors for operator vfx thing !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(operatorIndicatorColor));
         
@@ -137,7 +137,7 @@ public class dronevisibility : PatchBase<dronevisibility>
             "set distance which hologram becomes visible (set like 99999 for always !!",
             99999f,
             "");
-        BNRUtils.SliderConfig(15f, 999f, visibilityDistance);
+        Utils.SliderConfig(15f, 999f, visibilityDistance);
     }
 
     private ConfigEntry<bool> enabled;

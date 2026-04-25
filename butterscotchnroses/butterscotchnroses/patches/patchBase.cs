@@ -4,6 +4,8 @@ using RoR2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BepInEx;
+using BepInEx.Bootstrap;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -22,7 +24,20 @@ namespace BNR.patches
     }
     public abstract class PatchBase
     {
-        public abstract void Init(Harmony harmony);
+        public virtual string chainLoaderKey => "";
+
+        public void PreInit()
+        {
+            if (chainLoaderKey.IsNullOrWhiteSpace() || Chainloader.PluginInfos.ContainsKey(chainLoaderKey))
+            {
+                Init();
+            }
+            else
+            {
+                Log.Debug($"didnt finds {chainLoaderKey} loaded !!! not applyings patches ,.,,.");
+            }
+        }
+        public abstract void Init();
 
         public abstract void Config(ConfigFile config);
         

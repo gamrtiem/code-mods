@@ -15,6 +15,8 @@ namespace BNR;
 
 public class debugplains : PatchBase<debugplains>
 {
+	public override string chainLoaderKey => "com.Dragonyck.DebuggingPlains";
+	
     [HarmonyPatch]
 	public class DebuggingPlainsChanges
 	{
@@ -104,11 +106,11 @@ public class debugplains : PatchBase<debugplains>
 		}
 	}
 
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!enabled.Value) return;
         
-        harmony.CreateClassProcessor(typeof(DebuggingPlainsChanges)).Patch();
+        butterscotchnroses.harmony.CreateClassProcessor(typeof(DebuggingPlainsChanges)).Patch();
     }
     
     public override void Config(ConfigFile config)
@@ -117,7 +119,7 @@ public class debugplains : PatchBase<debugplains>
             "enable patches for debugging plains",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
     }
 
     private ConfigEntry<bool> enabled;

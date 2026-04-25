@@ -37,7 +37,7 @@ public class allyhealthred : PatchBase<allyhealthred>
         
         public static void addCard(HealthComponent newHealthComponent, Transform transform, Texture2D texture, GameObject component)
         {
-            Log.Debug($"adding new to iconcontroller  !!! ");
+            Log.Debug($"adding new to iconcontroller  !!!");
             
             if (texture == null)
             {
@@ -90,7 +90,7 @@ public class allyhealthred : PatchBase<allyhealthred>
     }
     
     
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         //RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Parent.matParentTeleportPortal_mat
         Addressables.LoadAssetAsync<Material>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_DLC3_SolusAmalgamator.matSolusAmalgamatorBombCoreExplode_mat).Completed += handle =>
@@ -207,7 +207,7 @@ public class allyhealthred : PatchBase<allyhealthred>
             "enable patches for allyhealthred",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             applyHooks();

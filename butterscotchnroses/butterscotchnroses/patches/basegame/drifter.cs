@@ -20,7 +20,7 @@ namespace BNR;
 
 public class drifter : PatchBase<drifter>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (enabled.Value)
         {
@@ -234,20 +234,20 @@ public class drifter : PatchBase<drifter>
             "enable patches for drifter",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) => { applyHooks(); };
         
         cubeCount = config.Bind("BNR - drifter",
             "junk cube count",
             20,
             "limit of junk cubes !!");
-        BNRUtils.SliderConfig(4, 300, cubeCount);
+        Utils.SliderConfig(4, 300, cubeCount);
         
         neverKillCubes = config.Bind("BNR - drifter",
             "never kill cubes !!!",
             true,
             "byeah ,,.");
-        BNRUtils.CheckboxConfig(neverKillCubes);
+        Utils.CheckboxConfig(neverKillCubes);
     }
 
     private ConfigEntry<bool> enabled;

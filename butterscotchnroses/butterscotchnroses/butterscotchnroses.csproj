@@ -4,7 +4,6 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<RootNamespace>ExamplePlugin</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,53 +27,50 @@
 
 	<ItemGroup>
 	  <Reference Include="AllyNames">
-	    <HintPath>..\AllyNames-nstrip.dll</HintPath>
+	    <HintPath>..\lib\AllyNames-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="CoolerEclipse">
-	    <HintPath>..\CoolerEclipse-nstrip.dll</HintPath>
+	    <HintPath>..\lib\CoolerEclipse-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="DebuggingPlains">
-	    <HintPath>..\DebuggingPlains-nstrip.dll</HintPath>
+	    <HintPath>..\lib\DebuggingPlains-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="GoldenCoastPlusRevived">
-	    <HintPath>..\GoldenCoastPlusRevived-nstrip.dll</HintPath>
+	    <HintPath>..\lib\GoldenCoastPlusRevived-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Inferno">
-	    <HintPath>..\Inferno-nstrip.dll</HintPath>
+	    <HintPath>..\lib\Inferno-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="LittleGameplayTweaks">
-	    <HintPath>..\LittleGameplayTweaks-nstrip.dll</HintPath>
+	    <HintPath>..\lib\LittleGameplayTweaks-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="MysticsRisky2Utils">
-	    <HintPath>..\MysticsRisky2Utils-nstrip.dll</HintPath>
+	    <HintPath>..\lib\MysticsRisky2Utils-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Nautilus">
-	    <HintPath>..\..\Nautilus-nstrip.dll</HintPath>
+	    <HintPath>..\lib\lib\Nautilus-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="PhotoMode">
-	    <HintPath>..\PhotoMode-nstrip.dll</HintPath>
+	    <HintPath>..\lib\PhotoMode-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="ShaderSwapper">
-	    <HintPath>..\ShaderSwapper.dll</HintPath>
+	    <HintPath>..\lib\ShaderSwapper.dll</HintPath>
 	  </Reference>
 	  <Reference Include="SkillsmasPlugin">
-	    <HintPath>..\SkillsmasPlugin-nstrip.dll</HintPath>
+	    <HintPath>..\lib\SkillsmasPlugin-nstrip.dll</HintPath>
 	  </Reference>
-	  <!--Reference Include="MiscModpackUtils">
-	    <HintPath>..\MiscModpackUtils-nstrip.dll</HintPath>
-	  </Reference-->
 	  <Reference Include="Starstorm2">
-	    <HintPath>..\Starstorm2-nstrip.dll</HintPath>
+	    <HintPath>..\lib\Starstorm2-nstrip.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Unity.Postprocessing.Runtime">
-	    <HintPath>..\Unity.Postprocessing.Runtime.dll</HintPath>
+	    <HintPath>..\lib\Unity.Postprocessing.Runtime.dll</HintPath>
 	  </Reference>
 	  <Reference Include="UnityHotReload">
-	    <HintPath>..\UnityHotReload.dll</HintPath>
+	    <HintPath>..\lib\UnityHotReload.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.dll&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug 3/BepInEx/plugins/icebro-ButterscotchandRosesBaseMod/butterscotchnroses.dll&quot;&#xA;cp &quot;/run/media/icebrah/buh/github/code-mods/butterscotchnroses/butterscotchnroses/bin/Debug/netstandard2.1/butterscotchnroses.pdb&quot; &quot;/run/media/icebrah/buh/gale/riskofrain2/profiles/debug 3/BepInEx/plugins/icebro-ButterscotchandRosesBaseMod/butterscotchnroses.pdb&quot;" />
+	  <Exec Command="$(SolutionDir)butterscotchnroses/postbuild.sh $(SolutionDir)"/>
 	</Target>
 </Project>

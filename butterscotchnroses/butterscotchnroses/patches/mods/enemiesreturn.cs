@@ -1,39 +1,31 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BNR.patches;
 using BepInEx.Configuration;
 using HarmonyLib;
-using HG;
-using PhotoMode;
 using R2API;
-using Rewired;
-using RiskOfOptions;
-using RiskOfOptions.Options;
 using RoR2;
-using RoR2.ContentManagement;
 using RoR2.Items;
-using Unity.Hierarchy;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
-using Inventory = On.RoR2.Inventory;
-using Object = System.Object;
-using SkinCatalog = IL.RoR2.SkinCatalog;
+
+// ReSharper disable Unity.PerformanceCriticalCodeInvocation
 
 namespace BNR;
 
 public class enemiesreturn : PatchBase<enemiesreturn>
 {
+    public override string chainLoaderKey => "com.Viliger.EnemiesReturns";
+
     private static readonly int MainTex = Shader.PropertyToID("_MainTex");
     private static readonly int EmTex = Shader.PropertyToID("_EmTex");
     private static readonly int EmColor = Shader.PropertyToID("_EmColor");
-    private static HashSet<SkinDef> skinDefs = new HashSet<SkinDef>();
+    private static HashSet<SkinDef> skinDefs = [];
     private static ItemDef annointedItemDef;
     private static Material replacedCrown;
 
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         applyHooks();
     }
@@ -42,15 +34,14 @@ public class enemiesreturn : PatchBase<enemiesreturn>
     {
         if (enabled.Value)
         {
-            //BodyCatalog.availability.CallWhenAvailable(AddDrifterBodyLiTDrifterSkin);
-            //RoR2.RoR2Application.onLoad += AddDrifterBodyLiTDrifterSkin;
             BodyCatalog.availability.onAvailable += AddAnointedPink;
-            RoR2.CharacterBody.onBodyStartGlobal += CharacterBodyOnonBodyStartGlobal;
+            CharacterBody.onBodyStartGlobal += CharacterBodyOnonBodyStartGlobal;
             ItemCatalog.availability.onAvailable += () => { annointedItemDef = ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex("HiddenAnointed")); };
         }
         else
         {
-
+            BodyCatalog.availability.onAvailable += AddAnointedPink;
+            CharacterBody.onBodyStartGlobal += CharacterBodyOnonBodyStartGlobal;
         }
     }
 
@@ -59,15 +50,8 @@ public class enemiesreturn : PatchBase<enemiesreturn>
         [ItemDefAssociation]
         private static ItemDef GetItemDef() => annointedItemDef;
 
-        private bool runOnce = false;
+        private bool runOnce;
         private ModelSkinController modelSkinController;
-        private void OnEnable()
-        {
-        }
-        
-        private void OnDisable()
-        {
-        }
 
         private void FixedUpdate()
         {
@@ -88,9 +72,9 @@ public class enemiesreturn : PatchBase<enemiesreturn>
                 if (!replacedCrown)
                 {
                     replacedCrown = UnityEngine.Object.Instantiate(crownRenderer.material);
-                    replacedCrown.SetTexture(MainTex, BNRUtils.hsvModifyTexture(replacedCrown.GetTexture(MainTex) as Texture2D, 100f));
-                    replacedCrown.SetTexture(EmTex, BNRUtils.hsvModifyTexture(replacedCrown.GetTexture(EmTex) as Texture2D, 100f));
-                    replacedCrown.SetColor(EmColor, BNRUtils.Color255(255, 195, 185));
+                    replacedCrown.SetTexture(MainTex, Utils.hsvModifyTexture(replacedCrown.GetTexture(MainTex) as Texture2D, hue.Value, saturation.Value, value.Value));
+                    replacedCrown.SetTexture(EmTex, Utils.hsvModifyTexture(replacedCrown.GetTexture(EmTex) as Texture2D, hue.Value, saturation.Value, value.Value));
+                    replacedCrown.SetColor(EmColor, Utils.Color255(255, 195, 185));
                 }
                 
                 display.GetComponent<ItemDisplay>().rendererInfos[0].defaultMaterial = replacedCrown;
@@ -103,7 +87,7 @@ public class enemiesreturn : PatchBase<enemiesreturn>
     
 
     //stolen from enemies return :3 ., ,.
-    private void CharacterBodyOnonBodyStartGlobal(CharacterBody body)
+    private static void CharacterBodyOnonBodyStartGlobal(CharacterBody body)
     {
         if (!NetworkServer.active) return;
         if (!body.isPlayerControlled) return;
@@ -123,12 +107,14 @@ public class enemiesreturn : PatchBase<enemiesreturn>
         }
     }
 
-    private void AddAnointedPink()
+    private static void AddAnointedPink()
     {
-        var bodyName = "CommandoBody";
-        var skinName = "testSkin";
+        string bodyName = "CommandoBody";
+        string skinName = "testSkin";
+        
         try
         {
+            //stolen from keb skin builder script ,.,.
             var bodyPrefab = BodyCatalog.FindBodyPrefab(bodyName);
             if (!bodyPrefab)
             {
@@ -151,35 +137,37 @@ public class enemiesreturn : PatchBase<enemiesreturn>
                 return;
             }
             
-            foreach (SkinDef skinDefs in skinController.skins)
+            foreach (SkinDef skinControllerSkinDef in skinController.skins)
             {
-                Log.Info(skinDefs.name);
+                Log.Info(skinControllerSkinDef.name);
             }
-            Log.Debug("adding !!");
+            Log.Debug("adding !");
             SkinDef skinDef = UnityEngine.Object.Instantiate(skinController.skins.First(skindef => skindef.name == "skinCommandoJudgementHidden"));
             
             //recolor
-            Texture2D newIcon = BNRUtils.hsvModifyTexture(skinDef.icon.texture, 100f);
+            Texture2D newIcon = Utils.hsvModifyTexture(skinDef.icon.texture, hue.Value, saturation.Value, value.Value);
             Sprite newIconSprite = Sprite.Create(newIcon, new Rect(0, 0, newIcon.width, newIcon.height), new Vector2(newIcon.width / 2, newIcon.height / 2));
             skinDef.icon = newIconSprite;
             
             //////////////////////////////////////////
 
             Material newMat = UnityEngine.Object.Instantiate(skinDef.skinDefParams.rendererInfos[0].defaultMaterial);
-            newMat.SetTexture(MainTex, BNRUtils.hsvModifyTexture(newMat.GetTexture(MainTex) as Texture2D, 100f));
-            newMat.SetTexture(EmTex, BNRUtils.hsvModifyTexture(newMat.GetTexture(EmTex) as Texture2D, 100f));
-            newMat.SetColor(EmColor, BNRUtils.Color255(255, 0, 185));
+            newMat.SetTexture(MainTex, Utils.hsvModifyTexture(newMat.GetTexture(MainTex) as Texture2D, hue.Value, saturation.Value, value.Value));
+            newMat.SetTexture(EmTex, Utils.hsvModifyTexture(newMat.GetTexture(EmTex) as Texture2D, hue.Value, saturation.Value, value.Value));
+            newMat.SetColor(EmColor, Utils.Color255(255, 0, 185));
             
             var newParams = UnityEngine.Object.Instantiate(skinDef.skinDefParams);
             for (int i = 0; i < newParams.rendererInfos.Length; i++)
             {
                 newParams.rendererInfos[i].defaultMaterial = newMat;
+                Log.Debug($"defualt address = {newParams.rendererInfos[i].defaultMaterialAddress}");
             }
             skinDef.skinDefParams = newParams;
             //
             
             skinDef.name = skinName;
-            skinDef.nameToken = "sillyiceskin";
+            skinDef.nameToken += "_BNR";
+            LanguageAPI.Add(skinDef.nameToken, "Annointed Pink");
             
             Array.Resize(ref skinController.skins, skinController.skins.Length + 1);
             skinController.skins[^1] = skinDef;
@@ -199,12 +187,40 @@ public class enemiesreturn : PatchBase<enemiesreturn>
             "enable patches for enemiesreturn",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             applyHooks();
         };
+        
+        addAnointed = config.Bind("BNR - enemiesreturn",
+            "add anointed pink skin !!",
+            true,
+            "enables commando pink annointed .,,. probablys doesnt show if you dont have original judgement unlocked ,....,.");
+        Utils.CheckboxConfig(addAnointed);
+        
+        hue = config.Bind("BNR - enemiesreturn",
+            "pink anointed skin hue ,...",
+            100f,
+            "pink anointed hue ,.,.");
+        Utils.SliderConfig(0f, 360f, hue);
+        
+        saturation = config.Bind("BNR - enemiesreturn",
+            "pink anointed skin saturation ,.,,",
+            0f,
+            "pink anointed saturation ,.,.");
+        Utils.SliderConfig(0f, 100f, saturation);
+        
+        value = config.Bind("BNR - enemiesreturn",
+            "pink anointed skin value ,..,",
+            0f,
+            "pink anointed value ,.,.");
+        Utils.SliderConfig(0f, 100f, value);
     }
     
-    private ConfigEntry<bool> enabled;
+    private static ConfigEntry<float> hue;
+    private static ConfigEntry<float> saturation;
+    private static ConfigEntry<float> value;
+    private static ConfigEntry<bool> addAnointed;
+    private static ConfigEntry<bool> enabled;
 }

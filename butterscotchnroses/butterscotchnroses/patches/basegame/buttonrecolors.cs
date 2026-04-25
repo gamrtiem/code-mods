@@ -14,7 +14,7 @@ namespace BNR;
 
 public class buttonrecolors : PatchBase<buttonrecolors>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!enabled.Value)
         {
@@ -35,7 +35,7 @@ public class buttonrecolors : PatchBase<buttonrecolors>
         Image image = self.gameObject.GetComponent<Image>();
         if (image.gameObject.name.Contains("RuleBook")) return;
 
-        image.color = BNRUtils.Color255(buttonNorm.Value.r, buttonNorm.Value.g, buttonNorm.Value.b, image.color.a);
+        image.color = Utils.Color255(buttonNorm.Value.r, buttonNorm.Value.g, buttonNorm.Value.b, image.color.a);
     }
 
     private static void ButtonSkinControllerOnAwake(ButtonSkinController.orig_Awake orig, RoR2.UI.SkinControllers.ButtonSkinController self)
@@ -69,7 +69,7 @@ public class buttonrecolors : PatchBase<buttonrecolors>
             "enable patches for button recolors",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             if (enabled.Value)
@@ -92,25 +92,25 @@ public class buttonrecolors : PatchBase<buttonrecolors>
             
         buttonNorm = config.Bind("BNR - UI",
             "normal button color",
-            BNRUtils.Color255(110, 83, 120),
+            Utils.Color255(110, 83, 120),
             ""); 
         ModSettingsManager.AddOption(new ColorOption(buttonNorm));
             
         buttonHigh = config.Bind("BNR - UI",
             "highlighted button coor",
-            BNRUtils.Color255(255, 177, 245),
+            Utils.Color255(255, 177, 245),
             ""); 
         ModSettingsManager.AddOption(new ColorOption(buttonHigh));
             
         buttonPress = config.Bind("BNR - UI",
             "pressed button color",
-            BNRUtils.Color255(192, 113, 182),
+            Utils.Color255(192, 113, 182),
             ""); 
         ModSettingsManager.AddOption(new ColorOption(buttonPress));
             
         buttonSelect = config.Bind("BNR - UI",
             "selected button color",
-            BNRUtils.Color255(255, 177, 238),
+            Utils.Color255(255, 177, 238),
             ""); 
         ModSettingsManager.AddOption(new ColorOption(buttonSelect));
     }

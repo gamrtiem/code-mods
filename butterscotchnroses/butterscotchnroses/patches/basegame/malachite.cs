@@ -10,7 +10,7 @@ namespace BNR;
 
 public class malachite : PatchBase<malachite>
     {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {     
         applyHooks();
     }
@@ -43,7 +43,7 @@ public class malachite : PatchBase<malachite>
             "enable patches for malachite (have them naturally spawn urchins ,.,.",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             applyHooks();
@@ -53,7 +53,7 @@ public class malachite : PatchBase<malachite>
             "time between urchin spawns .,,.",
             12f,
             "byeah.,,");
-        BNRUtils.SliderConfig(1, 30, timeBetweenSpawns);
+        Utils.SliderConfig(1, 30, timeBetweenSpawns);
     }
 
     private ConfigEntry<bool> enabled;

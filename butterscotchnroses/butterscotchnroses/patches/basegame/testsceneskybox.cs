@@ -12,7 +12,7 @@ namespace BNR;
 
 public class testsceneskybox : PatchBase<testsceneskybox>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         applyHooks();
     }
@@ -54,7 +54,7 @@ public class testsceneskybox : PatchBase<testsceneskybox>
             "enable patches for testscene",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             applyHooks();
@@ -62,7 +62,7 @@ public class testsceneskybox : PatchBase<testsceneskybox>
         
         skyboxColor = config.Bind("BNR - testscene", 
             "skyboxColor", 
-            BNRUtils.Color255(152, 122, 144),
+            Utils.Color255(152, 122, 144),
             "tint of skybox in testscene !!!");
         ModSettingsManager.AddOption(new ColorOption(skyboxColor));
     }

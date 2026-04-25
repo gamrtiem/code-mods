@@ -10,7 +10,7 @@ namespace BNR;
 
 public class pingrecolor : PatchBase<pingrecolor>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         applyHooks();
     }
@@ -71,7 +71,7 @@ public class pingrecolor : PatchBase<pingrecolor>
             "enable patches for pingrecolor",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             applyHooks();
@@ -79,25 +79,25 @@ public class pingrecolor : PatchBase<pingrecolor>
         
         pingIndicatorDefault = config.Bind("BNR - pingrecolor",
             "ping recolor for default ping !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorDefault));
         
         pingIndicatorEnemy = config.Bind("BNR - pingrecolor",
             "ping recolor for enemy ping !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorEnemy));
         
         pingIndicatorInteractable = config.Bind("BNR - pingrecolor",
             "ping recolor for interactable ping !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorInteractable));
         
         pingIndicatorCount = config.Bind("BNR - pingrecolor",
             "ping recolor for count ping (unsure what this one actually is !! !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorCount));
     }

@@ -17,6 +17,8 @@ namespace BNR;
 
 public class skillsmas : PatchBase<skillsmas>
 {
+	public override string chainLoaderKey => "com.themysticsword.skillsmas";
+
 	/*[HarmonyPatch]
 	public class SkillsmasChanges
 	{
@@ -277,7 +279,7 @@ public class skillsmas : PatchBase<skillsmas>
 		}
 	}*/
 
-	public override void Init(Harmony harmony)
+	public override void Init()
     {     
         if(!enabled.Value) { return; }
         //harmony.CreateClassProcessor(typeof(SkillsmasChanges)).Patch();
@@ -309,13 +311,13 @@ public class skillsmas : PatchBase<skillsmas>
             "enable patches for skillsmas",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         
         zandatsuRechargeSkill = config.Bind("BNR - skillsmas",
             "have zandatsu recharge skill on kill !!",
             true,
             "like !! if it kills something refresh cooldown !!");
-        BNRUtils.CheckboxConfig(zandatsuRechargeSkill);
+        Utils.CheckboxConfig(zandatsuRechargeSkill);
     }
 
     private static ConfigEntry<bool> zandatsuRechargeSkill;

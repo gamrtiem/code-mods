@@ -2,24 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AK.Wwise;
 using BepInEx;
-using BepInEx.Configuration;
 using BNR.patches;
 using BNR.items;
+using butterscotchnroses;
 using HarmonyLib;
-using RiskOfOptions;
-using RiskOfOptions.Options;
 using RoR2;
-using SS2.Items;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using SceneDirector = On.RoR2.SceneDirector;
 using ShaderSwapper;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
-using Patch = HarmonyLib.Patch;
 
 namespace BNR
 {
@@ -36,7 +27,8 @@ namespace BNR
 
         public static AssetBundle carvingKitBundle;
         public static butterscotchnroses instance;
-        public static List<PatchBase> patchBases = []; 
+        public static List<PatchBase> patchBases = [];
+        public static Harmony harmony;
         
         public void Awake()
         {
@@ -47,10 +39,11 @@ namespace BNR
             //TODO main menu pink color option like wolfo qol 
             Log.Init(Logger);
             Logger.LogDebug("loading mod !!");
-            carvingKitBundle = AssetBundle.LoadFromFile(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "carvingkit_assets"));
+            carvingKitBundle = AssetBundle.LoadFromFile(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "carvingkit_assets"));
             StartCoroutine(carvingKitBundle.UpgradeStubbedShadersAsync());
 
-            Harmony harmony = new(Info.Metadata.GUID);
+            harmony = new Harmony(Info.Metadata.GUID);
+            
             var patches = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(PatchBase)));
             foreach (Type patch in patches)
             {
@@ -58,31 +51,32 @@ namespace BNR
                 {
                     PatchBase patchBase = (PatchBase)Activator.CreateInstance(patch);
                     patchBase.Config(Config);
-                    patchBase.Init(harmony);
+                    patchBase.PreInit();
                     patchBases.Add(patchBase);
                 }
                 catch (Exception e)
                 {
-                    //Log.Warning("failed to patch something ! probably fine if you dont have whatever mod that was attempted to be patched enabled ,..,,.");
-                    //Log.Warning(e);
+                    Log.Warning("failed to patch something ! probably fine if you dont have whatever mod that was attempted to be patched enabled ,..,,.");
+                    Log.Warning(e);
                 }
             }
             
             var buffTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(BuffBase)));
             foreach (var buffType in buffTypes)
             {
-                BuffBase buff = (BuffBase)System.Activator.CreateInstance(buffType);
+                BuffBase buff = (BuffBase)Activator.CreateInstance(buffType);
                 buff.AddBuff();
             }
             
             var itemTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(ItemBase)));
             foreach (var itemType in itemTypes)
             {
-                ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
+                ItemBase item = (ItemBase)Activator.CreateInstance(itemType);
                 item.Init(Config);
             }
 
             RoR2.Console.CheatsConVar.instance.boolValue = true;
+            oldconfigs.fixOldConfigs();
         }
 
         private void Update()

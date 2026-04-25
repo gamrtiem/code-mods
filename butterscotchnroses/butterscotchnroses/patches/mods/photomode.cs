@@ -14,7 +14,9 @@ namespace BNR;
 
 public class photomode : PatchBase<photomode>
 {
-    [HarmonyPatch]
+	public override string chainLoaderKey => "com.cwmlolzlz.photomode";
+    
+	[HarmonyPatch]
 	public class PhotomodeChanges
 	{
 		private static bool timeStop;
@@ -119,11 +121,11 @@ public class photomode : PatchBase<photomode>
 		}
 	}
 
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!enabled.Value) return;
         
-        harmony.CreateClassProcessor(typeof(PhotomodeChanges)).Patch();
+        butterscotchnroses.harmony.CreateClassProcessor(typeof(PhotomodeChanges)).Patch();
     }
     
     public override void Config(ConfigFile config)
@@ -132,7 +134,7 @@ public class photomode : PatchBase<photomode>
             "enable patches for photomode",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
     }
     
     private ConfigEntry<bool> enabled;

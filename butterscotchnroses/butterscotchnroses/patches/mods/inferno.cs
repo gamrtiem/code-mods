@@ -8,6 +8,8 @@ namespace BNR;
 
 public class inferno : PatchBase<inferno>
 {
+    public override string chainLoaderKey => "HIFU.Inferno";
+
     [HarmonyPatch]
     public class InfernoChanges
     {
@@ -32,7 +34,7 @@ public class inferno : PatchBase<inferno>
     
     }
 
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!applyInferno.Value) return;
         harmony.CreateClassProcessor(typeof(InfernoChanges)).Patch();
@@ -44,13 +46,13 @@ public class inferno : PatchBase<inferno>
             "apply inferno patches !!",
             true,
             "");
-        BNRUtils.CheckboxConfig(applyInferno);
+        Utils.CheckboxConfig(applyInferno);
         
         noBeetleStun = config.Bind("Mods - Inferno", 
             "makes beetles able to be stunned i hate beetle stun sm ,,..,", 
             true, 
             "");
-        BNRUtils.CheckboxConfig(noBeetleStun);
+        Utils.CheckboxConfig(noBeetleStun);
     }
     
     public static ConfigEntry<bool> noBeetleStun;

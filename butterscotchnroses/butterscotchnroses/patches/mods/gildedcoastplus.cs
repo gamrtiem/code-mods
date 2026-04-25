@@ -7,6 +7,8 @@ namespace BNR;
 
 public class gildedcoastplus : PatchBase<gildedcoastplus>
 {
+    public override string chainLoaderKey => "com.TechDebtCollector.GoldenCoastPlus";
+
     [HarmonyPatch]
     public class GoldenCoastChanges
     {
@@ -19,7 +21,7 @@ public class gildedcoastplus : PatchBase<gildedcoastplus>
         }
     }
 
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!applyGCP.Value) return;
         harmony.CreateClassProcessor(typeof(GoldenCoastChanges)).Patch();
@@ -31,13 +33,13 @@ public class gildedcoastplus : PatchBase<gildedcoastplus>
             "apply golden coast plus patches !!",
             true,
             "");
-        BNRUtils.CheckboxConfig(applyGCP);
+        Utils.CheckboxConfig(applyGCP);
         
         skipGoldenRewards = config.Bind("Mods - GoldenCoastPlus", 
             "skip hidden buff", 
             true, 
             "");
-        BNRUtils.CheckboxConfig(skipGoldenRewards);
+        Utils.CheckboxConfig(skipGoldenRewards);
     }
     
     public static ConfigEntry<bool> skipGoldenRewards;
