@@ -183,7 +183,7 @@ public class enemiesreturn : PatchBase<enemiesreturn>
     
     public override void Config(ConfigFile config)
     {
-        enabled = config.Bind("BNR - enemiesreturn",
+        enabled = config.Bind("Mods - enemiesreturn",
             "enable patches for enemiesreturn",
             true,
             "");
@@ -193,25 +193,25 @@ public class enemiesreturn : PatchBase<enemiesreturn>
             applyHooks();
         };
         
-        addAnointed = config.Bind("BNR - enemiesreturn",
+        addAnointed = config.Bind("Mods - enemiesreturn",
             "add anointed pink skin !!",
             true,
             "enables commando pink annointed .,,. probablys doesnt show if you dont have original judgement unlocked ,....,.");
         Utils.CheckboxConfig(addAnointed);
         
-        hue = config.Bind("BNR - enemiesreturn",
+        hue = config.Bind("Mods - enemiesreturn",
             "pink anointed skin hue ,...",
             100f,
             "pink anointed hue ,.,.");
         Utils.SliderConfig(0f, 360f, hue);
         
-        saturation = config.Bind("BNR - enemiesreturn",
+        saturation = config.Bind("Mods - enemiesreturn",
             "pink anointed skin saturation ,.,,",
             0f,
             "pink anointed saturation ,.,.");
         Utils.SliderConfig(0f, 100f, saturation);
         
-        value = config.Bind("BNR - enemiesreturn",
+        value = config.Bind("Mods - enemiesreturn",
             "pink anointed skin value ,..,",
             0f,
             "pink anointed value ,.,.");

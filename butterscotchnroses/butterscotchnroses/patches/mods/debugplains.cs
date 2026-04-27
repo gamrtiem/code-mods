@@ -28,6 +28,7 @@ public class debugplains : PatchBase<debugplains>
 		[HarmonyPrefix]
 		public static bool PreGameRuleVoteController_ServerHandleClientVoteUpdate(DebuggingPlains.DebuggingPlains __instance)
 		{
+			if (!preventRepeatEnters.Value) return true;
 			if (autoVote) return false;
 	        
 			autoVote = true;
@@ -38,6 +39,7 @@ public class debugplains : PatchBase<debugplains>
 		[HarmonyPrefix]
 		public static bool MainMenuController_UpdateMenuTransition(DebuggingPlains.DebuggingPlains __instance)
 		{
+			if (!preventRepeatEnters.Value) return true;
 			if (autoMenu) return false;
 	        
 			autoMenu = true;
@@ -48,6 +50,7 @@ public class debugplains : PatchBase<debugplains>
 		[HarmonyPrefix]
 		public static bool Run_PickNextStageScene(DebuggingPlains.DebuggingPlains __instance, On.RoR2.Run.orig_PickNextStageScene orig, Run self, WeightedSelection<SceneDef> choices)
 		{
+			if (!preventRepeatEnters.Value) return true;
 			if (autoPlains)
 			{
 				//dragonyck destructive hook ,.., yay !!!
@@ -115,12 +118,19 @@ public class debugplains : PatchBase<debugplains>
     
     public override void Config(ConfigFile config)
     {
-        enabled = config.Bind("BNR - debugging plains",
-            "enable patches for debugging plains",
-            true,
-            "");
-        Utils.CheckboxConfig(enabled);
+	    enabled = config.Bind("Mods - debugging plains",
+		    "enable patches for debugging plains",
+		    true,
+		    "");
+	    Utils.CheckboxConfig(enabled);
+
+	    preventRepeatEnters = config.Bind("Mods - debugging plains",
+		    "prevent re-entering debugging plains",
+		    true,
+		    "like uhh you know when you just want to switch skills or skins or something and the chud mod puts you back in yeah it fixes that ,,.");
+	    Utils.CheckboxConfig(preventRepeatEnters);
     }
 
-    private ConfigEntry<bool> enabled;
+    private static ConfigEntry<bool> enabled;
+    private static ConfigEntry<bool> preventRepeatEnters;
 }

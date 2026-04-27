@@ -216,8 +216,5 @@ public class allyhealthred : PatchBase<allyhealthred>
 
     private static Material hurtOverlayMat;
     private static readonly int TintColor = Shader.PropertyToID("_TintColor"); // rider is telling me to do this <//3 ,.., 
-    private static readonly int CutoffScroll = Shader.PropertyToID("_CutoffScroll");
-    private static readonly int AlphaBias = Shader.PropertyToID("_AlphaBias");
-    private static readonly int RemapTex = Shader.PropertyToID("_RemapTex"); 
     private ConfigEntry<bool> enabled;
 }

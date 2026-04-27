@@ -111,8 +111,9 @@ public class Utils
             if (h < 0f) h += 1f;
             s = (s + saturation);
             v = (v + value);
-            
-            texPixels[i] = Color.HSVToRGB(h, s, v);
+            Color newColor = Color.HSVToRGB(h, s, v);
+            newColor.a = pixelColor.a;
+            texPixels[i] = newColor;
         }
 
         readableTex.SetPixels(texPixels);
@@ -120,131 +121,89 @@ public class Utils
         return readableTex;
     }
 
-    [CanBeNull]
-    public static SkinDef skinRecolor(string baseSkinDefName, string bodyName, float hue, float saturation, float value, string skinName, string prefix = "", bool dontAdd = false)
+    public static Material RecolorMaterial(Material mat, float hue, float saturation, float value)
     {
-        SkinDef recoloredSkinDef = null;
-        
-        try
+        if (mat.HasTexture(MainTex) && mat.GetTexture(MainTex) != null)
         {
-            //stolen from keb skin builder script ,.,.
-            var bodyPrefab = BodyCatalog.FindBodyPrefab(bodyName);
-            if (!bodyPrefab)
-            {
-                Log.Warning($"failed to recolor {skinName} since couldnts find body name {bodyName} ,.,.");
-                return null;
-            }
+            mat.SetTexture(MainTex, hsvModifyTexture(mat.GetTexture(MainTex) as Texture2D, hue, saturation/100f, value/100f));
+        }
+        if (mat.HasTexture(EmTex) && mat.GetTexture(EmTex) != null)
+        {
+            mat.SetTexture(EmTex, hsvModifyTexture(mat.GetTexture(EmTex) as Texture2D, hue, saturation/100f, value/100f));
+        }
+        if (mat.HasTexture(RemapTex) && mat.GetTexture(RemapTex) != null)
+        {
+            mat.SetTexture(RemapTex, hsvModifyTexture(mat.GetTexture(RemapTex) as Texture2D, hue, saturation/100f, value/100f));
+        }
 
-            var modelLocator = bodyPrefab.GetComponent<ModelLocator>();
-            if (!modelLocator)
-            {
-                Log.Warning($"failed to recolor {skinName} since couldnts find model locator on {bodyName},.,,. ");
-                return null;
-            }
-
-            var mdl = modelLocator.modelTransform.gameObject;
-            var skinController = mdl ? mdl.GetComponent<ModelSkinController>() : null;
-            if (!skinController)
-            {
-                Log.Warning($"failed to recolor {skinName} since couldnts find model skin controller components on {bodyName} ,.,..");
-                return null;
-            }
-            
-            SkinDef skinDef = UnityEngine.Object.Instantiate(skinController.skins.First(skindef => skindef.name == baseSkinDefName));
-            
-            Texture2D newIcon = hsvModifyTexture(skinDef.icon.texture, hue, saturation/100f, value/100f);
-            Sprite newIconSprite = Sprite.Create(newIcon, new Rect(0, 0, newIcon.width, newIcon.height), new Vector2(newIcon.width / 2, newIcon.height / 2));
-            skinDef.icon = newIconSprite;
-
-            if (skinDef.skinDefParams == null && skinDef.skinDefParamsAddress == null)
-            {
-                //legacy skins use this i think .,.,
-                CharacterModel.RendererInfo[] newRenderers = new CharacterModel.RendererInfo[skinDef.rendererInfos.Length];
-
-                for (int i = 0; i < skinDef.rendererInfos.Length; i++)
-                {
-                    CharacterModel.RendererInfo renderer = skinDef.rendererInfos[i];
-                    Material newMat = UnityEngine.Object.Instantiate(renderer.defaultMaterial);
-                    newMat.SetTexture(MainTex, hsvModifyTexture(newMat.GetTexture(MainTex) as Texture2D, hue, saturation/100f, value/100f));
-                    newMat.SetTexture(EmTex, hsvModifyTexture(newMat.GetTexture(EmTex) as Texture2D, hue, saturation/100f, value/100f));
-                
-                    Color.RGBToHSV(newMat.GetColor(EmColor), out float colorHue, out float colorSaturation, out float colorValue);
-                    colorHue = (colorHue + hue / 360f) % 1f;
-                    if (colorHue < 0f) colorHue += 1f;
-                    colorSaturation = (colorSaturation + saturation/100f);
-                    colorValue = (colorValue + value/100f);
-                
-                    newMat.SetColor(EmColor, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
-                    renderer.defaultMaterial = newMat;
-                    newRenderers[i] = renderer;
-                }
-
-                skinDef.rendererInfos = newRenderers;
-            }
-            else
-            {
-                var newParams = UnityEngine.Object.Instantiate(skinDef.skinDefParams == null ? skinDef.skinDefParamsAddress.LoadAssetAsync().WaitForCompletion() : skinDef.skinDefParams);
-
-                for (int i = 0; i < newParams.rendererInfos.Length; i++)
-                {
-                    Material newMat = UnityEngine.Object.Instantiate(newParams.rendererInfos[i].defaultMaterial == null ? newParams.rendererInfos[i].defaultMaterialAddress.LoadAssetAsync().WaitForCompletion() : newParams.rendererInfos[i].defaultMaterial);
-                    
-                    if (newMat.HasTexture(MainTex) && newMat.GetTexture(MainTex) != null)
-                    {
-                        newMat.SetTexture(MainTex, hsvModifyTexture(newMat.GetTexture(MainTex) as Texture2D, hue, saturation/100f, value/100f));
-                    }
-                    if (newMat.HasTexture(EmTex) && newMat.GetTexture(EmTex) != null)
-                    {
-                        newMat.SetTexture(EmTex, hsvModifyTexture(newMat.GetTexture(EmTex) as Texture2D, hue, saturation/100f, value/100f));
-                    }
-
-                    if (newMat.HasColor(EmColor))
-                    {
-                        Color.RGBToHSV(newMat.GetColor(EmColor), out float colorHue, out float colorSaturation, out float colorValue);
+        if (mat.HasColor(EmColor))
+        {
+            Color.RGBToHSV(mat.GetColor(EmColor), out float colorHue, out float colorSaturation, out float colorValue);
                         
-                        colorHue = (colorHue + hue / 360f) % 1f;
-                        if (colorHue < 0f) colorHue += 1f;
-                        colorSaturation += saturation/100f;
-                        colorValue += value/100f;
+            colorHue = (colorHue + hue / 360f) % 1f;
+            if (colorHue < 0f) colorHue += 1f;
+            colorSaturation += saturation/100f;
+            colorValue += value/100f;
                 
-                        newMat.SetColor(EmColor, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
-                    }
-                   
-                    newParams.rendererInfos[i].defaultMaterial = newMat;
-                    newParams.rendererInfos[i].defaultMaterialAddress = new AssetReferenceT<Material>("");
-                }
-
-                skinDef.optimizedSkinDefParams = newParams;
-                skinDef.skinDefParams = newParams;
-                skinDef.skinDefParamsAddress = new AssetReferenceT<SkinDefParams>("");
-            }
-
-            string internalName = skinName.Replace(" ", "");
-            skinDef.name = skinDef.name.Replace("(Clone)", "");
-            skinDef.name += $"Recolored{internalName}";
-            skinDef.name = prefix + skinDef.name; // if someone wants ot add like Red or something to check for wolfo ,.,.
-            skinDef.nameToken += $"_BNR_{internalName.ToUpper()}";
-            LanguageAPI.Add(skinDef.nameToken, skinName);
-
-            if (!dontAdd)
-            {
-                Array.Resize(ref skinController.skins, skinController.skins.Length + 1);
-                skinController.skins[^1] = skinDef;
-            }
-            Log.Debug($"added {skinName} to {bodyName} !!!!");
-
-            recoloredSkinDef = skinDef;
+            mat.SetColor(EmColor, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
         }
-        catch (Exception e)
+        if (mat.HasColor(_Color))
         {
-            Log.Warning($"faileds to add {skinName} skin to {bodyName} ,.,.,.");
-            Log.Error(e);
+            Color.RGBToHSV(mat.GetColor(_Color), out float colorHue, out float colorSaturation, out float colorValue);
+                        
+            colorHue = (colorHue + hue / 360f) % 1f;
+            if (colorHue < 0f) colorHue += 1f;
+            colorSaturation += saturation/100f;
+            colorValue += value/100f;
+                
+            mat.SetColor(_Color, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
+        }
+        if (mat.HasColor(TintColor))
+        {
+            Color.RGBToHSV(mat.GetColor(TintColor), out float colorHue, out float colorSaturation, out float colorValue);
+                        
+            colorHue = (colorHue + hue / 360f) % 1f;
+            if (colorHue < 0f) colorHue += 1f;
+            colorSaturation += saturation/100f;
+            colorValue += value/100f;
+                
+            mat.SetColor(TintColor, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
         }
 
-        return recoloredSkinDef;
+        return mat;
     }
     
     private static readonly int MainTex = Shader.PropertyToID("_MainTex");
+    private static readonly int RemapTex = Shader.PropertyToID("_RemapTex");
     private static readonly int EmTex = Shader.PropertyToID("_EmTex");
     private static readonly int EmColor = Shader.PropertyToID("_EmColor");
+    private static readonly int _Color = Shader.PropertyToID("_Color");
+    private static readonly int TintColor = Shader.PropertyToID("_TintColor");
+
+    public static ModelSkinController GetModelLocator(GameObject characterbody)
+    {
+        //stolen from keb skin builder script ,.,.
+        if (!characterbody)
+        {
+            Log.Warning($"failed to get model locator from null ,.,.");
+            return null;
+        }
+
+        var modelLocator = characterbody.GetComponent<ModelLocator>();
+        if (!modelLocator)
+        {
+            Log.Warning($"failed to get model skin controller since couldnts find model locator on {characterbody.name},.,,. ");
+            return null;
+        }
+
+        var mdl = modelLocator.modelTransform.gameObject;
+        var skinController = mdl ? mdl.GetComponent<ModelSkinController>() : null;
+        if (!skinController)
+        {
+            Log.Warning($"failed to get model skin controlelr since couldnts find model skin controller components on {characterbody.name} ,.,..");
+            return null;
+        }
+
+        return skinController;
+    }
 }

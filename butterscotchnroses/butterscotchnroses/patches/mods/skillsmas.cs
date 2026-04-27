@@ -288,13 +288,7 @@ public class skillsmas : PatchBase<skillsmas>
         //On.EntityStates.Merc.EvisDash.FixedUpdate += EvisDashOnFixedUpdate; 
     }
 
-	private void EvisDashOnFixedUpdate(EvisDash.orig_FixedUpdate orig, EntityStates.Merc.EvisDash self)
-	{
-		Log.Debug($" bewww34 {self.dashVector * (self.moveSpeedStat * EntityStates.Merc.EvisDash.speedCoefficient * self.GetDeltaTime())}");
-		orig(self);
-	}
-
-	private void GlobalEventManagerOnonCharacterDeathGlobal(DamageReport damageReport)
+	private static void GlobalEventManagerOnonCharacterDeathGlobal(DamageReport damageReport)
     {
         if (damageReport.damageInfo != null && damageReport.damageInfo.HasModdedDamageType(Skillsmas.Skills.Merc.Zandatsu.zandatsuDamageType))
         {
@@ -307,13 +301,13 @@ public class skillsmas : PatchBase<skillsmas>
 
     public override void Config(ConfigFile config)
     {
-        enabled = config.Bind("BNR - skillsmas",
+        enabled = config.Bind("Mods - skillsmas",
             "enable patches for skillsmas",
             true,
             "");
         Utils.CheckboxConfig(enabled);
         
-        zandatsuRechargeSkill = config.Bind("BNR - skillsmas",
+        zandatsuRechargeSkill = config.Bind("Mods - skillsmas",
             "have zandatsu recharge skill on kill !!",
             true,
             "like !! if it kills something refresh cooldown !!");

@@ -24,7 +24,8 @@ public class photomode : PatchBase<photomode>
 		[HarmonyPatch(typeof(PhotoModeController), "Update")]
 		[HarmonyPrefix]
 		public static bool UpdatePrefix(PhotoModeController __instance)
-        {
+		{
+			if (!noConsoleCamMovement.Value) return true;
             UserProfile userProfile = __instance.cameraRigController.localUserViewer.userProfile;
 			Player inputPlayer = __instance.cameraRigController.localUserViewer.inputPlayer;
 			if (inputPlayer.GetButton(25))
@@ -107,7 +108,6 @@ public class photomode : PatchBase<photomode>
 		[HarmonyPostfix]
 		public static void PhotomodePrefix(PhotoModeController __instance)
 		{
-			
 			timeStop = true;
 			Log.Debug($"enter photo mode !2 {prevTimeScale}");
 		}
@@ -116,6 +116,7 @@ public class photomode : PatchBase<photomode>
 		[HarmonyPostfix]
 		public static void PhotomodePost(PhotoModeController __instance)
 		{
+			if (!keepPreviousTimescale.Value) return;
 			Time.timeScale = prevTimeScale;
 			Log.Debug($"leave mode !2 {Time.timeScale}");
 		}
@@ -130,12 +131,26 @@ public class photomode : PatchBase<photomode>
     
     public override void Config(ConfigFile config)
     {
-        enabled = config.Bind("BNR - photomode",
-            "enable patches for photomode",
-            true,
-            "");
-        Utils.CheckboxConfig(enabled);
+	    enabled = config.Bind("Mods - photomode",
+		    "enable patches for photomode",
+		    true,
+		    "");
+	    Utils.CheckboxConfig(enabled);
+	    
+	    noConsoleCamMovement = config.Bind("Mods - photomode",
+		    "disable cam movement on console open",
+		    true,
+		    "doesnt move the camera around when you have the console open ,,. helpful when testing material edits with runtime material inspector @!!!!");
+	    Utils.CheckboxConfig(noConsoleCamMovement);
+	    
+	    keepPreviousTimescale = config.Bind("Mods - photomode",
+		    "keep previous timescale exiting photomode",
+		    true,
+		    "like !! if your time_scale was 0.3 going in ,.,. 0.3 going out !! instead of resetting back to 1 ,,.");
+	    Utils.CheckboxConfig(keepPreviousTimescale);
     }
     
-    private ConfigEntry<bool> enabled;
+    private static ConfigEntry<bool> enabled;
+    private static ConfigEntry<bool> noConsoleCamMovement;
+    private static ConfigEntry<bool> keepPreviousTimescale;
 }

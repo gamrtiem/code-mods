@@ -4,6 +4,7 @@ using HarmonyLib;
 using On.RoR2.UI;
 using RiskOfOptions;
 using RiskOfOptions.Options;
+using RoR2;
 using UnityEngine;
 
 namespace BNR;
@@ -21,12 +22,26 @@ public class pingrecolor : PatchBase<pingrecolor>
         {
             On.RoR2.UI.PingIndicator.OnEnable += PingIndicatorOnOnEnable;
             PingIndicator.RebuildPing += PingIndicatorOnRebuildPing;
+            PingIndicator.Start += PingIndicatorOnStart;
+            PingIndicator.OnPreRenderOutlineHighlight += PingIndicatorOnOnPreRenderOutlineHighlight;
         }
         else
         {
             PingIndicator.OnEnable -= PingIndicatorOnOnEnable;
             PingIndicator.RebuildPing -= PingIndicatorOnRebuildPing;
         }
+    }
+
+    private void PingIndicatorOnOnPreRenderOutlineHighlight(PingIndicator.orig_OnPreRenderOutlineHighlight orig, RoR2.UI.PingIndicator self, OutlineHighlight outlinehighlight)
+    {
+        recolorPingIndicator(self);
+        orig(self, outlinehighlight);
+    }
+
+    private void PingIndicatorOnStart(PingIndicator.orig_Start orig, RoR2.UI.PingIndicator self)
+    {
+        recolorPingIndicator(self);
+        orig(self);
     }
 
     private void PingIndicatorOnOnEnable(PingIndicator.orig_OnEnable orig, RoR2.UI.PingIndicator self)
@@ -56,6 +71,7 @@ public class pingrecolor : PatchBase<pingrecolor>
             RoR2.UI.PingIndicator.PingType.Count => pingIndicatorCount.Value,
             _ => pingIndicator.pingColor
         };
+        pingIndicator.activeColor = pingIndicator.pingColor;
         pingIndicator.transform.GetChild(0).GetComponent<ParticleSystem>().startColor = pingIndicatorDefault.Value;
         pingIndicator.transform.GetChild(1).GetComponent<ParticleSystem>().startColor = pingIndicatorInteractable.Value;
         pingIndicator.transform.GetChild(2).GetComponent<ParticleSystem>().startColor = pingIndicatorEnemy.Value;
