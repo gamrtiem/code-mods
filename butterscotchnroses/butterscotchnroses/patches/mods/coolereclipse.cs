@@ -3,9 +3,12 @@ using BepInEx.Configuration;
 using BNR.patches;
 using static BNR.butterscotchnroses;
 using HarmonyLib;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 
@@ -23,6 +26,12 @@ public class coolereclipse : PatchBase<coolereclipse>
         public static bool CoolerEclipseAddSkyboxPreFix(On.RoR2.SceneDirector.orig_Start orig, SceneDirector self)
         {
             CoolerEclipse.CoolerEclipse.shouldBeChance.Value = false;
+            if (!NetworkServer.active)
+            {
+                orig(self);
+                return false;
+            }
+            
             string sceneName = SceneManager.GetActiveScene().name;
             int rng = Run.instance.runRNG.RangeInt(0, 100);
 
@@ -64,10 +73,21 @@ public class coolereclipse : PatchBase<coolereclipse>
         public static void CoolerEclipseAddSkyboxPostFix(On.RoR2.SceneDirector.orig_Start orig, SceneDirector self)
         {
             int rng = Run.instance.runRNG.RangeInt(0, 100);
-            Log.Debug($"pink eclipse ? rng {rng} umm {(rng < pinkEclipseChance.Value)}");
+            Log.Debug($"pink eclipse ? rng {rng} umm {(rng > pinkEclipseChance.Value)}");
             if (!GameObject.Find("Eclipse")) return;
 
-            //bascially ramp fog stays pink even after ?? shouldnt but reapplying here if we got another eclipse ,.,. 
+            if (rng > pinkEclipseChance.Value)
+            {
+                return;
+            }
+            new SyncPinkEclipse(true).Send(NetworkDestination.Clients);
+            TurnPink();
+        }
+    }
+
+    public static void TurnPink()
+    {
+        //bascially ramp fog stays pink even after ?? shouldnt but reapplying here if we got another eclipse ,.,. 
             GameObject pp = GameObject.Find("PP + Amb");
             if (pp && pp.GetComponent<PostProcessVolume>())
             {
@@ -81,8 +101,6 @@ public class coolereclipse : PatchBase<coolereclipse>
                 
                 ppv.sharedProfile = ppf;
             }
-            
-            if (!(rng < pinkEclipseChance.Value)) return;
             
             if (pp && pp.GetComponent<SetAmbientLight>())
             {
@@ -193,7 +211,42 @@ public class coolereclipse : PatchBase<coolereclipse>
                     eclipseRenderer.sharedMaterial = newMat;
                 }
             }
-            
+    }
+    
+    public class SyncPinkEclipse : INetMessage
+    {
+        bool pinkEclipse; // 0 - none | 1 - base | 2 - pink
+        
+        public SyncPinkEclipse()
+        {
+        }
+
+        public SyncPinkEclipse(bool pink)
+        {
+            pinkEclipse = pink;
+        }
+        public void Deserialize(NetworkReader reader)
+        {
+            pinkEclipse = reader.ReadBoolean();
+        }
+
+        public void OnReceived()
+        {
+            if (NetworkServer.active)
+            {
+                Log.Debug("SyncSomething: Host ran this. Skip.");
+                return;
+            }
+            Chat.AddMessage($"client recieved pink eclipse as {pinkEclipse} ,..,");
+            if (pinkEclipse)
+            {
+                TurnPink();
+            }
+        }
+
+        public void Serialize(NetworkWriter writer)
+        {
+            writer.Write(pinkEclipse);
         }
     }
 
@@ -202,6 +255,7 @@ public class coolereclipse : PatchBase<coolereclipse>
         Log.Debug("init cooler eclipse !! " + applyCE.Value);
         if (!applyCE.Value) return;
         harmony.CreateClassProcessor(typeof(CoolerEclipseChanges)).Patch();
+        NetworkingAPI.RegisterMessageType<SyncPinkEclipse>();
         Log.Debug("ptached cooler eclipse !!");
     }
 
@@ -228,7 +282,7 @@ public class coolereclipse : PatchBase<coolereclipse>
         
         blacklistStages = config.Bind("Mods - CoolerEclipse", 
             "stage blacklist", 
-            "goldshores,bazaar,solutionalhaunt,ss2_voidshop", 
+            "goldshores,bazaar,solutionalhaunt,ss2_voidshop,testscene", 
             "eclipse stage blacklist (seperate by , !! (eg golemplains,blackbeach!!");
         Utils.StringConfig(blacklistStages);
         

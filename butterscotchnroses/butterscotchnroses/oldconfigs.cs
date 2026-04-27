@@ -21,6 +21,12 @@ public class oldconfigs
         {
             coolereclipse.whitelistStages.Value = (string)coolereclipse.whitelistStages.DefaultValue;
         }
+
+        string olderCoolerEclipseBlacklist = "goldshores,bazaar,solutionalhaunt,ss2_voidshop";
+        if (coolereclipse.blacklistStages.Value == olderCoolerEclipseBlacklist)
+        {
+            coolereclipse.blacklistStages.Value = (string)coolereclipse.blacklistStages.DefaultValue;
+        }
         
         string oldAllyNames = "BombardmentDrone,Bombardment Drone,Default;Drones,Tsar Bomba;Fat Man;Little Boy|" +
                               "JunkDrone,Junk Drone,Default;Drones|" +

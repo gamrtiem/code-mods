@@ -111,6 +111,7 @@ public class allyhealthred : PatchBase<allyhealthred>
             On.RoR2.UI.AllyCardController.UpdateInfo += AllyCardControllerOnUpdateInfo;
             On.RoR2.UI.ScoreboardStrip.EnterStrip += ScoreboardStripOnEnterStrip;
             On.RoR2.Stage.Start += StageOnStart;
+            // on equip gained hook that iterates through card object health component body and if its there and equal and equip def has a dictionary entry add a elite overlay to it; equip removed same but get rid of it ,,.
         }
         else
         {

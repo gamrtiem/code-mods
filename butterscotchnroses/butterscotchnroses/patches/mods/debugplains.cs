@@ -23,6 +23,7 @@ public class debugplains : PatchBase<debugplains>
 		private static bool autoVote;
 		private static bool autoMenu;
 		private static bool autoPlains;
+		private static bool autoCharacter;
 		
 		[HarmonyPatch(typeof(DebuggingPlains.DebuggingPlains), "PreGameRuleVoteController_ServerHandleClientVoteUpdate")]
 		[HarmonyPrefix]
@@ -32,6 +33,17 @@ public class debugplains : PatchBase<debugplains>
 			if (autoVote) return false;
 	        
 			autoVote = true;
+			return true;
+		}
+		
+		[HarmonyPatch(typeof(DebuggingPlains.DebuggingPlains), "Stage_RespawnCharacter")]
+		[HarmonyPrefix]
+		public static bool Stage_RespawnCharacter(DebuggingPlains.DebuggingPlains __instance)
+		{
+			if (!preventRepeatEnters.Value) return true;
+			if (autoCharacter) return false;
+	        
+			autoCharacter = true;
 			return true;
 		}
 		
