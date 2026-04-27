@@ -21,18 +21,17 @@ public class allyhealthred : PatchBase<allyhealthred>
 {
     public static class IconController
     {
-        public static Dictionary<GameObject, Texture2D> iconRelationship = [];
         public static List<allyObject> cardObjects = [];
         public static Stack addQueue = new();
         public static Stack removeQueue = new();
 
-        public class allyObject(Material newHurtMat, HealthComponent newHealthComponent, GameObject newAllyCard)
+        public class allyObject(Material newHurtMat, HealthComponent newHealthComponent, Texture2D newIcon, GameObject newAllyCard)
         {
             public Material hurtMat = newHurtMat;
             public HealthComponent healthComponent = newHealthComponent;
             public GameObject allyCard = newAllyCard;
+            public Texture2D icon = newIcon;
             public float prevHealth;
-            public Texture2D icon;
         }
         
         public static void addCard(HealthComponent newHealthComponent, Transform transform, Texture2D texture, GameObject component)
@@ -44,23 +43,15 @@ public class allyhealthred : PatchBase<allyhealthred>
                 Log.Warning("tried to add health overlay thing to a icon that didnt exist ,., (null ,..,. gorp ,.,,..");
                 return;
             }
-            
-            if (iconRelationship.TryGetValue(component, out Texture2D value))
+
+            allyObject existingIcon = cardObjects.FirstOrDefault(card => card.icon != texture);
+            if (existingIcon != null)
             {
-                Log.Debug("alreadys there ,..,.");
+                Log.Debug("alreadys there with a different icon,..,. replacing !!");
                 
-                if (value != texture)
-                {
-                    //update the icon if its changed ,.,. 
-                    iconRelationship.Remove(component);
-                    cardObjects.Remove(cardObjects.First(card => card.allyCard == component));
-                }
-                else
-                {
-                    return;
-                }
+                //update the icon if its changed ,.,. 
+                removeQueue.Push(existingIcon);
             }
-            iconRelationship.Add(component, texture);
             
             GameObject newObject = new GameObject("healthoverlay");
             Image newImage = newObject.AddComponent<Image>();
@@ -85,7 +76,7 @@ public class allyhealthred : PatchBase<allyhealthred>
             
             newObject.GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 1);
             
-            addQueue.Push(new allyObject(newImage.material, newHealthComponent, component));
+            addQueue.Push(new allyObject(newImage.material, newHealthComponent, texture, component));
         }
     }
     
@@ -117,7 +108,6 @@ public class allyhealthred : PatchBase<allyhealthred>
     {
         if (enabled.Value)
         {
-            //On.RoR2.UI.AllyCardController.Awake += AllyCardControllerOnAwake;
             On.RoR2.UI.AllyCardController.UpdateInfo += AllyCardControllerOnUpdateInfo;
             On.RoR2.UI.ScoreboardStrip.EnterStrip += ScoreboardStripOnEnterStrip;
             On.RoR2.Stage.Start += StageOnStart;
@@ -132,7 +122,6 @@ public class allyhealthred : PatchBase<allyhealthred>
 
     private IEnumerator StageOnStart(Stage.orig_Start orig, RoR2.Stage self)
     {
-        IconController.iconRelationship.Clear();
         IconController.cardObjects.Clear();
         
         return orig(self);
@@ -158,7 +147,7 @@ public class allyhealthred : PatchBase<allyhealthred>
         if (!enabled.Value) return;
         if (!RoR2.Run.instance) return;
         
-        //performance debugging ,.,. 
+        //performance debugging ,.,. start the stopwatch !!!
         //Stopwatch stopwatch = Stopwatch.StartNew();
         //stopwatch.Start();
         
