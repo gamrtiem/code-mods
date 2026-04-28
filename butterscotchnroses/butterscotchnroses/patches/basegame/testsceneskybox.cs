@@ -1,3 +1,4 @@
+using System.Collections;
 using BNR.patches;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -21,14 +22,34 @@ public class testsceneskybox : PatchBase<testsceneskybox>
     {
         if (enabled.Value)
         {
-            On.RoR2.SceneDirector.Start += SceneDirectorOnStart;
+            //On.RoR2.SceneDirector.Start += SceneDirectorOnStart;
+            On.RoR2.Stage.Start += StageOnStart;
         }
         else
         {
-            On.RoR2.SceneDirector.Start -= SceneDirectorOnStart;
+            //On.RoR2.SceneDirector.Start -= SceneDirectorOnStart;
+            On.RoR2.Stage.Start += StageOnStart;
         }
     }
-    
+
+    private IEnumerator StageOnStart(Stage.orig_Start orig, RoR2.Stage self)
+    {
+        if (SceneManager.GetActiveScene().name == "testscene")
+        {
+            //Log.Debug($"new scene !! {RenderSettings.skybox} {SceneManager.GetActiveScene().name}");
+                
+            if (skyboxMaterial == null)
+            {
+                skyboxMaterial = Object.Instantiate(RenderSettings.skybox);
+                skyboxMaterial.SetColor("_Tint", skyboxColor.Value);
+            }
+                
+            RenderSettings.skybox = skyboxMaterial;
+        }
+        
+        return orig(self);
+    }
+
     private static Material skyboxMaterial;
     private void SceneDirectorOnStart(SceneDirector.orig_Start orig, RoR2.SceneDirector self)
     {

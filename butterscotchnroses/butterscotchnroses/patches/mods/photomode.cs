@@ -7,6 +7,8 @@ using Rewired;
 using RiskOfOptions;
 using RiskOfOptions.Options;
 using RoR2;
+using RoR2.UI;
+using RoR2.UI.SkinControllers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -120,6 +122,33 @@ public class photomode : PatchBase<photomode>
 			Time.timeScale = prevTimeScale;
 			Log.Debug($"leave mode !2 {Time.timeScale}");
 		}
+
+		[HarmonyPatch(typeof(PhotoMode.PhotoModePlugin), "SetupPhotoModeButton")]
+		[HarmonyPostfix]
+		public static bool PhotomodePostButton(PhotoModePlugin __instance, PauseScreenController pauseScreenController)
+		{
+			GameObject gameObject = pauseScreenController.GetComponentInChildren<ButtonSkinController>()?.gameObject;
+			if (gameObject == null) return false;
+			GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject, gameObject.transform.parent);
+			if (gameObject2 == null) return false;
+			gameObject2.name = "GenericMenuButton (Photo mode)";
+			gameObject2.SetActive(value: true);
+			ButtonSkinController component = gameObject2.GetComponent<ButtonSkinController>();
+			if (component == null) return false;
+			component.GetComponent<LanguageTextMeshController>().token = "Photo mode";
+			HGButton component2 = gameObject2.GetComponent<HGButton>();
+			if (component2 == null) return false;
+			component2.interactable = __instance.cameraRigController.localUserViewer != null;
+			component2.onClick.AddListener(delegate
+			{
+				GameObject gameObject3 = new GameObject("PhotoModeController");
+				PhotoModeController photoModeController = gameObject3.AddComponent<PhotoModeController>();
+				photoModeController.EnterPhotoMode(pauseScreenController, __instance.cameraRigController);
+			});
+			gameObject2.transform.SetSiblingIndex(PhotoModePlugin.buttonPlacement.Value);
+			return false;
+		}
+
 	}
 
     public override void Init()
