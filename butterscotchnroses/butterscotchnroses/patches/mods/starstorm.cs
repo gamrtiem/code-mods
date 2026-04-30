@@ -2,6 +2,7 @@ using BepInEx.Configuration;
 using BNR.patches;
 using R2API;
 using SS2;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
 namespace BNR;
@@ -205,10 +206,12 @@ public class starstorm : PatchBase<starstorm>
     public override void Init()
     {
         if (!applySS2.Value) return;
-        butterscotchnroses.harmony.CreateClassProcessor(typeof(Starstorm2ExeChanges)).Patch();
+        //butterscotchnroses.harmony.CreateClassProcessor(typeof(Starstorm2ExeChanges)).Patch();
         //LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC", $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
         LanguageAPI.Add("SS2_ITEM_ICETOOL_DESC", $"While <style=cIsUtility>touching a wall</style>, gain <style=cIsUtility>+1</style> <style=cStack>(+1 per stack)</style> extra jump and a <style=\"cIsUtility\">{iceToolFreezeChance.Value}%</style> <style=\"cStack\">(+{iceToolFreezeChanceStack.Value}% per stack)</style> chance to <style=\"cIsUtility\">freeze enemies</style> for <style=\"cIsUtility\">{iceToolFreezeTime.Value} seconds</style> <style=\"cStack\">(+{iceToolFreezeTimeStack.Value} per stack)</style>. ");
         
+        //ice tool rework 
+        // on hit X% (~5%) chance to apply a timed debuff for Xs (~25s) (refreshes on new applied) that decreases movespeed by X% (~5%),,.,. after X (~4) amount of buffs freeze the enemy .,,., 
         Hooks();
     }
 
@@ -229,6 +232,7 @@ public class starstorm : PatchBase<starstorm>
             
             if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
             
+            //self.body.AddBuff(Addressables.LoadAssetAsync<BuffDef>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_DLC2_Chef.bdFrost_asset).WaitForCompletion());
             SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
             if (frozenState)
             {

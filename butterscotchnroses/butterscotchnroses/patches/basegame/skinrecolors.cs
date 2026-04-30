@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BepInEx;
 using BNR.patches;
 using BepInEx.Configuration;
 using JetBrains.Annotations;
@@ -9,11 +11,16 @@ using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using SkinCatalog = On.RoR2.SkinCatalog;
 
 namespace BNR;
 
 public class skinrecolors : PatchBase<skinrecolors>
 {
+    public static SkinDef baseSkinName;
+    public static string newSkinName;
+    public static CharacterBody currentBody;
+    public static float[] hsv = [0, 0, 0];
     public override void Init()
     {
         applyHooks();
@@ -23,12 +30,20 @@ public class skinrecolors : PatchBase<skinrecolors>
     {
         if (enabled.Value)
         {
-            RoR2.BodyCatalog.availability.onAvailable += RecolorSkins;
+            On.RoR2.SkinCatalog.Init += SkinCatalogOnInit;
+            //RoR2.BodyCatalog.availability.onAvailable += RecolorSkins;
         }
         else
         {
-            RoR2.BodyCatalog.availability.onAvailable -= RecolorSkins;
+            On.RoR2.SkinCatalog.Init -= SkinCatalogOnInit;
+            //RoR2.BodyCatalog.availability.onAvailable -= RecolorSkins;
         }
+    }
+
+    private IEnumerator SkinCatalogOnInit(SkinCatalog.orig_Init orig)
+    {
+        RecolorSkins();
+        yield return orig();
     }
 
     private void RecolorSkins()
@@ -54,7 +69,20 @@ public class skinrecolors : PatchBase<skinrecolors>
         }
     }
     
-    [ConCommand(commandName = "list_skin", flags = ConVarFlags.None, helpText = "list internal skins.,,.")]
+    [ConCommand(commandName = "skin_create", flags = ConVarFlags.None, helpText = "list internal skins.,,.")]
+    public static void CreateSkin(ConCommandArgs args)
+    {
+        if (baseSkinName == null)
+        {
+            Log.Warning("base skin null !!");
+            return;
+        }
+        
+        string skinName = !newSkinName.IsNullOrWhiteSpace() ? newSkinName : "Generated Skin";
+        instance.skinRecolors.Value += $";;{baseSkinName.name},{currentBody.name[..^7]},{hsv[0]},{hsv[1]},{hsv[2]},{skinName}";
+    }
+    
+    [ConCommand(commandName = "skin_list", flags = ConVarFlags.None, helpText = "list internal skins.,,.")]
     public static void ListSkins(ConCommandArgs args)
     {
         Debug.Log("args = " + args[0] + " " );
@@ -86,14 +114,14 @@ public class skinrecolors : PatchBase<skinrecolors>
         }
     }
 
-    [ConCommand(commandName = "clear_skin", flags = ConVarFlags.None, helpText = "recolor current skins.,,.")]
+    [ConCommand(commandName = "skin_clear", flags = ConVarFlags.None, helpText = "recolor current skins.,,.")]
     public static void clearSkin(ConCommandArgs args)
     {
         bodyNameToPrev.Clear();
     }
     
     private static Dictionary<string, int> bodyNameToPrev = [];
-    [ConCommand(commandName = "recolor_skin", flags = ConVarFlags.None, helpText = "recolor current skins.,,.")]
+    [ConCommand(commandName = "skin_recolor", flags = ConVarFlags.None, helpText = "recolor current skins.,,.")]
     public static void recolorSkin(ConCommandArgs args)
     {
         ModelSkinController skinController = Utils.GetModelLocator(args.GetSenderBody().gameObject);
@@ -107,24 +135,62 @@ public class skinrecolors : PatchBase<skinrecolors>
         {
             bodyNameToPrev.Add(args.senderBody.name, skinController.currentSkinIndex);
         }
-        SkinDef currentSkin = skinController.skins[currentIndex];
-        float sat = 0;
-        if (args.Count > 2)
-        {
-            sat = float.Parse(args[1]);
-        }
+        SkinDef baseSkin = skinController.skins[currentIndex];
+
+        float HSVhue = 0;
+        float HSVsat = 0;
         float HSVvalue = 0;
-        if (args.Count > 3)
+        if (float.TryParse(args[0], out HSVhue))
         {
-            HSVvalue = float.Parse(args[3]);
+            if (args.Count >= 1)
+            {
+                HSVhue = float.Parse(args[0]);
+            }
+        
+            if (args.Count >= 2)
+            {
+                HSVsat = float.Parse(args[1]);
+            }
+        
+            if (args.Count >= 3)
+            {
+                HSVvalue = float.Parse(args[2]);
+            }
         }
-        SkinDef replacementSkin = skinRecolor(currentSkin.name, args.senderBody.name, float.Parse(args[0]), sat, HSVvalue, "temp");
+        else
+        {
+            newSkinName = args[0];
+            
+            if (args.Count >= 2)
+            {
+                HSVhue = float.Parse(args[1]);
+            }
+        
+            if (args.Count >= 3)
+            {
+                HSVsat = float.Parse(args[2]);
+            }
+        
+            if (args.Count >= 4)
+            {
+                HSVvalue = float.Parse(args[3]);
+            }
+        }
+        
+        
+        SkinDef replacementSkin = skinRecolor(baseSkin.name, args.senderBody.name, HSVhue, HSVsat, HSVvalue, "temp");
 
         Array.Resize(ref skinController.skins, skinController.skins.Length + 1);
         skinController.skins[^1] = replacementSkin;
         skinController.currentSkinIndex = skinController.skins.Length - 1;
         args.senderBody.skinIndex = (uint)(skinController.skins.Length - 1);
         skinController.ApplySkin(skinController.currentSkinIndex);
+        
+        baseSkinName = baseSkin;
+        hsv[0] = HSVhue;
+        hsv[1] = HSVsat;
+        hsv[2] = value;
+        currentBody = args.senderBody;
         
         Log.Debug("bwaa");
     }
@@ -137,11 +203,12 @@ public class skinrecolors : PatchBase<skinrecolors>
         try
         {
             ModelSkinController skinController = Utils.GetModelLocator(BodyCatalog.FindBodyPrefab(bodyName));
-            SkinDef skinDef = UnityEngine.Object.Instantiate(skinController.skins.First(skindef => skindef.name == baseSkinDefName));
+            SkinDef originalSkin = skinController.skins.First(skindef => skindef.name == baseSkinDefName);
+            SkinDef skinDef = UnityEngine.Object.Instantiate(originalSkin);
             
             Texture2D newTexture = Utils.hsvModifyTexture(skinDef.icon.texture, hue, saturation/100f, value/100f);
             Texture2D newIcon = new Texture2D(Mathf.FloorToInt(skinDef.icon.textureRect.width), Mathf.FloorToInt(skinDef.icon.textureRect.height));
-            
+
             var pixels = newTexture.GetPixels(  
                 Mathf.FloorToInt(skinDef.icon.textureRect.x), 
                 Mathf.FloorToInt(skinDef.icon.textureRect.y), 
@@ -171,7 +238,10 @@ public class skinrecolors : PatchBase<skinrecolors>
             }
             else
             {
-                var newParams = UnityEngine.Object.Instantiate(skinDef.skinDefParams == null ? skinDef.skinDefParamsAddress.LoadAssetAsync().WaitForCompletion() : skinDef.skinDefParams);
+                Log.Debug($"skinDef.skinDefParamsAddress null ? {skinDef.skinDefParamsAddress == null}");
+                Log.Debug($"skinDef.skinDefParams null ? {skinDef.skinDefParams}");
+                Log.Debug($"SkinDefParams.FromSkinDef null ? {SkinDefParams.FromSkinDef(originalSkin)}");
+                var newParams = UnityEngine.Object.Instantiate(skinDef.skinDefParamsAddress != null && skinDef.skinDefParamsAddress.ToString() != "[]" ? skinDef.skinDefParamsAddress.LoadAssetAsync().WaitForCompletion() : (skinDef.skinDefParams == null ? SkinDefParams.FromSkinDef(originalSkin) : skinDef.skinDefParams));
 
                 for (int i = 0; i < newParams.rendererInfos.Length; i++)
                 {
@@ -180,7 +250,7 @@ public class skinrecolors : PatchBase<skinrecolors>
                     newParams.rendererInfos[i].defaultMaterialAddress = new AssetReferenceT<Material>("");
                 }
 
-                skinDef.optimizedSkinDefParams = newParams;
+                skinDef.optimizedSkinDefParams = newParams; 
                 skinDef.skinDefParams = newParams;
                 skinDef.skinDefParamsAddress = new AssetReferenceT<SkinDefParams>("");
             }

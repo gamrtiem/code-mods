@@ -111,7 +111,7 @@ public class photomode : PatchBase<photomode>
 		public static void PhotomodePrefix(PhotoModeController __instance)
 		{
 			timeStop = true;
-			Log.Debug($"enter photo mode !2 {prevTimeScale}");
+			//Log.Debug($"enter photo mode !2 {prevTimeScale}");
 		}
 		
 		[HarmonyPatch(typeof(PhotoModeController), "ExitPhotoMode")]
@@ -120,11 +120,11 @@ public class photomode : PatchBase<photomode>
 		{
 			if (!keepPreviousTimescale.Value) return;
 			Time.timeScale = prevTimeScale;
-			Log.Debug($"leave mode !2 {Time.timeScale}");
+			//Log.Debug($"leave mode !2 {Time.timeScale}");
 		}
 
 		[HarmonyPatch(typeof(PhotoMode.PhotoModePlugin), "SetupPhotoModeButton")]
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		public static bool PhotomodePostButton(PhotoModePlugin __instance, PauseScreenController pauseScreenController)
 		{
 			GameObject gameObject = pauseScreenController.GetComponentInChildren<ButtonSkinController>()?.gameObject;

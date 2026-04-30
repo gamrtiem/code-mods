@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using BepInEx.Configuration;
 using JetBrains.Annotations;
@@ -10,6 +11,7 @@ using RiskOfOptions.Options;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using Path = System.IO.Path;
 
 namespace BNR;
 
@@ -111,16 +113,28 @@ public class Utils
             if (h < 0f) h += 1f;
             s = (s + saturation);
             v = (v + value);
+            
             Color newColor = Color.HSVToRGB(h, s, v);
             newColor.a = pixelColor.a;
             texPixels[i] = newColor;
         }
-
+        
+        readableTex.anisoLevel = texture.anisoLevel;
+        readableTex.filterMode = texture.filterMode;
+        readableTex.wrapMode = texture.wrapMode;
+        readableTex.wrapModeU = texture.wrapModeU;
+        readableTex.wrapModeV = texture.wrapModeV;
+        readableTex.wrapModeW = texture.wrapModeW;
+        
         readableTex.SetPixels(texPixels);
         readableTex.Apply();
+        readableTex.name = texture.name + $"_RecolorH{hueShift}S{saturation}V{value}";
+        Log.Debug($"tex name {texture.name}");
+        //File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(butterscotchnroses.instance.Info.Location), "exports") + "old" + texture.name + ".png", makeReadable(texture).EncodeToPNG());
+        //File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(butterscotchnroses.instance.Info.Location), "exports") + "new" + texture.name + ".png", readableTex.EncodeToPNG());
         return readableTex;
     }
-
+    
     public static Material RecolorMaterial(Material mat, float hue, float saturation, float value)
     {
         if (mat.HasTexture(MainTex) && mat.GetTexture(MainTex) != null)
@@ -144,8 +158,10 @@ public class Utils
             if (colorHue < 0f) colorHue += 1f;
             colorSaturation += saturation/100f;
             colorValue += value/100f;
+            Color newColor = Color.HSVToRGB(colorHue, colorSaturation, colorValue);
+            newColor.a = mat.GetColor(EmColor).a;
                 
-            mat.SetColor(EmColor, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
+            mat.SetColor(EmColor, newColor);
         }
         if (mat.HasColor(_Color))
         {
@@ -155,8 +171,10 @@ public class Utils
             if (colorHue < 0f) colorHue += 1f;
             colorSaturation += saturation/100f;
             colorValue += value/100f;
-                
-            mat.SetColor(_Color, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
+            Color newColor = Color.HSVToRGB(colorHue, colorSaturation, colorValue);
+            newColor.a = mat.GetColor(_Color).a;
+            
+            mat.SetColor(_Color, newColor);
         }
         if (mat.HasColor(TintColor))
         {
@@ -166,8 +184,10 @@ public class Utils
             if (colorHue < 0f) colorHue += 1f;
             colorSaturation += saturation/100f;
             colorValue += value/100f;
-                
-            mat.SetColor(TintColor, Color.HSVToRGB(colorHue, colorSaturation, colorValue));
+            Color newColor = Color.HSVToRGB(colorHue, colorSaturation, colorValue);
+            newColor.a = mat.GetColor(TintColor).a;
+
+            mat.SetColor(TintColor, newColor);
         }
 
         return mat;
