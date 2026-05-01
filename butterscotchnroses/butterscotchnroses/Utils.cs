@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using BepInEx;
 using BepInEx.Configuration;
 using JetBrains.Annotations;
 using On.RoR2.UI;
@@ -101,38 +103,54 @@ public class Utils
 
     public static Texture2D hsvModifyTexture(Texture2D texture, float hueShift = 0, float saturation = 0, float value = 0)
     {
-        Texture2D readableTex = makeReadable(texture);
-        Color[] texPixels = readableTex.GetPixels(0, 0, readableTex.width, readableTex.height);
-
-        for (int i = 0; i < texPixels.Length; i++)
+        Texture2D returnTexture;
+        
+        string testPath = $"{skinrecolors.textureDirs}\\{texture.name}_RecolorH{hueShift}S{saturation}V{value}.png";
+        //Log.Debug($"specificdir: {specificDir} | test path: {testPath} | config path : {Paths.ConfigPath} | dir name : {Path.GetDirectoryName(Paths.ConfigPath)}");
+        if (File.Exists(testPath))
         {
-            Color pixelColor = texPixels[i];
-            Color.RGBToHSV(pixelColor, out float h, out float s, out float v);
+            byte[] bytes = File.ReadAllBytes(testPath);
+            returnTexture = new Texture2D(2, 2);
+            returnTexture.LoadImage(bytes);
             
-            h = (h + hueShift / 360f) % 1f;
-            if (h < 0f) h += 1f;
-            s = (s + saturation);
-            v = (v + value);
+            //Log.Debug($"loaded return texture in {stopwatch.ElapsedMilliseconds}ms !!! {texture.name}");
+        }
+        else
+        {
+            returnTexture = makeReadable(texture);
+            Color[] texPixels = returnTexture.GetPixels(0, 0, returnTexture.width, returnTexture.height);
+
+            for (int i = 0; i < texPixels.Length; i++)
+            {
+                Color pixelColor = texPixels[i];
+                Color.RGBToHSV(pixelColor, out float h, out float s, out float v);
             
-            Color newColor = Color.HSVToRGB(h, s, v);
-            newColor.a = pixelColor.a;
-            texPixels[i] = newColor;
+                h = (h + hueShift / 360f) % 1f;
+                if (h < 0f) h += 1f;
+                s = (s + saturation);
+                v = (v + value);
+            
+                Color newColor = Color.HSVToRGB(h, s, v);
+                newColor.a = pixelColor.a;
+                texPixels[i] = newColor;
+            }
+        
+            returnTexture.SetPixels(texPixels);
+            returnTexture.Apply();
+            
+            Log.Debug($"created return texture !!! {texture.name}");
+            File.WriteAllBytes(testPath, returnTexture.EncodeToPNG());
         }
         
-        readableTex.anisoLevel = texture.anisoLevel;
-        readableTex.filterMode = texture.filterMode;
-        readableTex.wrapMode = texture.wrapMode;
-        readableTex.wrapModeU = texture.wrapModeU;
-        readableTex.wrapModeV = texture.wrapModeV;
-        readableTex.wrapModeW = texture.wrapModeW;
+        returnTexture.name = $"{texture.name}_RecolorH{hueShift}S{saturation}V{value}";
+        returnTexture.anisoLevel = texture.anisoLevel;
+        returnTexture.filterMode = texture.filterMode;
+        returnTexture.wrapMode = texture.wrapMode;
+        returnTexture.wrapModeU = texture.wrapModeU;
+        returnTexture.wrapModeV = texture.wrapModeV;
+        returnTexture.wrapModeW = texture.wrapModeW;
         
-        readableTex.SetPixels(texPixels);
-        readableTex.Apply();
-        readableTex.name = texture.name + $"_RecolorH{hueShift}S{saturation}V{value}";
-        Log.Debug($"tex name {texture.name}");
-        //File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(butterscotchnroses.instance.Info.Location), "exports") + "old" + texture.name + ".png", makeReadable(texture).EncodeToPNG());
-        //File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(butterscotchnroses.instance.Info.Location), "exports") + "new" + texture.name + ".png", readableTex.EncodeToPNG());
-        return readableTex;
+        return returnTexture;
     }
     
     public static Material RecolorMaterial(Material mat, float hue, float saturation, float value)
