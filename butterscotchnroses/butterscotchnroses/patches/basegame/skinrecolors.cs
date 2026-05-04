@@ -43,6 +43,25 @@ public class skinrecolors : PatchBase<skinrecolors>
 
         baseSkin = Addressables.LoadAssetAsync<SkinDef>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_Base_Commando.skinCommandoDefault_asset).WaitForCompletion();
         applyHooks();
+
+        await Task.Run(LoadTextures);
+    }
+
+    private static void LoadTextures()
+    {
+        string[] files = Directory.GetFiles(textureDirs, "*.*", SearchOption.AllDirectories);
+        foreach (string texture in files)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
+            byte[] bytes = File.ReadAllBytes(texture);
+            var returnTexture = new Texture2D(2, 2);
+            returnTexture.LoadImage(bytes);
+            
+            Log.Debug($"loaded {texture.Split("/")[^1]} in {stopwatch.ElapsedMilliseconds}ms !! adding to recoloredTextures ,.,.");
+            recoloredTextures.Add(texture.Split("/")[^1], returnTexture);
+        }
     }
 
     private void applyHooks()
@@ -50,12 +69,10 @@ public class skinrecolors : PatchBase<skinrecolors>
         if (enabled.Value)
         {
             On.RoR2.SkinCatalog.Init += SkinCatalogOnInit;
-            //RoR2.BodyCatalog.availability.onAvailable += RecolorSkins;
         }
         else
         {
             On.RoR2.SkinCatalog.Init -= SkinCatalogOnInit;
-            //RoR2.BodyCatalog.availability.onAvailable -= RecolorSkins;
         }
     }
     
@@ -86,9 +103,8 @@ public class skinrecolors : PatchBase<skinrecolors>
                 skinArgs.Length == 7 ? skinArgs[6] : "");
         }
     }
-    
-    //[CanBeNull]
-    public static SkinDef skinRecolor(string baseSkinDefName, string bodyName, float hue, float saturation, float value, string skinName, string prefix = "", bool dontAdd = false)
+
+    private static SkinDef skinRecolor(string baseSkinDefName, string bodyName, float hue, float saturation, float value, string skinName, string prefix = "", bool dontAdd = false)
     {
         SkinDef recoloredSkinDef = baseSkin;
         
@@ -184,6 +200,7 @@ public class skinrecolors : PatchBase<skinrecolors>
         return recoloredSkinDef;
     }
     
+    #region debugcommands
     [ConCommand(commandName = "skin_create", flags = ConVarFlags.None, helpText = "list internal skins.,,.")]
     public static void CreateSkin(ConCommandArgs args)
     {
@@ -310,6 +327,7 @@ public class skinrecolors : PatchBase<skinrecolors>
         
         Log.Debug("bwaa");
     }
+    #endregion
 
     public override void Config(ConfigFile config)
     {

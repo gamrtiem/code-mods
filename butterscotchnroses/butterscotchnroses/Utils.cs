@@ -107,13 +107,21 @@ public class Utils
         
         string testPath = $"{skinrecolors.textureDirs}\\{texture.name}_RecolorH{hueShift}S{saturation}V{value}.png";
         //Log.Debug($"specificdir: {specificDir} | test path: {testPath} | config path : {Paths.ConfigPath} | dir name : {Path.GetDirectoryName(Paths.ConfigPath)}");
-        if (File.Exists(testPath))
+        if (skinrecolors.recoloredTextures.TryGetValue(testPath, out Texture2D texture2D))
         {
+            Log.Debug($"found {testPath} in recolored texture dict !!");
+            returnTexture = texture2D;
+        }
+        else if (File.Exists(testPath))
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
             byte[] bytes = File.ReadAllBytes(testPath);
             returnTexture = new Texture2D(2, 2);
             returnTexture.LoadImage(bytes);
             
-            //Log.Debug($"loaded return texture in {stopwatch.ElapsedMilliseconds}ms !!! {texture.name}");
+            Log.Debug($"loaded return texture in {stopwatch.ElapsedMilliseconds}ms !!! {texture.name}");
         }
         else
         {
