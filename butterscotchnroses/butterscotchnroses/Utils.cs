@@ -101,20 +101,20 @@ public class Utils
         return myTexture2D;
     }
 
-    public static Texture2D hsvModifyTexture(Texture2D texture, float hueShift = 0, float saturation = 0, float value = 0)
+    public static Texture2D hsvModifyTexture(Texture2D texture, float hueShift = 0, float saturation = 0, float value = 0, bool dontExport = false)
     {
         Texture2D returnTexture;
         
         string testPath = $"{skinrecolors.textureDirs}\\{texture.name}_RecolorH{hueShift}S{saturation}V{value}.png";
         //Log.Debug($"specificdir: {specificDir} | test path: {testPath} | config path : {Paths.ConfigPath} | dir name : {Path.GetDirectoryName(Paths.ConfigPath)}");
-        if (skinrecolors.recoloredTextures.TryGetValue(testPath, out Texture2D texture2D))
+        if (skinrecolors.recoloredTextures.TryGetValue($"{texture.name}_RecolorH{hueShift}S{saturation}V{value}.png", out Texture2D texture2D))
         {
-            Log.Debug($"found {testPath} in recolored texture dict !!");
+            Log.Debug($"found {texture.name}_RecolorH{hueShift}S{saturation}V{value}.png in recolored texture dict !!");
             returnTexture = texture2D;
         }
         else if (File.Exists(testPath))
         {
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
             
             byte[] bytes = File.ReadAllBytes(testPath);
@@ -132,12 +132,13 @@ public class Utils
             {
                 Color pixelColor = texPixels[i];
                 Color.RGBToHSV(pixelColor, out float h, out float s, out float v);
+                
             
                 h = (h + hueShift / 360f) % 1f;
                 if (h < 0f) h += 1f;
-                s = (s + saturation);
-                v = (v + value);
-            
+                v += value/100f;
+                s += saturation/100f;
+                
                 Color newColor = Color.HSVToRGB(h, s, v);
                 newColor.a = pixelColor.a;
                 texPixels[i] = newColor;
@@ -145,9 +146,12 @@ public class Utils
         
             returnTexture.SetPixels(texPixels);
             returnTexture.Apply();
-            
-            Log.Debug($"created return texture !!! {texture.name}");
-            File.WriteAllBytes(testPath, returnTexture.EncodeToPNG());
+
+            if (!dontExport)
+            {
+                Log.Debug($"created return texture !!! {texture.name} {dontExport}"); 
+                File.WriteAllBytes(testPath, returnTexture.EncodeToPNG());
+            }
         }
         
         returnTexture.name = $"{texture.name}_RecolorH{hueShift}S{saturation}V{value}";
@@ -161,19 +165,19 @@ public class Utils
         return returnTexture;
     }
     
-    public static Material RecolorMaterial(Material mat, float hue, float saturation, float value)
+    public static Material RecolorMaterial(Material mat, float hue, float saturation, float value, bool dontAdd = false)
     {
         if (mat.HasTexture(MainTex) && mat.GetTexture(MainTex) != null)
         {
-            mat.SetTexture(MainTex, hsvModifyTexture(mat.GetTexture(MainTex) as Texture2D, hue, saturation/100f, value/100f));
+            mat.SetTexture(MainTex, hsvModifyTexture(mat.GetTexture(MainTex) as Texture2D, hue, saturation/100f, value/100f, dontAdd));
         }
         if (mat.HasTexture(EmTex) && mat.GetTexture(EmTex) != null)
         {
-            mat.SetTexture(EmTex, hsvModifyTexture(mat.GetTexture(EmTex) as Texture2D, hue, saturation/100f, value/100f));
+            mat.SetTexture(EmTex, hsvModifyTexture(mat.GetTexture(EmTex) as Texture2D, hue, saturation/100f, value/100f, dontAdd));
         }
         if (mat.HasTexture(RemapTex) && mat.GetTexture(RemapTex) != null)
         {
-            mat.SetTexture(RemapTex, hsvModifyTexture(mat.GetTexture(RemapTex) as Texture2D, hue, saturation/100f, value/100f));
+            mat.SetTexture(RemapTex, hsvModifyTexture(mat.GetTexture(RemapTex) as Texture2D, hue, saturation/100f, value/100f, dontAdd));
         }
 
         if (mat.HasColor(EmColor))

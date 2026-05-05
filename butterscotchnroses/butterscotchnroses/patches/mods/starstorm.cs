@@ -1,4 +1,5 @@
 using BepInEx.Configuration;
+using BNR.items;
 using BNR.patches;
 using R2API;
 using SS2;
@@ -225,19 +226,39 @@ public class starstorm : PatchBase<starstorm>
             if (!info.attacker) return;
             CharacterBody attackerbody = info.attacker.GetComponent<CharacterBody>();
             
-            if (!attackerbody || !attackerbody.inventory) return;
+            if (!attackerbody?.inventory) return;
             
             int stacks = attackerbody.inventory.GetItemCountEffective(SS2Content.Items.IceTool._itemIndex);
             if (stacks <= 0) return;
             
             if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
             
-            //self.body.AddBuff(Addressables.LoadAssetAsync<BuffDef>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_DLC2_Chef.bdFrost_asset).WaitForCompletion());
-            SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
-            if (frozenState)
+            self.body.AddTimedBuff(IcetoolDebuff.instance.BuffDef, 25);
+            
+            foreach (CharacterBody.TimedBuff t in self.body.timedBuffs)
             {
-                frozenState.SetFrozen(iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1));
+                if (t.buffIndex == IcetoolDebuff.instance.BuffDef.buffIndex)
+                {
+                    t.totalDuration = 25;
+                }
             }
+            
+            if (self.body.GetBuffCount(IcetoolDebuff.instance.BuffDef) >= 5)
+            {
+                SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
+                if (frozenState)
+                {
+                    Log.Debug($"duration {iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1)}");
+                    frozenState.SetFrozen(iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1));
+                    self.body.SetBuffCount(IcetoolDebuff.instance.BuffDef.buffIndex, 0);
+                }
+                else
+                {
+                    Log.Debug($"failed to freeze {self.body}");
+                }
+            }
+            //self.body.AddBuff(Addressables.LoadAssetAsync<BuffDef>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_DLC2_Chef.bdFrost_asset).WaitForCompletion());
+            
         };
     }
 
