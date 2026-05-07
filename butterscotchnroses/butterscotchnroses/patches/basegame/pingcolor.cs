@@ -5,6 +5,7 @@ using On.RoR2.UI;
 using RiskOfOptions;
 using RiskOfOptions.Options;
 using RoR2;
+using Unity.Baselib.LowLevel;
 using UnityEngine;
 
 namespace BNR;
@@ -24,12 +25,22 @@ public class pingrecolor : PatchBase<pingrecolor>
             PingIndicator.RebuildPing += PingIndicatorOnRebuildPing;
             PingIndicator.Start += PingIndicatorOnStart;
             PingIndicator.OnPreRenderOutlineHighlight += PingIndicatorOnOnPreRenderOutlineHighlight;
+            On.RoR2.UI.ChargeIndicatorController.TriggerPing += ChargeIndicatorControllerOnTriggerPing;
         }
         else
         {
             PingIndicator.OnEnable -= PingIndicatorOnOnEnable;
             PingIndicator.RebuildPing -= PingIndicatorOnRebuildPing;
+            PingIndicator.Start -= PingIndicatorOnStart;
+            PingIndicator.OnPreRenderOutlineHighlight -= PingIndicatorOnOnPreRenderOutlineHighlight;
+            On.RoR2.UI.ChargeIndicatorController.TriggerPing -= ChargeIndicatorControllerOnTriggerPing;
         }
+    }
+
+    private void ChargeIndicatorControllerOnTriggerPing(ChargeIndicatorController.orig_TriggerPing orig, RoR2.UI.ChargeIndicatorController self, string pingownername, bool triggeranimation)
+    {
+        self.playerPingColor = pingIndicatorInteractable.Value;
+        orig(self, pingownername, triggeranimation);
     }
 
     private void PingIndicatorOnOnPreRenderOutlineHighlight(PingIndicator.orig_OnPreRenderOutlineHighlight orig, RoR2.UI.PingIndicator self, OutlineHighlight outlinehighlight)

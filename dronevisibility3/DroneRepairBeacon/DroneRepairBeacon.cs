@@ -30,7 +30,7 @@ namespace DroneRepairBeacon
         private const string PluginGUID = PluginAuthor + "." + PluginName;
         private const string PluginAuthor = "icebro";
         private const string PluginName = "DroneRepairBeacon";
-        private const string PluginVersion = "1.0.1";
+        private const string PluginVersion = "1.0.2";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
         private static bool SS2Installed => Chainloader.PluginInfos.ContainsKey("com.TeamMoonstorm");
@@ -131,8 +131,8 @@ namespace DroneRepairBeacon
             projector.displayDistance = displayDistance.Value;
             DroneIndicatorHologram.RegisterNetworkPrefab();
             
-            NetworkingAPI.RegisterMessageType<deadDroneTracker.recieveMessageID>();
-            NetworkingAPI.RegisterMessageType<deadDroneTracker.sendMessageID>();
+            //NetworkingAPI.RegisterMessageType<deadDroneTracker.recieveMessageID>();
+            //NetworkingAPI.RegisterMessageType<deadDroneTracker.sendMessageID>();
         }
         
         
@@ -148,10 +148,8 @@ namespace DroneRepairBeacon
         private void SummonMasterBehaviorOnOnEnable(On.RoR2.SummonMasterBehavior.orig_OnEnable orig, SummonMasterBehavior self)
         {
             orig(self);
-            if(!alwaysShowHelp.Value || !alwaysShowHelpAllowTurrets.Value && self.gameObject.name.Contains("Turret"))
-            {
-                return;
-            }
+            if(!alwaysShowHelp.Value || !alwaysShowHelpAllowTurrets.Value && self.gameObject.name.Contains("Turret")) return;
+            if (!NetworkServer.active) return;
             
             int rng = -1;
             bool usingSpecificSprite = false;

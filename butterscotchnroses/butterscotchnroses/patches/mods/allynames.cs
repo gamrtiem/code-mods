@@ -72,13 +72,13 @@ public class allynames : PatchBase<allynames>
  
     public override void Config(ConfigFile config)
     {
-        enabled = config.Bind("BNR - allynames",
+        enabled = config.Bind("Mods - allynames",
             "enable patches for allynames",
             true,
             "");
         Utils.CheckboxConfig(enabled);
         
-        bodyNames = config.Bind("BNR - allynames",
+        bodyNames = config.Bind("Mods - allynames",
             "ally name replace !!",
             "BombardmentDrone,Bombardment Drone,Default;Drones,Tsar Bomba;Fat Man;Little Boy|" +
             "JunkDrone,Junk Drone,Default;Drones|" +
@@ -91,7 +91,8 @@ public class allynames : PatchBase<allynames>
             "DTHealingDrone,DOC,Default;Drones,Bunny|" +
             "DTHaulerDrone,CHIRP,Default;Drones,Moose|" +
             "FriendUnit,Best Buddy,Default,Friend Inside Me;Stupid Baby;Son|" +
-            "DroneBomber,Lt. Droneboy,Default,Lt. Beep Boop",
+            "DroneBomber,Lt. Droneboy,Default,Lt. Beep Boop|" +
+            "_Turretling,turretling,Default,Chudling",
             "add custom !! use bodynamewithoutBody,realname,category1;category2,customname1;customname2|seconditem format to add custom names !!");
         Utils.StringConfig(bodyNames);
     }

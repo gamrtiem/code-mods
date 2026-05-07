@@ -22,7 +22,7 @@ public class oldconfigs
             coolereclipse.whitelistStages.Value = (string)coolereclipse.whitelistStages.DefaultValue;
         }
 
-        string olderCoolerEclipseBlacklist = "goldshores,bazaar,solutionalhaunt,ss2_voidshop";
+        string olderCoolerEclipseBlacklist = "goldshores,bazaar,solutionalhaunt,ss2_voidshop,goldshores";
         if (coolereclipse.blacklistStages.Value == olderCoolerEclipseBlacklist)
         {
             coolereclipse.blacklistStages.Value = (string)coolereclipse.blacklistStages.DefaultValue;
