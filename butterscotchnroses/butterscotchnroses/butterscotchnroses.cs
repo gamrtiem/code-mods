@@ -23,7 +23,7 @@ namespace BNR
 
         private const string PluginAuthor = "icebro";
         private const string PluginName = "BNR";
-        private const string PluginVersion = "0.1.3";
+        private const string PluginVersion = "0.2.0";
 
         public static AssetBundle carvingKitBundle;
         public static butterscotchnroses instance;

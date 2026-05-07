@@ -18,6 +18,11 @@ public class commands
             Log.Warning("base skin null !!");
             return;
         }
+
+        if (args.Count >= 1)
+        {
+            skinrecolors.newSkinName = args[0];
+        }
         
         string skinName = !skinrecolors.newSkinName.IsNullOrWhiteSpace() ? skinrecolors.newSkinName : "Generated Skin";
         skinrecolors.skinRecolors.Value += $";;{skinrecolors.baseSkinName.name},{skinrecolors.currentBody.name[..^7]},{skinrecolors.hsv[0]},{skinrecolors.hsv[1]},{skinrecolors.hsv[2]},{skinName}";
@@ -127,7 +132,7 @@ public class commands
         skinrecolors.baseSkinName = baseSkin;
         skinrecolors.hsv[0] = HSVhue;
         skinrecolors.hsv[1] = HSVsat;
-        skinrecolors.hsv[2] = value;
+        skinrecolors.hsv[2] = HSVvalue;
         skinrecolors.currentBody = args.senderBody;
         
         //Log.Debug("bwaa");

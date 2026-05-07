@@ -27,8 +27,9 @@ have little message above beacons when they die ,..,., ,if you are like ,. reall
  - autumnis - original mod idea in modcord #ideas !! 
  - anartoast - made indicators and indicator template !! ! some death messages too,., ,
  - lukas - made mod icon and an indicator !!!!
- - acanthi - wrote a lot of drone death message s!! emotionals support ,.,.
+ - acanthi - wrote a lot of drone death message s!! emotionals support ,.,. also helpeds with networking !! thanks you !!!!!!
  - synodii - stole a death message from sorry <//3 ,,. 
+ - emerald - alsos wrote a lot of drone death messages !!!!!! 
 
 
 woah .,., a lot of names starting with a ,..,,.., never noticed s.,.,,..,.,,,.,..,

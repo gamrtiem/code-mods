@@ -13,6 +13,8 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using R2API.Utils;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace AlloyHunterSurprise
 {
@@ -24,7 +26,7 @@ namespace AlloyHunterSurprise
         private const string PluginGUID = PluginAuthor + "." + PluginName;
         private const string PluginAuthor = "icebro";
         private const string PluginName = "AlloyHunterSurprise";
-        private const string PluginVersion = "1.0.0";
+        private const string PluginVersion = "1.0.1";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
         private GameObject alloyHunterMasterOriginalRef;
@@ -90,11 +92,15 @@ namespace AlloyHunterSurprise
             On.RoR2.VultureFightOverride.TriggerVultureOnMasterServer += VultureFightOverrideOnTriggerVultureOnMasterServer;
             IL.RoR2.VultureFightOverride.TriggerServer += VultureFightOverrideOnTriggerServer;
             On.RoR2.MasterCatalog.Init += MasterCatalogOnInit;
-            
-            AsyncOperationHandle<GameObject> matVultureHunterAddressable = Addressables.LoadAssetAsync<GameObject>(RoR2BepInExPack.GameAssetPaths.Version_1_35_0.RoR2_DLC3_VultureHunter.VultureHunterMaster_prefab);
-            matVultureHunterAddressable.Completed += _ =>
+            IL.RoR2.VultureFightOverride.TriggerVultureOnMasterServer += il =>
             {
-                alloyHunterMasterOriginalRef = matVultureHunterAddressable.Result;
+                Debug.Log("logging ");
+                Debug.Log(il);
+            };
+            
+            Addressables.LoadAssetAsync<GameObject>(RoR2BepInExPack.GameAssetPaths.Version_1_35_0.RoR2_DLC3_VultureHunter.VultureHunterMaster_prefab).Completed += result =>
+            {
+                alloyHunterMasterOriginalRef = result.Result;
             };
         }
 
@@ -120,7 +126,7 @@ namespace AlloyHunterSurprise
             GameObject invaderReplace = MasterCatalog.GetMasterPrefab(MasterCatalog.FindMasterIndex(invaderReplacement.Value));
             if (invaderReplace != null)
             {
-                //Log.Debug($"replacing invader with {invaderReplace} !!");
+                Log.Debug($"replacing invader with {invaderReplace} !!");
                 alloyHunterMaster = invaderReplace;
             }
             else
@@ -166,6 +172,7 @@ namespace AlloyHunterSurprise
                 );
                 
                 Log.Debug("added il hook to null chcek forcedbossfight !!");
+                Debug.Log(il);
             }
         }
 
@@ -217,7 +224,17 @@ namespace AlloyHunterSurprise
                 self.ForcedBossFight = bossCard;
             }
             
-            orig(self, boss);
+            Log.Debug($" forced fight null ? {self.ForcedBossFight == null}");
+            if (self.ForcedBossFight != null)
+            {
+                orig(self, boss);
+            }
+            
+            //if (SceneManager.GetActiveScene().name != "conduitcanyon" && !asManyInvasionsAsBosses.Value)
+            //{
+            //    Log.Debug($"spawned one !! killing self .,,. ");
+            //    Destroy(self);
+            //}
         }
 
         private void TeleporterInteractionOnAwake(On.RoR2.TeleporterInteraction.orig_Awake orig, TeleporterInteraction self)

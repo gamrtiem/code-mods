@@ -140,7 +140,7 @@ public class skinrecolors : PatchBase<skinrecolors>
 
             SkinDef skinDef = UnityEngine.Object.Instantiate(originalSkin);
             
-            Texture2D newTexture = Utils.hsvModifyTexture(skinDef.icon.texture, hue, saturation/100f, value/100f);
+            Texture2D newTexture = Utils.hsvModifyTexture(skinDef.icon.texture, hue, saturation/100f, value/100f, dontAdd);
             Texture2D newIcon = new Texture2D(Mathf.FloorToInt(skinDef.icon.textureRect.width), Mathf.FloorToInt(skinDef.icon.textureRect.height));
 
             var pixels = newTexture.GetPixels(  

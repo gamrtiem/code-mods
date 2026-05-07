@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -194,8 +194,8 @@ public class allyhealthred : PatchBase<allyhealthred>
     public override void Config(ConfigFile config)
     {
         enabled = config.Bind("BNR - allyhealthred",
-            "enable patches for allyhealthred",
-            true,
+            "enable patches for allyhealthred (buggy atm, disabled by default)",
+            false,
             "");
         Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
@@ -207,4 +207,4 @@ public class allyhealthred : PatchBase<allyhealthred>
     private static Material hurtOverlayMat;
     private static readonly int TintColor = Shader.PropertyToID("_TintColor"); // rider is telling me to do this <//3 ,.., 
     private ConfigEntry<bool> enabled;
-}
+}*/

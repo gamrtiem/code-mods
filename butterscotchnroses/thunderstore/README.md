@@ -5,6 +5,31 @@ everything is configurable to some degree too ,.,,. so if you dont like an edit 
 
 ### basegame edits ,.,,.
 <details>
+<summary> HSV skin recolors !!!!!!!  </summary>
+
+- lets you make custom skins base off HSV values !!! just load in with the skin you want to make an edit of ,..,. run "recolor_skin (hue) (saturation) (value)" and once it looks nice do "create_skin (skin name)" then itll appear in lobby the next game start !!! 
+- this will likely end up becoming its own mod but for nows limited to bnr land ,.,. consider it technically a little in beta since it can make load times a slights bit longer .,,.,.,
+- works with modded characters too !!!! showcase exmaples below ,.,. 
+
+using orbit's [surivorsreturn](https://thunderstore.io/package/Orbital/SurvivorsReturn/) skinpack ,.,. ``Infamy,Bandit2Body,320,-10,5,ralsei bandit``
+![](https://files.catbox.moe/exm45b.png)
+
+``SkinNemCommandoDefault,NemCommandoBody,160,90,0,greenemmando``
+![](https://files.catbox.moe/6axg8k.png)
+
+``skinDroneTechDef,DroneTechBody,170,-30,0,gemporator``
+![](https://files.catbox.moe/nuczzj.png)
+
+``skinLoaderAltSolus,LoaderBody,200,-20,3,evil2``
+![](https://files.catbox.moe/be9pxp.png)
+
+basically tutorial on how to use ,..,
+![](https://files.catbox.moe/yvdx4l.gif)
+![](https://files.catbox.moe/z3gwae.png)
+
+</details>
+
+<details>
 <summary> ui edits !!  </summary>
 
 - (disabled by default since fairlys buggy ,.,.) customize button colors .,.,.
@@ -56,9 +81,9 @@ everything is configurable to some degree too ,.,,. so if you dont like an edit 
 
 ![](https://files.catbox.moe/okvzsw.png)
 
-![](https://files.catbox.moe/jem5kv.png)
+![](https://files.catbox.moe/e7hyb3.png)
 
-![](https://files.catbox.moe/kauzte.png)
+![](https://files.catbox.moe/vkmoyt.png)
 
 
 </details>
@@ -88,7 +113,7 @@ everything is configurable to some degree too ,.,,. so if you dont like an edit 
 <summary> starstorm !!  </summary>
 
 - [mod link ,..,](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/)
- - (might break if beta isnt enabled ( give icetool a chance to freeze (eg. artificer wall( enemies on hit !!! kinds of broken tbh because of the execute but its okay <33 ,.,.,.,
+- (might break if beta isnt enabled ( give icetool chance to apply a debuff on hit that decreases enemy movespeed by 5% per stack .,,. 5 stack causes the enemy to freeze (eg. artificer wall( !!! kinds of broken tbh because of the execute but its okay <33 ,.,.,.,
 
 </details>
 
@@ -108,6 +133,42 @@ everything is configurable to some degree too ,.,,. so if you dont like an edit 
 
 ![](https://files.catbox.moe/g5hbx6.png)
 </details>
+
+<details>
+<summary> debugging plains !!  </summary>
+
+- [mod link ,.,.](https://thunderstore.io/c/riskofrain2/p/Dragonyck/DebuggingPlains/)
+- rage edit .,,.,. makes it so you can exit debuggingplains without it repeatedly kicking you back in !!! unable to click buttons other than single player though .,,.,.
+
+</details>
+
+<details>
+<summary> photomode !!  </summary>
+
+- [mod link ,.,.](https://thunderstore.io/c/riskofrain2/p/Dragonyck/PhotoMode/)
+- rage edit .,,., attempts to fix an NRE on photomode exit !!
+- also makes it so the camera doesnt move around while having the console open .,,.
+
+</details>
+
+<details>
+<summary> skillsmas !!  </summary>
+
+- [mod link ,.,.](https://thunderstore.io/c/riskofrain2/p/FortunesTeam/Skillsmas/)
+- rage edit .,,., makes mercenary's zandatsu recharge it's skill cooldown if it kills an enemy !!!! it uses the bandit sound and it made me weirdly mad that it didnt ,.,.
+
+</details>
+
+<details>
+<summary> enemies return !!  </summary>
+
+- [mod link ,.,.](https://thunderstore.io/c/riskofrain2/p/Risky_Sleeps/EnemiesReturns/)
+- adds a pink variant of commandos judgement skin !!! pink halo included .,,. you can change the color in the config to whatevers you want !! 
+![](https://files.catbox.moe/yx3opp.png)
+
+</details>
+
+
 
 ### items ,.,.
 |![carving kit](https://raw.githubusercontent.com/gamrtiem/code-mods/refs/heads/main/butterscotchnroses/assetbundle/carvingkit.png) | **Carving Kit** | After interacting with a ``Shrine of the Woods``, gain a piece of``bark`` that drops after standing still for ``2`` seconds, healing for ``6%`` ``(+4% per stack)`` of your health every second to all allies within ``7m`` ``(+4m per stack)``. Guarantee a ``Shrine of the Woods`` spawn.

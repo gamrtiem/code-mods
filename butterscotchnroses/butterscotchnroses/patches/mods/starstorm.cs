@@ -23,7 +23,7 @@ public class starstorm : PatchBase<starstorm>
     [HarmonyPatch]
     public class Starstorm2ExeChanges
     {
-        [HarmonyPatch(typeof(EntityStates.Executioner2.Dash), "OnEnter")]
+        /*[HarmonyPatch(typeof(EntityStates.Executioner2.Dash), "OnEnter")]
         [HarmonyPostfix]
         public static void DashOnEnterPostFix(Dash __instance)
         {
@@ -201,7 +201,7 @@ public class starstorm : PatchBase<starstorm>
             {
                 Log.Debug("failed");
             }
-        }
+        }*/
     }
     
     public override void Init()
@@ -218,47 +218,55 @@ public class starstorm : PatchBase<starstorm>
 
     public override void Hooks()
     {
-        On.RoR2.HealthComponent.TakeDamageProcess += (orig, self, info) =>
+        On.RoR2.HealthComponent.TakeDamageProcess += HealthComponentOnTakeDamageProcess;
+        RecalculateStatsAPI.GetStatCoefficients += RecalculateStatsAPIOnGetStatCoefficients;
+    }
+
+    private void RecalculateStatsAPIOnGetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
+    {
+        int iceToolDebuff = sender.GetBuffCount(IcetoolDebuff.instance.BuffDef);
+        args.moveSpeedReductionMultAdd += iceToolDebuff * .05f;
+    }
+
+    private void HealthComponentOnTakeDamageProcess(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageinfo)
+    {
+        orig(self, damageinfo);
+            
+        if (!NetworkServer.active) return;
+        if (!damageinfo.attacker) return;
+            
+        CharacterBody attackerbody = damageinfo.attacker.GetComponent<CharacterBody>();
+            
+        if (!attackerbody?.inventory) return;
+        int stacks = attackerbody.inventory.GetItemCountEffective(SS2Content.Items.IceTool._itemIndex);
+        if (stacks <= 0) return;
+        if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
+            
+        self.body.AddTimedBuff(IcetoolDebuff.instance.BuffDef, 25);
+            
+        foreach (CharacterBody.TimedBuff t in self.body.timedBuffs)
         {
-            orig(self, info);
-            
-            if (!NetworkServer.active) return;
-            if (!info.attacker) return;
-            CharacterBody attackerbody = info.attacker.GetComponent<CharacterBody>();
-            
-            if (!attackerbody?.inventory) return;
-            
-            int stacks = attackerbody.inventory.GetItemCountEffective(SS2Content.Items.IceTool._itemIndex);
-            if (stacks <= 0) return;
-            
-            if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
-            
-            self.body.AddTimedBuff(IcetoolDebuff.instance.BuffDef, 25);
-            
-            foreach (CharacterBody.TimedBuff t in self.body.timedBuffs)
+            if (t.buffIndex == IcetoolDebuff.instance.BuffDef.buffIndex)
             {
-                if (t.buffIndex == IcetoolDebuff.instance.BuffDef.buffIndex)
-                {
-                    t.totalDuration = 25;
-                }
+                t.totalDuration = 25;
+            }
+        }
+            
+        if (self.body.GetBuffCount(IcetoolDebuff.instance.BuffDef) >= 5)
+        {
+            SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
+            
+            if (frozenState)
+            {
+                Log.Debug($"duration {iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1)}");
+                frozenState.SetFrozen(iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1));
+            }
+            else
+            {
+                Log.Debug($"failed to freeze {self.body}");
             }
             
-            if (self.body.GetBuffCount(IcetoolDebuff.instance.BuffDef) >= 5)
-            {
-                SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
-                if (frozenState)
-                {
-                    Log.Debug($"duration {iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1)}");
-                    frozenState.SetFrozen(iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1));
-                    self.body.SetBuffCount(IcetoolDebuff.instance.BuffDef.buffIndex, 0);
-                }
-                else
-                {
-                    Log.Debug($"failed to freeze {self.body}");
-                }
-            }
-            //self.body.AddBuff(Addressables.LoadAssetAsync<BuffDef>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_DLC2_Chef.bdFrost_asset).WaitForCompletion());
-            
+            self.body.SetBuffCount(IcetoolDebuff.instance.BuffDef.buffIndex, 0);
         };
     }
 
