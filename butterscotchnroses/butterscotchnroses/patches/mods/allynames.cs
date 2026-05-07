@@ -14,6 +14,8 @@ namespace BNR;
 
 public class allynames : PatchBase<allynames>
 {
+    public override string chainLoaderKey => "SwagWizards.AllyNames";
+
     [HarmonyPatch]
     public class AllyNamesChanges
     {
@@ -56,31 +58,25 @@ public class allynames : PatchBase<allynames>
             }
         }
     }
-    public override void Init(Harmony harmony)
+    public override void Init()
     {     
         if(!enabled.Value) { return; }
+        
         Log.Debug("applying allynames patches !!");
         harmony.CreateClassProcessor(typeof(AllyNamesChanges)).Patch();
         NamesList.InitConfig();
         NamesList.BuildNamesByBodyName();
         
         AllyNames.AllyNames.instance.AddTokens();
-        On.RoR2.CharacterBody.Start += CharacterBodyOnStart;
     }
-
-    private void CharacterBodyOnStart(CharacterBody.orig_Start orig, RoR2.CharacterBody self)
-    {
-        orig(self);
-        Log.Debug($"test - {RoR2.BodyCatalog.GetBodyName(self.bodyIndex)}");
-    }
-
+ 
     public override void Config(ConfigFile config)
     {
         enabled = config.Bind("BNR - allynames",
             "enable patches for allynames",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         
         bodyNames = config.Bind("BNR - allynames",
             "ally name replace !!",
@@ -97,7 +93,7 @@ public class allynames : PatchBase<allynames>
             "FriendUnit,Best Buddy,Default,Friend Inside Me;Stupid Baby;Son|" +
             "DroneBomber,Lt. Droneboy,Default,Lt. Beep Boop",
             "add custom !! use bodynamewithoutBody,realname,category1;category2,customname1;customname2|seconditem format to add custom names !!");
-        BNRUtils.StringConfig(bodyNames);
+        Utils.StringConfig(bodyNames);
     }
 
     public static ConfigEntry<string> bodyNames;

@@ -11,7 +11,7 @@ namespace BNR;
 
 public class logoreplace : PatchBase<logoreplace>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         Hook();
     }

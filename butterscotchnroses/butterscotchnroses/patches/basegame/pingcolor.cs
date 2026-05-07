@@ -4,13 +4,14 @@ using HarmonyLib;
 using On.RoR2.UI;
 using RiskOfOptions;
 using RiskOfOptions.Options;
+using RoR2;
 using UnityEngine;
 
 namespace BNR;
 
 public class pingrecolor : PatchBase<pingrecolor>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         applyHooks();
     }
@@ -21,12 +22,26 @@ public class pingrecolor : PatchBase<pingrecolor>
         {
             On.RoR2.UI.PingIndicator.OnEnable += PingIndicatorOnOnEnable;
             PingIndicator.RebuildPing += PingIndicatorOnRebuildPing;
+            PingIndicator.Start += PingIndicatorOnStart;
+            PingIndicator.OnPreRenderOutlineHighlight += PingIndicatorOnOnPreRenderOutlineHighlight;
         }
         else
         {
             PingIndicator.OnEnable -= PingIndicatorOnOnEnable;
             PingIndicator.RebuildPing -= PingIndicatorOnRebuildPing;
         }
+    }
+
+    private void PingIndicatorOnOnPreRenderOutlineHighlight(PingIndicator.orig_OnPreRenderOutlineHighlight orig, RoR2.UI.PingIndicator self, OutlineHighlight outlinehighlight)
+    {
+        recolorPingIndicator(self);
+        orig(self, outlinehighlight);
+    }
+
+    private void PingIndicatorOnStart(PingIndicator.orig_Start orig, RoR2.UI.PingIndicator self)
+    {
+        recolorPingIndicator(self);
+        orig(self);
     }
 
     private void PingIndicatorOnOnEnable(PingIndicator.orig_OnEnable orig, RoR2.UI.PingIndicator self)
@@ -56,6 +71,7 @@ public class pingrecolor : PatchBase<pingrecolor>
             RoR2.UI.PingIndicator.PingType.Count => pingIndicatorCount.Value,
             _ => pingIndicator.pingColor
         };
+        pingIndicator.activeColor = pingIndicator.pingColor;
         pingIndicator.transform.GetChild(0).GetComponent<ParticleSystem>().startColor = pingIndicatorDefault.Value;
         pingIndicator.transform.GetChild(1).GetComponent<ParticleSystem>().startColor = pingIndicatorInteractable.Value;
         pingIndicator.transform.GetChild(2).GetComponent<ParticleSystem>().startColor = pingIndicatorEnemy.Value;
@@ -71,7 +87,7 @@ public class pingrecolor : PatchBase<pingrecolor>
             "enable patches for pingrecolor",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             applyHooks();
@@ -79,25 +95,25 @@ public class pingrecolor : PatchBase<pingrecolor>
         
         pingIndicatorDefault = config.Bind("BNR - pingrecolor",
             "ping recolor for default ping !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorDefault));
         
         pingIndicatorEnemy = config.Bind("BNR - pingrecolor",
             "ping recolor for enemy ping !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorEnemy));
         
         pingIndicatorInteractable = config.Bind("BNR - pingrecolor",
             "ping recolor for interactable ping !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorInteractable));
         
         pingIndicatorCount = config.Bind("BNR - pingrecolor",
             "ping recolor for count ping (unsure what this one actually is !! !!",
-            BNRUtils.Color255(252, 142, 249),
+            Utils.Color255(252, 142, 249),
             "");
         ModSettingsManager.AddOption(new ColorOption(pingIndicatorCount));
     }

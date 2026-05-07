@@ -2,50 +2,48 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AK.Wwise;
 using BepInEx;
-using BepInEx.Configuration;
 using BNR.patches;
 using BNR.items;
+using butterscotchnroses;
 using HarmonyLib;
-using RiskOfOptions;
-using RiskOfOptions.Options;
 using RoR2;
-using SS2.Items;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using SceneDirector = On.RoR2.SceneDirector;
 using ShaderSwapper;
-using UnityEngine.SceneManagement;
-using Object = UnityEngine.Object;
+using UnityEngine.UI;
 
 namespace BNR
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInDependency("com.Viliger.EnemiesReturns", BepInDependency.DependencyFlags.SoftDependency)]
 
     public class butterscotchnroses : BaseUnityPlugin
     {
-        public const string PluginGUID = "zzz" + PluginAuthor + "." + PluginName;
+        private const string PluginGUID = "zzz" + PluginAuthor + "." + PluginName;
 
-        public const string PluginAuthor = "icebro";
-        public const string PluginName = "BNR";
-        public const string PluginVersion = "0.1.3";
+        private const string PluginAuthor = "icebro";
+        private const string PluginName = "BNR";
+        private const string PluginVersion = "0.1.3";
 
         public static AssetBundle carvingKitBundle;
+        public static butterscotchnroses instance;
+        public static List<PatchBase> patchBases = [];
+        public static Harmony harmony;
         
-        private static ConfigEntry<Color> skyboxColor;
         public void Awake()
         {
+            instance = this;
             //TODO add making inferno + ESBM config not give them double jumps TT 
             //TODO add mod options button (uses something different i think idk( and highlighted text color change configfs 
             //TODO cleanesthud color force instead of survivor color 
             //TODO main menu pink color option like wolfo qol 
             Log.Init(Logger);
             Logger.LogDebug("loading mod !!");
-            carvingKitBundle = AssetBundle.LoadFromFile(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "carvingkit_assets"));
+            carvingKitBundle = AssetBundle.LoadFromFile(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location)!, "carvingkit_assets"));
             StartCoroutine(carvingKitBundle.UpgradeStubbedShadersAsync());
 
-            Harmony harmony = new(Info.Metadata.GUID);
+            harmony = new Harmony(Info.Metadata.GUID);
+            
             var patches = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(PatchBase)));
             foreach (Type patch in patches)
             {
@@ -53,7 +51,8 @@ namespace BNR
                 {
                     PatchBase patchBase = (PatchBase)Activator.CreateInstance(patch);
                     patchBase.Config(Config);
-                    patchBase.Init(harmony);
+                    patchBase.PreInit();
+                    patchBases.Add(patchBase);
                 }
                 catch (Exception e)
                 {
@@ -65,39 +64,19 @@ namespace BNR
             var buffTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(BuffBase)));
             foreach (var buffType in buffTypes)
             {
-                BuffBase buff = (BuffBase)System.Activator.CreateInstance(buffType);
+                BuffBase buff = (BuffBase)Activator.CreateInstance(buffType);
                 buff.AddBuff();
             }
             
             var itemTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(ItemBase)));
             foreach (var itemType in itemTypes)
             {
-                ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
+                ItemBase item = (ItemBase)Activator.CreateInstance(itemType);
                 item.Init(Config);
             }
-            
-            On.RoR2.SceneDirector.Start += SceneDirectorOnStart;
-            skyboxColor = Config.Bind("BNR - testscene", "skyboxColor", BNRUtils.Color255(152, 122, 144), "tint of skybox in testscene !!!");
-            ModSettingsManager.AddOption(new ColorOption(skyboxColor));
-        }
 
-        private static Material skyboxMaterial;
-        private void SceneDirectorOnStart(SceneDirector.orig_Start orig, RoR2.SceneDirector self)
-        {
-            orig(self);
-            if (SceneManager.GetActiveScene().name == "testscene")
-            {
-                Log.Debug($"new scene !! {RenderSettings.skybox} {SceneManager.GetActiveScene().name}");
-                
-                if (skyboxMaterial == null)
-                {
-                    skyboxMaterial = Object.Instantiate(RenderSettings.skybox);
-                    skyboxMaterial.SetColor("_Tint", skyboxColor.Value);
-                }
-                
-                RenderSettings.skybox = skyboxMaterial;
-            }
-            
+            RoR2.Console.CheatsConVar.instance.boolValue = true;
+            oldconfigs.fixOldConfigs();
         }
 
         private void Update()
@@ -109,62 +88,13 @@ namespace BNR
             }
 #endif  
         }
-        
-        private static List<uint> sounds = [];
-        [ConCommand(commandName = "play_sound", flags = ConVarFlags.None, helpText = "https://risk-of-thunder.github.io/R2Wiki/Mod-Creation/Developer-Reference/Sound-%E2%80%90-Wwise-Events/")]
-        public static void akplaysound(ConCommandArgs args)
-        {
-            Debug.Log("args = " + args[0]);
-            Debug.Log($"sender body = {args.senderBody}");
-            uint soundid = AkSoundEngine.PostEvent(args[0], ((Component)(object)args.senderBody).gameObject);
-            Debug.Log($"sound id = {soundid}");
-            sounds.Add(soundid);
-        }
 
-        [ConCommand(commandName = "stop_sound", flags = ConVarFlags.None, helpText = "stop looping sounds from playsound !!!!!")]
-        public static void akstopsound(ConCommandArgs args)
+        private void FixedUpdate()
         {
-            Debug.Log($"sender body = {args.senderBody}");
-            foreach (uint sound in sounds.ToList())
+            foreach (PatchBase patch in patchBases)
             {
-                AkSoundEngine.StopPlayingID(sound);
-                Debug.Log($"stopped sound {sound} !!!");
-                sounds.Remove(sound);
+                patch.FixedUpdate();
             }
-        }
-        
-        [ConCommand(commandName = "play_effect", flags = ConVarFlags.None, helpText = "play an effect !!!!!")]
-        [ConCommand(commandName = "spawn_effect", flags = ConVarFlags.None, helpText = "play an effect !!!!!")]
-        public static void spawnEffect(ConCommandArgs args)
-        {
-            float scale = 1;
-            if (args.Count > 1)
-            {
-                scale = Convert.ToSingle(args[1]);
-            }
-            Debug.Log("args = " + args[0] + " " + scale);
-            
-            EffectDef effect = null;
-            foreach (EffectDef effectDef in EffectCatalog.entries)
-            {
-                if (!effectDef.prefabName.Contains(args[0])) continue;
-                
-                effect = effectDef;
-                break;
-            }
-
-            if (effect == null)
-            {
-                Log.Warning($"couldnt find effect {args[0]} !!!");
-                return;
-            }
-            
-            EffectManager.SpawnEffect(effect.index, new EffectData
-            {
-                origin = args.senderBody.transform.position,
-                scale = scale,
-                rotation = Util.QuaternionSafeLookRotation(Vector3.up)
-            }, true);
         }
     }
 }

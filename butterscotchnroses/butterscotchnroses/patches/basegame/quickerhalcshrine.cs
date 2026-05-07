@@ -17,7 +17,7 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
     private HalcyoniteShrineInteractable halcshrineinteractable;
     private GameObject bluePortalRef;
     private float startingTickRate;
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!enabled.Value)
         {
@@ -87,7 +87,7 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
             "enable patches for halyc shrines",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) =>
         {
             if (enabled.Value)
@@ -106,25 +106,25 @@ public class quickerhalcshrine : PatchBase<quickerhalcshrine>
             "speed up halcyon shrine mutlipler",
             2f,
             "");
-        BNRUtils.SliderConfig(1, 3, multiplier);
+        Utils.SliderConfig(1, 3, multiplier);
 
         playerCount = config.Bind("BNR - Halyc Shrines",
             "only apply multiplier under or equal to x amount of players",
             1,
             "eg. 1 = only singleplayer 2 = only 2 people multiplayer");
-        BNRUtils.SliderConfig(1, 4, playerCount);
+        Utils.SliderConfig(1, 4, playerCount);
         
         scaleTime = config.Bind("BNR - Halyc Shrines",
             "speed up time scale as well",
             true,
             "make time scale with halcyon shrine speed as well");
-        BNRUtils.CheckboxConfig(scaleTime);
+        Utils.CheckboxConfig(scaleTime);
         
         greenToBlue = config.Bind("BNR - Halyc Shrines",
             "turn green portal to blue",
             true,
             "makes green portals become blue after the boss has been defeated !!!");
-        BNRUtils.CheckboxConfig(greenToBlue);
+        Utils.CheckboxConfig(greenToBlue);
     }
 
     private ConfigEntry<bool> enabled;

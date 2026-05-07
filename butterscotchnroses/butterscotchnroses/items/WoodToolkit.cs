@@ -86,7 +86,7 @@ public class WoodToolkit : ItemBase<WoodToolkit>
             "enable wooden toolkit",
             true,
             "");
-        BNRUtils.CheckboxConfig(enabled);
+        Utils.CheckboxConfig(enabled);
     }
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()

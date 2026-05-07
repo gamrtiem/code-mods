@@ -1,10 +1,14 @@
+using BepInEx;
 using BepInEx.Configuration;
 using BNR.patches;
 using static BNR.butterscotchnroses;
 using HarmonyLib;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +16,8 @@ namespace BNR;
 
 public class coolereclipse : PatchBase<coolereclipse>
 {
+    public override string chainLoaderKey => "com.Nuxlar.CoolerEclipse";
+
     [HarmonyPatch]
     public class CoolerEclipseChanges
     {
@@ -20,38 +26,45 @@ public class coolereclipse : PatchBase<coolereclipse>
         public static bool CoolerEclipseAddSkyboxPreFix(On.RoR2.SceneDirector.orig_Start orig, SceneDirector self)
         {
             CoolerEclipse.CoolerEclipse.shouldBeChance.Value = false;
-            string sceneName = SceneManager.GetActiveScene().name;
-            int rng = Run.instance.runRNG.RangeInt(0, 100);
-
-            Log.Debug($"test ecluipse !! rng {rng} < {eclipseChance.Value} ,,,.. applying ? {rng < eclipseChance.Value}");
-            if (!(rng < eclipseChance.Value))
+            if (!NetworkServer.active)
             {
                 orig(self);
                 return false;
             }
+            
+            string sceneName = SceneManager.GetActiveScene().name;
+            int rng = Run.instance.runRNG.RangeInt(0, 100);
 
-            if(!blacklistStages.Value.Equals(""))
+            if (!whitelistStages.Value.IsNullOrWhiteSpace())
             {
-                foreach (var stage in whitelistStages.Value.Split(","))
+                foreach (string stage in whitelistStages.Value.Split(","))
                 {
-                    if (sceneName.Contains(stage))
-                    {
-                        Log.Debug($"{stage} is in whitelist !! forcing !!");
-                        return true;
-                    }
-                }
-                foreach (var stage in blacklistStages.Value.Split(","))
-                {
-                    if (sceneName.Contains(stage))
-                    {
-                        Log.Debug($"name {stage} is in config !! skipping !!");
-                        orig(self);
-                        return false;
-                    }
+                    if (!sceneName.Contains(stage)) continue;
+                
+                    Log.Debug($"{stage} is in whitelist !! forcing !!");
+                    return true;
                 }
             }
             
-            Log.Debug($"appling eclipse to {sceneName}");
+            if (!blacklistStages.Value.IsNullOrWhiteSpace())
+            {
+                foreach (string stage in blacklistStages.Value.Split(","))
+                {
+                    if (!sceneName.Contains(stage)) continue;
+                
+                    Log.Debug($"name {stage} is in config !! skipping !!");
+                    orig(self);
+                    return false;
+                }
+            }
+            
+            Log.Debug($"test ecluipse !! rng {rng} < {eclipseChance.Value} ,,,.. applying ? {rng > eclipseChance.Value}");
+            if (rng > eclipseChance.Value)
+            {
+                orig(self);
+                return false;
+            }
+            
             return true; 
         }
         
@@ -60,10 +73,21 @@ public class coolereclipse : PatchBase<coolereclipse>
         public static void CoolerEclipseAddSkyboxPostFix(On.RoR2.SceneDirector.orig_Start orig, SceneDirector self)
         {
             int rng = Run.instance.runRNG.RangeInt(0, 100);
-            Log.Debug($"pink eclipse ? rng {rng} umm {(rng < pinkEclipseChance.Value)}");
+            Log.Debug($"pink eclipse ? rng {rng} umm {(rng > pinkEclipseChance.Value)}");
             if (!GameObject.Find("Eclipse")) return;
 
-            //bascially ramp fog stays pink even after ?? shouldnt but reapplying here if we got another eclipse ,.,. 
+            if (rng > pinkEclipseChance.Value)
+            {
+                return;
+            }
+            new SyncPinkEclipse(true).Send(NetworkDestination.Clients);
+            TurnPink();
+        }
+    }
+
+    public static void TurnPink()
+    {
+        //bascially ramp fog stays pink even after ?? shouldnt but reapplying here if we got another eclipse ,.,. 
             GameObject pp = GameObject.Find("PP + Amb");
             if (pp && pp.GetComponent<PostProcessVolume>())
             {
@@ -78,14 +102,12 @@ public class coolereclipse : PatchBase<coolereclipse>
                 ppv.sharedProfile = ppf;
             }
             
-            if (!(rng < pinkEclipseChance.Value)) return;
-            
             if (pp && pp.GetComponent<SetAmbientLight>())
             {
                 SetAmbientLight amb = pp.GetComponent<SetAmbientLight>();
-                amb.ambientSkyColor = BNRUtils.Color255(207, 97, 182);
-                amb.ambientEquatorColor = BNRUtils.Color255(207, 97, 165);
-                amb.ambientGroundColor = BNRUtils.Color255(146, 32, 93);
+                amb.ambientSkyColor = Utils.Color255(207, 97, 182);
+                amb.ambientEquatorColor = Utils.Color255(207, 97, 165);
+                amb.ambientGroundColor = Utils.Color255(146, 32, 93);
                 amb.ApplyLighting();
             }
             if (pp && pp.GetComponent<PostProcessVolume>())
@@ -121,8 +143,11 @@ public class coolereclipse : PatchBase<coolereclipse>
                 
                 if (particleSystem)
                 {
+                    Log.Debug($"bwaaa {particleSystem.sharedMaterial == null}");
                     Material newMat = Object.Instantiate(particleSystem.sharedMaterial);
                     Texture2D newRamp = Addressables.LoadAssetAsync<Texture2D>(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Common_ColorRamps.texRampDiamondLaser_png).WaitForCompletion();
+                    Log.Debug($"bwaaa2 {newRamp == null}");
+                    Log.Debug($"bwaaa3 {newMat == null}");
                     newMat.SetTexture("_RemapTex", newRamp);
                     particleSystem.sharedMaterial = newMat;
                 }
@@ -186,15 +211,51 @@ public class coolereclipse : PatchBase<coolereclipse>
                     eclipseRenderer.sharedMaterial = newMat;
                 }
             }
-            
+    }
+    
+    public class SyncPinkEclipse : INetMessage
+    {
+        bool pinkEclipse; // 0 - none | 1 - base | 2 - pink
+        
+        public SyncPinkEclipse()
+        {
+        }
+
+        public SyncPinkEclipse(bool pink)
+        {
+            pinkEclipse = pink;
+        }
+        public void Deserialize(NetworkReader reader)
+        {
+            pinkEclipse = reader.ReadBoolean();
+        }
+
+        public void OnReceived()
+        {
+            if (NetworkServer.active)
+            {
+                Log.Debug("SyncSomething: Host ran this. Skip.");
+                return;
+            }
+            Chat.AddMessage($"client recieved pink eclipse as {pinkEclipse} ,..,");
+            if (pinkEclipse)
+            {
+                TurnPink();
+            }
+        }
+
+        public void Serialize(NetworkWriter writer)
+        {
+            writer.Write(pinkEclipse);
         }
     }
 
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         Log.Debug("init cooler eclipse !! " + applyCE.Value);
         if (!applyCE.Value) return;
         harmony.CreateClassProcessor(typeof(CoolerEclipseChanges)).Patch();
+        NetworkingAPI.RegisterMessageType<SyncPinkEclipse>();
         Log.Debug("ptached cooler eclipse !!");
     }
 
@@ -204,33 +265,33 @@ public class coolereclipse : PatchBase<coolereclipse>
             "apply cooler eclipse patches !!",
             true,
             "");
-        BNRUtils.CheckboxConfig(applyCE);
+        Utils.CheckboxConfig(applyCE);
         
         eclipseChance = config.Bind("Mods - CoolerEclipse", 
                 "chance for eclipse", 
                 15f, 
                 "bwaa,  (0-100 !!!");
-        BNRUtils.SliderConfig(0, 100, eclipseChance);
+        Utils.SliderConfig(0, 100, eclipseChance);
         
         pinkEclipseChance = config.Bind("Mods - CoolerEclipse", 
             "chance for pink eclipse if enabled !", 
             50f, 
             "bwaa,  (0-100 !!! if regular eclipse is rolled rolls this percent chance on top .,,. set to 0 to disable !!");
-        BNRUtils.SliderConfig(0, 100, pinkEclipseChance);
+        Utils.SliderConfig(0, 100, pinkEclipseChance);
         
         
         blacklistStages = config.Bind("Mods - CoolerEclipse", 
             "stage blacklist", 
-            "goldshores,bazaar,solutionalhaunt,ss2_voidshop,goldshores", 
+            "goldshores,bazaar,solutionalhaunt,ss2_voidshop,testscene", 
             "eclipse stage blacklist (seperate by , !! (eg golemplains,blackbeach!!");
-        BNRUtils.StringConfig(blacklistStages);
+        Utils.StringConfig(blacklistStages);
         
         
         whitelistStages = config.Bind("Mods - CoolerEclipse", 
             "stage whitelist", 
-            "golemplains,golemplains2", 
+            "", 
             "what stages to force eclipses on (seperate by , !! (eg golemplains,blackbeach!! will not work with moon2, ,..");
-        BNRUtils.StringConfig(whitelistStages);
+        Utils.StringConfig(whitelistStages);
     }
     
     public static ConfigEntry<bool> applyCE;

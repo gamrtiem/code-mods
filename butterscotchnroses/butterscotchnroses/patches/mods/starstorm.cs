@@ -1,7 +1,9 @@
 using BepInEx.Configuration;
+using BNR.items;
 using BNR.patches;
 using R2API;
 using SS2;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
 namespace BNR;
@@ -16,6 +18,8 @@ using UnityEngine;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
 public class starstorm : PatchBase<starstorm>
 {
+    public override string chainLoaderKey => "com.TeamMoonstorm";
+    
     [HarmonyPatch]
     public class Starstorm2ExeChanges
     {
@@ -200,13 +204,15 @@ public class starstorm : PatchBase<starstorm>
         }
     }
     
-    public override void Init(Harmony harmony)
+    public override void Init()
     {
         if (!applySS2.Value) return;
-        harmony.CreateClassProcessor(typeof(Starstorm2ExeChanges)).Patch();
+        //butterscotchnroses.harmony.CreateClassProcessor(typeof(Starstorm2ExeChanges)).Patch();
         //LanguageAPI.Add("SS2_EXECUTIONER2_EXECUTION_DESC", $"Leap into the air, then slam an ion axe for <style=cIsDamage>{baseDamage.Value * 100f}-{boostedDamage.Value * 100f}% damage</style>. Hitting an isolated target deals <style=cIsDamage>double damage</style> and restores 3 <color=#29e5f2>Ion Charges</color>.");
         LanguageAPI.Add("SS2_ITEM_ICETOOL_DESC", $"While <style=cIsUtility>touching a wall</style>, gain <style=cIsUtility>+1</style> <style=cStack>(+1 per stack)</style> extra jump and a <style=\"cIsUtility\">{iceToolFreezeChance.Value}%</style> <style=\"cStack\">(+{iceToolFreezeChanceStack.Value}% per stack)</style> chance to <style=\"cIsUtility\">freeze enemies</style> for <style=\"cIsUtility\">{iceToolFreezeTime.Value} seconds</style> <style=\"cStack\">(+{iceToolFreezeTimeStack.Value} per stack)</style>. ");
         
+        //ice tool rework 
+        // on hit X% (~5%) chance to apply a timed debuff for Xs (~25s) (refreshes on new applied) that decreases movespeed by X% (~5%),,.,. after X (~4) amount of buffs freeze the enemy .,,., 
         Hooks();
     }
 
@@ -220,18 +226,39 @@ public class starstorm : PatchBase<starstorm>
             if (!info.attacker) return;
             CharacterBody attackerbody = info.attacker.GetComponent<CharacterBody>();
             
-            if (!attackerbody || !attackerbody.inventory) return;
+            if (!attackerbody?.inventory) return;
             
             int stacks = attackerbody.inventory.GetItemCountEffective(SS2Content.Items.IceTool._itemIndex);
             if (stacks <= 0) return;
             
             if (!Util.CheckRoll(iceToolFreezeChance.Value + iceToolFreezeChanceStack.Value * (stacks - 1), attackerbody.master)) return;
             
-            SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
-            if (frozenState)
+            self.body.AddTimedBuff(IcetoolDebuff.instance.BuffDef, 25);
+            
+            foreach (CharacterBody.TimedBuff t in self.body.timedBuffs)
             {
-                frozenState.SetFrozen(iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1));
+                if (t.buffIndex == IcetoolDebuff.instance.BuffDef.buffIndex)
+                {
+                    t.totalDuration = 25;
+                }
             }
+            
+            if (self.body.GetBuffCount(IcetoolDebuff.instance.BuffDef) >= 5)
+            {
+                SetStateOnHurt frozenState = self.body.GetComponent<SetStateOnHurt>();
+                if (frozenState)
+                {
+                    Log.Debug($"duration {iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1)}");
+                    frozenState.SetFrozen(iceToolFreezeTime.Value + iceToolFreezeTimeStack.Value * (stacks - 1));
+                    self.body.SetBuffCount(IcetoolDebuff.instance.BuffDef.buffIndex, 0);
+                }
+                else
+                {
+                    Log.Debug($"failed to freeze {self.body}");
+                }
+            }
+            //self.body.AddBuff(Addressables.LoadAssetAsync<BuffDef>(RoR2BepInExPack.GameAssetPaths.Version_1_39_0.RoR2_DLC2_Chef.bdFrost_asset).WaitForCompletion());
+            
         };
     }
 
@@ -241,7 +268,7 @@ public class starstorm : PatchBase<starstorm>
             "apply ss2 patches !!",
             true,
             "");
-        BNRUtils.CheckboxConfig(applySS2);
+        Utils.CheckboxConfig(applySS2);
         
         #region iceTool
 
@@ -249,25 +276,25 @@ public class starstorm : PatchBase<starstorm>
             "ice tool freeze chance",
             5f,
             "percent chance for icetool to freeze enemies !!");
-        BNRUtils.SliderConfig(0, 100, iceToolFreezeChance);
+        Utils.SliderConfig(0, 100, iceToolFreezeChance);
         
         iceToolFreezeTime = config.Bind("Mods - SS2",
             "ice tool freeze time",
             0.5f,
             "how long icetool should freeze enemies !!");
-        BNRUtils.SliderConfig(0, 30, iceToolFreezeTime);
+        Utils.SliderConfig(0, 30, iceToolFreezeTime);
         
         iceToolFreezeChanceStack = config.Bind("Mods - SS2",
             "ice tool freeze chance stack",
             2.5f,
             "percent chance for icetool to freeze enemies stack !!");
-        BNRUtils.SliderConfig(0, 100, iceToolFreezeChanceStack);
+        Utils.SliderConfig(0, 100, iceToolFreezeChanceStack);
         
         iceToolFreezeTimeStack = config.Bind("Mods - SS2",
             "ice tool freeze time stack",
             0.25f,
             "how long icetool should freeze enemies !!");
-        BNRUtils.SliderConfig(0, 30, iceToolFreezeTimeStack);
+        Utils.SliderConfig(0, 30, iceToolFreezeTimeStack);
 
         iceToolFreezeChance.SettingChanged += IceToolFreezeChanceOnSettingChanged;
         iceToolFreezeTime.SettingChanged += IceToolFreezeChanceOnSettingChanged;

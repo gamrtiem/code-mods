@@ -13,7 +13,7 @@ namespace BNR;
 
 public class ChefBazaar : PatchBase<ChefBazaar>
 {
-    public override void Init(Harmony harmony)
+    public override void Init()
     {     
         applyHooks();
             
