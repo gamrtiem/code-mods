@@ -30,7 +30,7 @@ namespace DroneRepairBeacon
         private const string PluginGUID = PluginAuthor + "." + PluginName;
         private const string PluginAuthor = "icebro";
         private const string PluginName = "DroneRepairBeacon";
-        private const string PluginVersion = "1.0.2";
+        private const string PluginVersion = "1.0.3";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
         private static bool SS2Installed => Chainloader.PluginInfos.ContainsKey("com.TeamMoonstorm");
@@ -176,10 +176,9 @@ namespace DroneRepairBeacon
             
             GameObject indicator = Instantiate(DroneIndicatorHologram, self.gameObject.transform);
             deadDroneTracker tracker = indicator.GetComponent<deadDroneTracker>();
+            NetworkServer.Spawn(indicator);
             tracker.messageID = rng;
             tracker.usingSpecificSprite = usingSpecificSprite;
-
-            NetworkServer.Spawn(indicator);
         }
 
         private void HologramProjectorOnUpdateForViewer(ILContext il)

@@ -15,16 +15,29 @@ public class deadDroneTracker : NetworkBehaviour, IHologramContentProvider
     public int messageID = -1;
     [SyncVar]
     public bool usingSpecificSprite;
+    [SyncVar]
+    public Vector3 serverPosition;
 
-    public void Start()
+    public void Awake()
     {
+        if (!NetworkServer.active) return;
         gameObject.transform.localScale = new Vector3(DroneRepairBeacon.helpScale.Value, DroneRepairBeacon.helpScale.Value, DroneRepairBeacon.helpScale.Value);
-
+        
         //doping this during initialization would change the local position and it just wasnt makes me go insane !! 
+        //Log.Debug($"old pos {this.gameObject.transform.position} ., ,.");
         Vector3 newPos = this.gameObject.transform.position;
         newPos.y += 4f * DroneRepairBeacon.helpScale.Value;
         gameObject.transform.position = newPos;
+        //Log.Debug($"new pos {gameObject.transform.position} ., ,.");
+        serverPosition = newPos;
+    }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (NetworkServer.active) return;
+        //Log.Debug($"setting post o {serverPosition}");
+        gameObject.transform.position = serverPosition;
         //if (!NetworkServer.active)
         //{
         //    new sendMessageID(GetComponent<NetworkIdentity>().netId, usingSpecificSprite).Send(NetworkDestination.Server);
