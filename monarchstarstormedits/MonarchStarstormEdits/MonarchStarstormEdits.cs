@@ -18,7 +18,7 @@ namespace MonarchStarstormEdits
         private const string PluginGUID = PluginAuthor + "." + PluginName;
         private const string PluginAuthor = "icebro";
         private const string PluginName = "MonarchStarstormEdits";
-        private const string PluginVersion = "0.1.0";
+        private const string PluginVersion = "0.1.1";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
 
@@ -26,7 +26,7 @@ namespace MonarchStarstormEdits
         {
             Log.Init(Logger);
             
-            Harmony harmony = new(Info.Metadata.GUID);
+            Harmony harmony = new Harmony(Info.Metadata.GUID);
 
             IEnumerable<Type> patches = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(PatchBase)));
             foreach (Type patch in patches)

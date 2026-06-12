@@ -1,4 +1,4 @@
-using BepInEx.Configuration;
+/*using BepInEx.Configuration;
 using HarmonyLib;
 using RoR2;
 using SS2;
@@ -70,4 +70,4 @@ public class etherealUpgradeChanges : PatchBase<etherealUpgradeChanges>
     private static ConfigEntry<bool> etherealEclipseChanges;
     private static ConfigEntry<bool> etherealEclipseUpgrade;
     private static ConfigEntry<float> etherealEclipseUpgradeStack;
-}
+}*/
