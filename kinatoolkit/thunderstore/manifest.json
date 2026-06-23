@@ -1,0 +1,11 @@
+﻿{
+	"name": "ButterscotchandRosesBaseMod",
+	"version_number": "0.2.1",
+	"website_url": "https://github.com/gamrtiem/code-mods/tree/main/butterscotchnroses",
+	"description": "random misc edits mod !!!! !! mostly for personal use ,..,. but theres some cool stuff in it !!! 0.2.0 - HSV skin recolors update !!!!!!!!!!",
+	"dependencies": [
+		"Rune580-Risk_Of_Options-2.8.5",
+		"tristanmcpherson-R2API-5.0.5",
+		"Smooth_Salad-ShaderSwapper-1.0.1"
+	]
+}
