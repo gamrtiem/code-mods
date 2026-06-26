@@ -2,7 +2,6 @@ using BepInEx.Configuration;
 using RiskOfOptions;
 using RiskOfOptions.OptionConfigs;
 using RiskOfOptions.Options;
-using UnityEngine;
 
 namespace kinatoolkit;
 
@@ -53,5 +52,4 @@ public static class Utils
         KeyBindOption keyBindOption = new KeyBindOption(config, keyBindConfig);
         ModSettingsManager.AddOption(keyBindOption);
     }
-
 }

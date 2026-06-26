@@ -50,7 +50,7 @@ public class cursorfree : PatchBase<cursorfree>
     {
         enabled = config.Bind("kinaToolkit - free cursor",
             "Enable hooks for free cursor.",
-            false,
+            true,
             "");
         Utils.CheckboxConfig(enabled);
         enabled.SettingChanged += (_, _) => { applyHooks(); };

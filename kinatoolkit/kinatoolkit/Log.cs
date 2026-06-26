@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 
 namespace kinatoolkit
 {

@@ -44,7 +44,6 @@ public class lowfpsinbg : PatchBase<lowfpsinbg>
 
     private void OnApplicationFocus(bool hasFocus)
     {
-        Log.Debug("focues ");   
         if (!applyFramerate) return;
         if (hasFocus && oldFramerate != 0)
         {
@@ -72,7 +71,7 @@ public class lowfpsinbg : PatchBase<lowfpsinbg>
         targetFPS = config.Bind("kinaToolkit - lowfpsinbg",
             "Target FPS while in background.",
             30,
-            "What framerate to target while ROR2 is in the background. Recommend setting it to what the game allows (30, 60, 120, 144, etc) as some numbers can cause the game to not load.");
+            "What framerate to target while RoR2 is in the background.");
         Utils.SliderConfig(0, 144, targetFPS);
     }
 

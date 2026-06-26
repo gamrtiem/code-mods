@@ -1,17 +1,10 @@
 using BepInEx.Configuration;
 using RoR2;
-using System.IO;
 using System.Linq;
-using BepInEx;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
-using RoR2.CharacterAI;
-using UnityEngine.Networking;
 using Console = RoR2.Console;
-using Object = UnityEngine.Object;
 
 namespace kinatoolkit.patches.basegame;
 
@@ -24,6 +17,8 @@ public class debugplains : PatchBase<debugplains>
     private static bool oldDisableInteractables;
     private static bool runStartCommands;
     private static bool stageStartCommands;
+
+    public static bool enableAllFoodItems;
     
     public override void Init()
     {
@@ -40,6 +35,7 @@ public class debugplains : PatchBase<debugplains>
             On.RoR2.Stage.GetPlayerSpawnTransform += StageOnGetPlayerSpawnTransform;
             Run.onRunStartGlobal += OnRunStart;
             On.RoR2.Stage.Start += StageOnStart;
+            On.RoR2.PickupTransmutationManager.GetGroupFromPickupIndex += PickupTransmutationManagerOnGetGroupFromPickupIndex;
         }
         else
         {
@@ -49,9 +45,26 @@ public class debugplains : PatchBase<debugplains>
             On.RoR2.Stage.GetPlayerSpawnTransform -= StageOnGetPlayerSpawnTransform;
             Run.onRunStartGlobal -= OnRunStart;
             On.RoR2.Stage.Start -= StageOnStart;
+            On.RoR2.PickupTransmutationManager.GetGroupFromPickupIndex -= PickupTransmutationManagerOnGetGroupFromPickupIndex;
         }
     }
     
+
+    private PickupIndex[] PickupTransmutationManagerOnGetGroupFromPickupIndex(On.RoR2.PickupTransmutationManager.orig_GetGroupFromPickupIndex orig, PickupIndex pickupindex)
+    {
+        PickupIndex[] returnIndex = orig(pickupindex);
+        
+        if (enableAllFoodItems)
+        {
+            if (pickupindex.pickupDef?.itemTier == ItemTier.FoodTier)
+            {
+                return PickupCatalog.entries.Where(entry => entry.itemTier == pickupindex.pickupDef?.itemTier && entry.itemIndex != ItemIndex.None).Select(entry => entry.pickupIndex).ToArray();
+            }
+        }
+        
+        return returnIndex;
+    }
+
     private static void CharacterSelectControllerOnAwake(On.RoR2.UI.CharacterSelectController.orig_Awake orig, RoR2.UI.CharacterSelectController self)
     {
         orig(self);
@@ -76,7 +89,7 @@ public class debugplains : PatchBase<debugplains>
         titlemenuController.consoleFunctions.SubmitCmd("transition_command \"gamemode ClassicRun; host 0;\"");
     }
     
-    private static Transform StageOnGetPlayerSpawnTransform(On.RoR2.Stage.orig_GetPlayerSpawnTransform orig, RoR2.Stage self)
+    private static Transform StageOnGetPlayerSpawnTransform(On.RoR2.Stage.orig_GetPlayerSpawnTransform orig, Stage self)
     {
         Transform spawnPoint = orig(self);
         
@@ -84,43 +97,10 @@ public class debugplains : PatchBase<debugplains>
         if (!enteredScene || changedSpawnTransform >= 2) return spawnPoint;
         
         changedSpawnTransform++;
-            
-        Log.Debug($"changing spawn pos !!");
-        string[] cordsList = cordinates.Value.Split(",");
-        int indexOf = cordsList.ToList().IndexOf(SceneManager.GetActiveScene().name);
-        if (indexOf != -1 && cordsList.Length > indexOf + 3)
-        {
-            spawnPoint.position = new Vector3(float.Parse(cordsList[indexOf + 1].Trim()), float.Parse(cordsList[indexOf + 2].Trim()), float.Parse(cordsList[indexOf + 3].Trim()));
-        }
-        else
-        {
-            Log.Warning($"invalid formatting for cords config !! {cordinates.Value}");
-        }
 
         if (changedSpawnTransform == 2)
         {
-            string dir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Paths.ConfigPath)!, "config", "kinaToolkit");
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-            
-            string jsonPath = System.IO.Path.Combine(dir, "debugPlains.json");
-
-            string[] addressables = ["RoR2/Base/ShrineChance/iscShrineChance.asset"];
-            foreach (string addressable in addressables)
-            {
-                InteractableSpawnCard spawnCard = Addressables.LoadAssetAsync<InteractableSpawnCard>(addressable).WaitForCompletion();
-                SpawnCard.SpawnResult spawned = spawnCard.DoSpawn(new Vector3(334.3808f, -52.90586f, -177.3572f), new Quaternion(0f, 180f, 0f, 0f), new DirectorSpawnRequest(spawnCard, null, RoR2Application.rng));
-                Log.Debug($"spawned interactable ! {spawned.success}");
-            }
-
-            string[] dummies = ["GolemMaster"];
-            foreach (string dummyMasterName in dummies)
-            {
-                SpawnDummy(dummyMasterName, new Vector3(334.3808f, -47.90586f, -177.3572f), Quaternion.identity);
-            }
-
+            commands.LoadJson();
         }
             
         if (disableInteractables.Value)
@@ -131,7 +111,7 @@ public class debugplains : PatchBase<debugplains>
         return spawnPoint;
     }
 
-    private static void RunOnOnEnable(On.RoR2.Run.orig_OnEnable orig, RoR2.Run self)
+    private static void RunOnOnEnable(On.RoR2.Run.orig_OnEnable orig, Run self)
     {
         SceneDef sceneDef = SceneCatalog.GetSceneDefFromSceneName(sceneEntry.Value);
         
@@ -155,7 +135,7 @@ public class debugplains : PatchBase<debugplains>
         orig(self);
     }
     
-    private static IEnumerator StageOnStart(On.RoR2.Stage.orig_Start orig, RoR2.Stage self)
+    private static IEnumerator StageOnStart(On.RoR2.Stage.orig_Start orig, Stage self)
     {
         if (!stageStartCommands)
         {
@@ -197,28 +177,6 @@ public class debugplains : PatchBase<debugplains>
             Console.instance.RunCmd(LocalUserManager.GetFirstLocalUser(), command, commandArgs);
         }
     }
-
-    public static void SpawnDummy(string masterName, Vector3 position, Quaternion rotation = default)
-    {
-        GameObject masterPrefab = MasterCatalog.FindMasterPrefab(masterName);
-        if (masterPrefab)
-        {
-            GameObject instantiatedMaster = Object.Instantiate(masterPrefab);
-            CharacterMaster master = instantiatedMaster.GetComponent<CharacterMaster>();
-            master.inventory.GiveItemPermanent(RoR2Content.Items.BoostHp, 9999999);
-            NetworkServer.Spawn(instantiatedMaster);
-            master.SpawnBody(position, rotation);
-            foreach (BaseAI ai in master.aiComponents)
-            {
-                Object.Destroy(ai);
-            }
-            master.aiComponents = [];
-        }
-        else
-        {
-            Log.Warning($"Couldn't find master prefab of {masterName}.");
-        }
-    }
     
     public override void Config(ConfigFile config)
     {
@@ -253,12 +211,6 @@ public class debugplains : PatchBase<debugplains>
             "Run disable_interactables as the scene loads to prevent any interactables from spawning in.");
         Utils.CheckboxConfig(disableInteractables);
         
-        cordinates = config.Bind("kinaToolkit - debugplains", 
-            "Spawn cordinates in Debug Plains", 
-            "golemplains, 313.3808, -50.90586, -195.3572",
-            "Default scene to send the player to upon starting a run for the first time. Set to blank or an invalid scene name to disable.");
-        Utils.StringConfig(cordinates);
-        
         runCommands = config.Bind("kinaToolkit - debugplains", 
             "Debug Plains run start commands", 
             "no_enemies true; stage1_pod 0",
@@ -277,7 +229,6 @@ public class debugplains : PatchBase<debugplains>
     private static ConfigEntry<bool> skipLobby;
     private static ConfigEntry<string> sceneEntry;
     private static ConfigEntry<bool> disableInteractables;
-    private static ConfigEntry<string> cordinates;
     private static ConfigEntry<string> runCommands;
     private static ConfigEntry<string> stageCommands;
 }

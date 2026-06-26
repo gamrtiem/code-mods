@@ -1,0 +1,520 @@
+{
+  "spawnPos":
+  {
+    "position": {
+      "x": 313.3808,
+      "y": -50.90586,
+      "z": -195.3572
+    },
+    "rotation": {
+      "x": 0,
+      "y": 103,
+      "z": 0
+    }
+  },
+  "dummies": [
+    {
+      "masterName": "GolemMaster",
+      "position": {
+        "x": 337.6638,
+        "y": -52.10878,
+        "z": -232.4719
+      },
+      "rotation": {
+        "x": 0,
+        "y": -50,
+        "z": 0
+      }
+    }
+  ],
+  "interactables": [
+    {
+      "interactableCard": "RoR2/Base/Barrel1/iscBarrel1.asset",
+      "position": {
+        "x": 317.12,
+        "y": -52.21725,
+        "z": -158.0462
+      },
+      "rotation": {
+        "x": 0,
+        "y": 230,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/EquipmentBarrel/iscEquipmentBarrel.asset",
+      "position": {
+        "x": 318.738,
+        "y": -52.23994,
+        "z": -159.8435
+      },
+      "rotation": {
+        "x": 0,
+        "y": 230,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/Chest1/iscChest1.asset",
+      "position": {
+        "x": 320.9254,
+        "y": -52.46462,
+        "z": -162.2499
+      },
+      "rotation": {
+        "x": 0,
+        "y": 230,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/Chest2/iscChest2.asset",
+      "position": {
+        "x": 323.2392,
+        "y": -52.29929,
+        "z": -164.9908
+      },
+      "rotation": {
+        "x": 0,
+        "y": 230,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/GoldChest/iscGoldChest.asset",
+      "position": {
+        "x": 326.1438,
+        "y": -52.47445,
+        "z": -167.6568
+      },
+      "rotation": {
+        "x": 0,
+        "y": 230,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/LunarChest/iscLunarChest.asset",
+      "position": {
+        "x": 329.2358,
+        "y": -52.82319,
+        "z": -170.4923
+      },
+      "rotation": {
+        "x": 0,
+        "y": 230,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineBlood/iscShrineBlood.asset",
+      "position": {
+        "x": 331.5801,
+        "y": -52.88429,
+        "z": -173.4541
+      },
+      "rotation": {
+        "x": 0,
+        "y": 235,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineChance/iscShrineChance.asset",
+      "position": {
+        "x": 334.6402,
+        "y": -52.33547,
+        "z": -177.1784
+      },
+      "rotation": {
+        "x": 0,
+        "y": 240,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineCombat/iscShrineCombat.asset",
+      "position": {
+        "x": 337.9944,
+        "y": -52.34299,
+        "z": -182.7293
+      },
+      "rotation": {
+        "x": 0,
+        "y": 250,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineBoss/iscShrineBoss.asset",
+      "position": {
+        "x": 339.7971,
+        "y": -52.31176,
+        "z": -187.5125
+      },
+      "rotation": {
+        "x": 0,
+        "y": 116,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineHealing/iscShrineHealing.asset",
+      "position": {
+        "x": 340.7592,
+        "y": -53.25931,
+        "z": -193.3108
+      },
+      "rotation": {
+        "x": 0,
+        "y": 75,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineCleanse/iscShrineCleanse.asset",
+      "position": {
+        "x": 342.2114,
+        "y": -52.14697,
+        "z": -198.4924
+      },
+      "rotation": {
+        "x": 0,
+        "y": 250,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineRestack/iscShrineRestack.asset",
+      "position": {
+        "x": 344.472,
+        "y": -52.00994,
+        "z": -203.2701
+      },
+      "rotation": {
+        "x": 0,
+        "y": 70,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/ShrineGoldshoresAccess/iscShrineGoldshoresAccess.asset",
+      "position": {
+        "x": 346.2198,
+        "y": -51.98051,
+        "z": -209.0303
+      },
+      "rotation": {
+        "x": 0,
+        "y": 250,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/Scrapper/iscScrapper.asset",
+      "position": {
+        "x": 348,
+        "y": -53,
+        "z": -214
+      },
+      "rotation": {
+        "x": 0,
+        "y": 250,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/TripleShop/iscTripleShop.asset",
+      "position": {
+        "x": 349,
+        "y": -52.3,
+        "z": -218
+      },
+      "rotation": {
+        "x": 0,
+        "y": 250,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/Duplicator/iscDuplicator.asset",
+      "position": {
+        "x": 350,
+        "y": -52.8,
+        "z": -223
+      },
+      "rotation": {
+        "x": 0,
+        "y": 260,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/Base/CasinoChest/iscCasinoChest.asset",
+      "position": {
+        "x": 350,
+        "y": -52.7,
+        "z": -228
+      },
+      "rotation": {
+        "x": 0,
+        "y": 250,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC1/VoidChest/iscVoidChest.asset",
+      "position": {
+        "x": 296.4867,
+        "y": -50.65779,
+        "z": -211.0889
+      },
+      "rotation": {
+        "x": 0,
+        "y": -250,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC1/VoidCoinBarrel/iscVoidCoinBarrel.asset",
+      "position": {
+        "x": 299.5138,
+        "y": -50.88175,
+        "z": -213.573
+      },
+      "rotation": {
+        "x": 0,
+        "y": -270,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC1/VoidTriple/iscVoidTriple.asset",
+      "position": {
+        "x": 301.4773,
+        "y": -51.10017,
+        "z": -216.7855
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC1/TreasureCacheVoid/iscLockboxVoid.asset",
+      "position": {
+        "x": 303.4536,
+        "y": -51.24438,
+        "z": -220.0484
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC2/iscGeode.asset",
+      "position": {
+        "x": 305.2582,
+        "y": -51.24438,
+        "z": -223.3277
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC2/iscShrineHalcyonite.asset",
+      "position": {
+        "x": 308.7599,
+        "y": -51.24438,
+        "z": -227.4792
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC2/iscShrineColossusAccess.asset",
+      "position": {
+        "x": 313.319,
+        "y": -51.9,
+        "z": -232.5197
+      },
+      "rotation": {
+        "x": 0,
+        "y": -320,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC3/DroneAssemblyStation/iscDroneAssemblyStation.asset",
+      "position": {
+        "x": 318.319,
+        "y": -51.84438,
+        "z": -235.5197
+      },
+      "rotation": {
+        "x": 0,
+        "y": -320,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC3/DroneCombinerStation/iscDroneCombinerStation.asset",
+      "position": {
+        "x": 321.319,
+        "y": -51.84438,
+        "z": -239.5197
+      },
+      "rotation": {
+        "x": 0,
+        "y": -320,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC3/DroneScrapper/iscDroneScrapper.asset",
+      "position": {
+        "x": 324.319,
+        "y": -51.9,
+        "z": -242.5197
+      },
+      "rotation": {
+        "x": 0,
+        "y": -320,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC3/TripleDroneShop/iscTripleDroneShop.asset",
+      "position": {
+        "x": 327.319,
+        "y": -51.9,
+        "z": -245.5197
+      },
+      "rotation": {
+        "x": 0,
+        "y": -320,
+        "z": 0
+      }
+    },
+    {
+      "interactableCard": "RoR2/DLC3/TemporaryItemsDistributor/iscTemporaryItemsShop.asset",
+      "position": {
+        "x": 330.319,
+        "y": -51.9,
+        "z": -248.5197
+      },
+      "rotation": {
+        "x": 0,
+        "y": -320,
+        "z": 0
+      }
+    }
+  ],
+  "commandPickups": [
+    {
+      "tier": "Tier1",
+      "position": {
+        "x": 310,
+        "y": -45,
+        "z": -160
+      }
+    },
+    {
+      "tier": "Tier2",
+      "position": {
+        "x": 305,
+        "y": -45,
+        "z": -165
+      }
+    },
+    {
+      "tier": "Tier3",
+      "position": {
+        "x": 300,
+        "y": -45,
+        "z": -170
+      }
+    },
+    {
+      "tier": "BossTier",
+      "position": {
+        "x": 295,
+        "y": -45,
+        "z": -175
+      }
+    },
+    {
+      "tier": "LunarTier",
+      "position": {
+        "x": 290,
+        "y": -45,
+        "z": -180
+      }
+    },
+    {
+      "tier": "LunarTierEquip",
+      "position": {
+        "x": 285,
+        "y": -45,
+        "z": -185
+      }
+    },
+    {
+      "tier": "VoidBoss",
+      "position": {
+        "x": 280,
+        "y": -45,
+        "z": -190
+      }
+    },
+    {
+      "tier": "VoidTier1",
+      "position": {
+        "x": 275,
+        "y": -30,
+        "z": -195
+      }
+    },
+    {
+      "tier": "VoidTier2",
+      "position": {
+        "x": 275,
+        "y": -30,
+        "z": -200
+      }
+    },
+    {
+      "tier": "VoidTier2",
+      "position": {
+        "x": 275,
+        "y": -30,
+        "z": -205
+      }
+    },
+    {
+      "tier": "VoidTier3",
+      "position": {
+        "x": 275,
+        "y": -30,
+        "z": -210
+      }
+    },
+    {
+      "tier": "FoodTier",
+      "position": {
+        "x": 275,
+        "y": -30,
+        "z": -215
+      }
+    }
+  ],
+}
