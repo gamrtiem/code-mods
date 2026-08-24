@@ -191,15 +191,16 @@ public class ScrapItemBehaviorBase : QuestBehaviorBase
     }
 }
 
-public class ScrapItemObjective : ObjectivePanelController.ObjectiveTracker
+public class ScrapItemObjective : QuestObjectiveBase
 {
-    ScrapItemBehaviorBase scrapQuest;
+    private ScrapItemBehaviorBase scrapQuest;
         
     public override string GenerateString()
     {
-        if (scrapQuest == null)
+        if (!scrapQuest)
         {
             scrapQuest = (ScrapItemBehaviorBase)sourceDescriptor.source;
+            questBehavior = scrapQuest;
         }
 
         string tierName = scrapQuest.targetTier switch
@@ -227,7 +228,7 @@ public class ScrapItemObjective : ObjectivePanelController.ObjectiveTracker
             
             Object.Destroy(scrapQuest);
         }
-        return text;
+        return GetPlayerName() + text;
     }
 
     public override bool IsDirty()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using questshrine.bases;
@@ -25,7 +26,7 @@ namespace questshrine
         private const string PluginGUID = PluginAuthor + "." + PluginName;
         private const string PluginAuthor = "kina";
         private const string PluginName = "questshrine";
-        private const string PluginVersion = "1.0.0";
+        private const string PluginVersion = "0.1.0";
 
         private static bool UHRInstalled => Chainloader.PluginInfos.ContainsKey("iDeathHD.UnityHotReload");
 
@@ -125,12 +126,11 @@ namespace questshrine
             {
                 QuestBase quest = (QuestBase)Activator.CreateInstance(questItem);
                 quest.Init(Config);
-                if (quest.enabled)
-                {
-                    GameObject questPrefab = PrefabAPI.CreateEmptyPrefab($"quest prefab {quest.QuestName}", true);
-                    questPrefab.AddComponent(quest.Behavior);
-                    questObjectCatalog.Add(quest, questPrefab);
-                }
+                if (!quest.enabled) continue;
+                
+                GameObject questPrefab = PrefabAPI.CreateEmptyPrefab($"quest prefab {quest.QuestName}", true);
+                questPrefab.AddComponent(quest.Behavior);
+                questObjectCatalog.Add(quest, questPrefab);
             }
         }
 
@@ -142,14 +142,12 @@ namespace questshrine
             QuestShrineComponent qsc = questshrine.AddComponent<QuestShrineComponent>();
             PurchaseInteraction interaction = questshrine.GetComponent<PurchaseInteraction>();
             qsc.purchaseInteraction = interaction;
-            
-            // mountain - 1
-            // combat - 3
-            // chance - 2
+
+            ConfigEntry<int> shrineWeight = instance.Config.Bind("Quest Shrine", "Shrine selection weight", 3, "selection weight of how common quest shrine should spawn .,., for reference mountain shrines are usually weight of 1 ,., chance a weight of 2 .,,. and combat a weight of 3 ,..,");
             InteractableSpawnCard questisc = bundle.LoadAsset<InteractableSpawnCard>("questshrineisc");
             DirectorCard directorCard = new DirectorCard
             {
-                selectionWeight = 3, 
+                selectionWeight = shrineWeight.Value, 
                 spawnCard = questisc,
             };
 

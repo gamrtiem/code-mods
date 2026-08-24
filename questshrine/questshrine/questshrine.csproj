@@ -24,6 +24,8 @@
 
 		<PackageReference Include="Rune580.Mods.RiskOfRain2.RiskOfOptions" Version="2.8.5" />
 
+		<PackageReference Include="Smooth_Salad-ShaderSwapper" Version="1.0.1" />
+
 		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
 		<PackageReference Include="RoR2BepInExPack" Version="1.43.0" />
 		<PackageReference Include="xiaoxiao921-UnityHotReload" Version="1.0.1" />

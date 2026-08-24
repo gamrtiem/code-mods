@@ -1,0 +1,11 @@
+﻿{
+	"name": "QuestShrine",
+	"version_number": "0.1.0",
+	"website_url": "https://github.com/kinaclipse101/code-mods/tree/main/questshrine",
+	"description": "adds quest shrines from ss1 .,., beta release id say ,..,., going to deprecate when ss2 gets around to adding theirs,.,..,",
+	"dependencies": [
+		"Rune580-Risk_Of_Options-2.8.5",
+		"tristanmcpherson-R2API-5.0.5",
+		"Smooth_Salad-ShaderSwapper-1.0.1"
+	]
+}

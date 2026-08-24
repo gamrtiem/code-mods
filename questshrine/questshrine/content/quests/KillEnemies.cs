@@ -109,7 +109,7 @@ public class KillEnemiesBehaviorBase : QuestBehaviorBase
     }
 }
 
-public class KillEnemiesObjective : ObjectivePanelController.ObjectiveTracker 
+public class KillEnemiesObjective : QuestObjectiveBase 
 {
     private KillEnemiesBehaviorBase _killEnemiesBehaviorBase;
     private int localKillAmount;
@@ -120,6 +120,7 @@ public class KillEnemiesObjective : ObjectivePanelController.ObjectiveTracker
         if (!_killEnemiesBehaviorBase)
         {
             _killEnemiesBehaviorBase = (KillEnemiesBehaviorBase)sourceDescriptor.source;
+            questBehavior = _killEnemiesBehaviorBase;
             name = Language.GetString(BodyCatalog.GetBodyPrefab((BodyIndex)_killEnemiesBehaviorBase.bodyIndex).GetComponent<CharacterBody>().baseNameToken);
         }
 
@@ -131,7 +132,7 @@ public class KillEnemiesObjective : ObjectivePanelController.ObjectiveTracker
             text = string.Format(KillEnemies.instance.QuestDescRetired, _killEnemiesBehaviorBase.startingKillAmount, name, "s");
             Object.Destroy(_killEnemiesBehaviorBase);
         }
-        return text;
+        return GetPlayerName() + text;
     }
 
     public override bool IsDirty()

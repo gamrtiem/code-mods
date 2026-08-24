@@ -116,8 +116,8 @@ public class DisableSkillsBehaviorBase : QuestBehaviorBase
     }
 }
 
-public class NoSkillsObjective : ObjectivePanelController.ObjectiveTracker
-{
+public class NoSkillsObjective : QuestObjectiveBase
+{ 
     private DisableSkillsBehaviorBase _disableSkillsQuest;
     
     public override string GenerateString()
@@ -125,6 +125,7 @@ public class NoSkillsObjective : ObjectivePanelController.ObjectiveTracker
         if (!_disableSkillsQuest)
         {
             _disableSkillsQuest = (DisableSkillsBehaviorBase)sourceDescriptor.source;
+            questBehavior = _disableSkillsQuest;
         }
 
         string text = string.Format(DisableSkills.instance.QuestDesc, _disableSkillsQuest.timer.ToString("0"));
@@ -134,7 +135,7 @@ public class NoSkillsObjective : ObjectivePanelController.ObjectiveTracker
             text = DisableSkills.instance.QuestDescRetired;
             Object.Destroy(_disableSkillsQuest);
         }
-        return text;
+        return GetPlayerName() + text;
     }
 
     public override bool IsDirty()

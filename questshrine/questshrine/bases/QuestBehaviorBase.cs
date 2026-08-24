@@ -72,11 +72,11 @@ public abstract class QuestBehaviorBase : NetworkBehaviour
     {
         Log.Debug(charMaster.GetBody().baseNameToken + " starting quest");
         Log.Debug(LocalUserManager.GetFirstLocalUser().cachedMaster.GetBody().baseNameToken + " local player");
-        if (LocalUserManager.GetFirstLocalUser().cachedMaster == charMaster)
-        {
-            Log.Debug("local player was master !");
+        //if (LocalUserManager.GetFirstLocalUser().cachedMaster == charMaster)
+        //{
+        //    Log.Debug("local player was master !");
             ObjectivePanelController.collectObjectiveSources += OnCollectObjectiveSources;
-        }
+        //}
         
         CharacterMasterNotificationQueue notificationQueueForMaster = CharacterMasterNotificationQueue.GetNotificationQueueForMaster(charMaster);
         var info = new CharacterMasterNotificationQueue.NotificationInfo(QuestBase, new CharacterMasterNotificationQueue.TransformationInfo((CharacterMasterNotificationQueue.TransformationType)notificationEnum, null), new CharacterMasterNotificationQueue.CustomOverrideInfo()

@@ -94,15 +94,16 @@ public class NoDamageBehaviorBase : QuestBehaviorBase
     }
 }
 
-public class NoDamageObjective : ObjectivePanelController.ObjectiveTracker
+public class NoDamageObjective : QuestObjectiveBase
 {
-    NoDamageBehaviorBase noDamageQuest;
+    private NoDamageBehaviorBase noDamageQuest;
     
     public override string GenerateString()
     {
         if (!noDamageQuest)
         {
             noDamageQuest = (NoDamageBehaviorBase)sourceDescriptor.source;
+            questBehavior = noDamageQuest;
         }
 
         string text = string.Format(NoDamage.instance.QuestDesc, noDamageQuest.timer.ToString("0"));
@@ -112,7 +113,7 @@ public class NoDamageObjective : ObjectivePanelController.ObjectiveTracker
             text = string.Format(NoDamage.instance.QuestDescRetired, noDamageQuest.startingTime.ToString("0"));
             Object.Destroy(noDamageQuest);
         }
-        return text;
+        return GetPlayerName() + text;
     }
 
     public override bool IsDirty()
