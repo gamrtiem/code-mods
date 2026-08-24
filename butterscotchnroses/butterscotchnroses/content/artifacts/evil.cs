@@ -23,6 +23,7 @@ class evil : ArtifactBase<evil>
 
     public override void Init(ConfigFile config)
     {
+        if(true) return;
         CreateConfig(config);
         CreateLang();
         CreateArtifact();

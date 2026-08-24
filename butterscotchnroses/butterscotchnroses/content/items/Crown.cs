@@ -27,28 +27,15 @@ public class Crown : ItemBase<Crown>
     public override GameObject ItemModel => butterscotchnroses.carvingKitBundle.LoadAsset<GameObject>("carvingkit.prefab");
     public override Sprite ItemIcon => butterscotchnroses.carvingKitBundle.LoadAsset<Sprite>("carvingkit.png");
     public override ItemTag[] ItemTags => [ItemTag.WorldUnique];
-
-    private ConfigEntry<bool> enabled;
-
+    
     public override void Init(ConfigFile config)
     {
         CreateConfig(config);
-        if(!enabled.Value) return;
-        
         CreateLang();
         CreateItem();
         Hooks();
         
         instance.ItemDef.hidden = true;
-    }
-    
-    public override void CreateConfig(ConfigFile config)
-    {
-        enabled = config.Bind("BNR - whodiddamage",
-            "give crown icon to highest damage dealer",
-            true,
-            "");
-        Utils.CheckboxConfig(enabled);
     }
 
     public override ItemDisplayRuleDict CreateItemDisplayRules()

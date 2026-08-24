@@ -12,19 +12,25 @@ everything is configurable to some degree too ,.,,. so if you dont like an edit 
 - works with modded characters too !!!! showcase exmaples below ,.,. 
 
 using orbit's [surivorsreturn](https://thunderstore.io/package/Orbital/SurvivorsReturn/) skinpack ,.,. ``Infamy,Bandit2Body,320,-10,5,ralsei bandit``
+
 ![](https://files.catbox.moe/exm45b.png)
 
 ``SkinNemCommandoDefault,NemCommandoBody,160,90,0,greenemmando``
+
 ![](https://files.catbox.moe/6axg8k.png)
 
 ``skinDroneTechDef,DroneTechBody,170,-30,0,gemporator``
+
 ![](https://files.catbox.moe/nuczzj.png)
 
 ``skinLoaderAltSolus,LoaderBody,200,-20,3,evil2``
+
 ![](https://files.catbox.moe/be9pxp.png)
 
 basically tutorial on how to use ,..,
+
 ![](https://files.catbox.moe/yvdx4l.gif)
+
 ![](https://files.catbox.moe/z3gwae.png)
 
 </details>
@@ -36,6 +42,57 @@ basically tutorial on how to use ,..,
 - shrink money to be how it used to pre SOTV (i miss you ,,,..,,..
 
 ![](https://files.catbox.moe/4cse35.png)
+
+</details>
+
+<details>
+<summary> color edits,. .,  </summary>
+
+- allows you to change any color in the games color catalog ,. ., notably allows you to change interact color .,.,,.
+
+![](https://files.catbox.moe/zowfuv.png)
+
+</details>
+
+<details>
+<summary> post processing,. .,  </summary>
+
+- allows you to modify post processing of any stage .,.,,. its uhh .,,. its a little complicated but i explain it in video here https://youtu.be/rZ7xW9sVDIQ ,.,. 
+- example of like .,. ambient occlusion being added to titanic plains .,,.
+
+![](https://files.catbox.moe/hqmudm.png)
+
+![](https://files.catbox.moe/0z2390.png)
+
+</details>
+
+<details>
+<summary> team health color,. .,  </summary>
+
+- lets you cahnge the color of teams ., like making things on the monster team have pink health bars or something .,. or changing your own to be pink ,., i like pink if you couldnt tell ,.
+
+![](https://files.catbox.moe/sxxcpj.png)
+
+
+</details>
+
+<details>
+<summary> ukulele pronouns,. .,  </summary>
+
+- changes ukulele to use the current survivors pronouns instead of "he" ,.., forwardport from ss1 ,. goes off survivor ending text so if one doesnt use " she " " it " or " they " might not work right.,,. comes with config to override pronouns based off characterbody too ,.,..,
+- comes with config to override looking glass too ,. ,.
+
+![](https://files.catbox.moe/wvon6i.png)
+
+![](https://files.catbox.moe/lxlhzn.png)
+</details>
+
+<details>
+<summary> who did damage  </summary>
+
+- sends a chat message with who did the most damage to whatever the current boss is in multiplayer ,.,.. also adds a little crown to the scoreboard for whoever did the most .,.,
+
+![](https://files.catbox.moe/lnqcpz.png)
 
 </details>
 

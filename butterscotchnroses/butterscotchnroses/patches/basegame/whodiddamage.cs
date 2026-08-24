@@ -3,22 +3,23 @@ using System.Linq;
 using BNR.patches;
 using BepInEx.Configuration;
 using BNR.items;
-using EntityStates;
 using RoR2;
 using RoR2.UI;
-using SS2.Orbs;
 using UnityEngine;
 using UnityEngine.UI;
-using ConCommandArgs = RoR2.ConCommandArgs;
-using TeleporterInteraction = On.RoR2.TeleporterInteraction;
 
 namespace BNR;
 
 public class whodiddamage : PatchBase<whodiddamage>
 {
-    public static Texture CrownIcon;
+    private static Texture CrownIcon;
+    private static List<GameObject> crownImages = [];
+    private Dictionary<BossGroup, Dictionary<CharacterMaster, DamageCredit>> bossGroupsToDamages = [];
+    private Dictionary<CharacterMaster, float> mastersTotalDamage = [];
+    
     public override void Init()
     {
+        CrownIcon = butterscotchnroses.bnrBundle.LoadAsset<Texture>("texCrownIcon");
         applyHooks();
     }
 
@@ -26,21 +27,20 @@ public class whodiddamage : PatchBase<whodiddamage>
     {
         if (enabled.Value)
         {
-            //RoR2.TeleporterInteraction.onTeleporterBeginChargingGlobal += StartTracking;
             BossGroup.onBossGroupStartServer += StartTracking;
             BossGroup.onBossGroupDefeatedServer += PrintDamage;
-            RoR2.Stage.onStageStartGlobal += StageOnonStageStartGlobal;
+            Stage.onStageStartGlobal += StageOnonStageStartGlobal;
             On.RoR2.UI.AllyCardController.InfoOverride += AllyCardControllerOnInfoOverride;
-            CrownIcon = butterscotchnroses.bnrBundle.LoadAsset<Texture>("texCrownIcon");
         }
         else
         {
-
+            BossGroup.onBossGroupStartServer -= StartTracking;
+            BossGroup.onBossGroupDefeatedServer -= PrintDamage;
+            Stage.onStageStartGlobal -= StageOnonStageStartGlobal;
+            On.RoR2.UI.AllyCardController.InfoOverride -= AllyCardControllerOnInfoOverride;
         }
     }
     
-    private static List<GameObject> crownImages = [];
-
     public static Color GetHex(string hex)
     {
         if (!hex.StartsWith("#"))
@@ -56,14 +56,22 @@ public class whodiddamage : PatchBase<whodiddamage>
     {
         orig(self);
 
-        if (!useCrown.Value) return;
-        if (self.cachedSourceMaster.inventory.GetItemCountEffective(Crown.instance.ItemDef) <= 0) return;
-        if (self.portraitIconImage.transform.Find("crown")) return;
-            
+        if (!useCrown.Value || butterscotchnroses.clientSide.Value) return;
+        
+        GameObject oldCrownObj = self.portraitIconImage.transform.Find("crown")?.gameObject;
+        bool hasCrownItem = self.sourceMaster.inventory.GetItemCountEffective(Crown.instance.ItemDef) > 0;
+        
+        if (oldCrownObj && !hasCrownItem)
+        {
+            Object.Destroy(oldCrownObj);
+            return;
+        }
+        if (!hasCrownItem) return;
+        
         GameObject crownObj = new GameObject("crown");
         crownObj.transform.parent = self.portraitIconImage.transform;
         crownObj.transform.localPosition = Vector3.zero;
-                
+        
         RawImage rawImage = crownObj.AddComponent<RawImage>();
         rawImage.texture = CrownIcon;//LocalUserManager.GetFirstLocalUser().userProfile.portraitTexture;
         if (crownColorBasedOffBody.Value)
@@ -75,11 +83,16 @@ public class whodiddamage : PatchBase<whodiddamage>
             string? steamID = self.sourceMaster?.playerCharacterMasterController?.networkUser?.id.steamId.ToSteamID();
             if (steamID != null)
             {
-                string[] values = steamID.Split(',');
+                Log.Debug($"target steamID: {steamID.Split(':')[^1]}");
+                string[] values = crownColorOverrides.Value.Split(',');
+                foreach (var value in values)
+                {
+                    Log.Debug($"config: {value.Split(':')[^1]}");
+                }
                 for (int i = 0; i < values.Length; i += 2)
                 {
                     values[i] = values[i].Trim();
-                    if (values[i] == steamID)
+                    if (values[i].Split(':')[^1] == steamID.Split(':')[^1])
                     {
                         rawImage.color = GetHex(values[i + 1]);
                     }
@@ -98,67 +111,92 @@ public class whodiddamage : PatchBase<whodiddamage>
     private void StageOnonStageStartGlobal(Stage stage)
     {
         bossGroupsToDamages = [];
+        mastersTotalDamage = [];
         GlobalEventManager.onServerDamageDealt -= GlobalEventManagerOnonServerDamageDealt;
     }
     
-    private Dictionary<BossGroup, Dictionary<CharacterMaster, DamageCredit>> bossGroupsToDamages = [];
     private void PrintDamage(BossGroup bossGroup)
     {
-        if (bossGroupsToDamages.TryGetValue(bossGroup, out Dictionary<CharacterMaster, DamageCredit> bossGroupsToDamage))
-        {
-            List<KeyValuePair<CharacterMaster, DamageCredit>> damageOrdered = bossGroupsToDamage.ToList();
-            damageOrdered.Sort((kvp, kvp2) => (kvp2.Value.damage + kvp2.Value.minionDamage).CompareTo(kvp.Value.damage + kvp.Value.minionDamage));
+        GlobalEventManager.onServerDamageDealt -= GlobalEventManagerOnonServerDamageDealt;
 
+        if (!bossGroupsToDamages.TryGetValue(bossGroup, out Dictionary<CharacterMaster, DamageCredit> bossGroupsToDamage)) return;
+        if (Run.instance.participatingPlayerCount == 1 && onlyInMultiplayer.Value) return;
+
+        List<KeyValuePair<CharacterMaster, DamageCredit>> damageOrdered = bossGroupsToDamage.ToList();
+        damageOrdered.Sort((kvp, kvp2) => (kvp2.Value.damage + kvp2.Value.minionDamage).CompareTo(kvp.Value.damage + kvp.Value.minionDamage));
+
+        if (useCrown.Value && !butterscotchnroses.clientSide.Value)
+        {
             foreach (CharacterMaster master in CharacterMaster.readOnlyInstancesList)
             {
-                master.inventory.RemoveItemPermanent(Crown.instance.ItemDef, 999);
+                master?.inventory?.RemoveItemPermanent(Crown.instance.ItemDef, 999);
             }
-
             foreach (GameObject crownObj in crownImages)
             {
-                Object.Destroy(crownObj);
-            }
-            
-            damageOrdered[0].Key.inventory.GiveItemPermanent(Crown.instance.ItemDef);
-            foreach (HUD hud in HUD.instancesList)
-            {
-                foreach (AllyCardController cardController in hud.allyCardManager.cardAllocator.elements)
-                {
-                    cardController.InfoOverride();
-                }
-            }
-            
-            foreach (KeyValuePair<CharacterMaster, DamageCredit> kvp in damageOrdered)
-            {
-                string name = kvp.Key.GetBody()?.baseNameToken;
-
-                if (name != null)
-                {
-                    name = Language.GetString(name);
-                }
-            
-                if (kvp.Key.playerCharacterMasterController)
-                {
-                    name = kvp.Key.playerCharacterMasterController.GetDisplayName();
-                }
-
-                if (name == null)
-                {
-                    Log.Warning($"gave up trying to get name for master {kvp.Key.name}");
-                    continue;
-                }
-            
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage() { baseToken = $"<color=#e5eefc><style=cIsUtility>{name}</style> dealt <style=cIsDamage>{(kvp.Value.damage + kvp.Value.minionDamage):0} damage</style>!" + ((kvp.Value.minionDamage != 0) ? $" <style=cStack>({kvp.Value.damage:0} self, {kvp.Value.minionDamage:0} minion)</style>" : "" ) + "</color>"});
-                Log.Debug($"{name} - {kvp.Value.damage:0}- {kvp.Value.minionDamage:0}");
+                Object.DestroyImmediate(crownObj);
             }
         }
         
-        GlobalEventManager.onServerDamageDealt -= GlobalEventManagerOnonServerDamageDealt;
+        bool printmvp = mastersTotalDamage.Count != 0;
+        
+        foreach (KeyValuePair<CharacterMaster, DamageCredit> kvp in damageOrdered)
+        {
+            if (!kvp.Key) continue;
+            
+            string name = TryGetName(kvp.Key);
+            
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage() { baseToken = $"<color=#e5eefc><style=cIsUtility>{name}</style> dealt <style=cIsDamage>{(kvp.Value.damage + kvp.Value.minionDamage):0} damage</style>!" + ((kvp.Value.minionDamage != 0) ? $" <style=cStack>({kvp.Value.damage:0} self, {kvp.Value.minionDamage:0} minion)</style>" : "" ) + "</color>"});
+            Log.Debug($"{name} - {kvp.Value.damage:0} - {kvp.Value.minionDamage:0}");
+
+            if (mastersTotalDamage.TryGetValue(kvp.Key, out float _))
+            { 
+                mastersTotalDamage[kvp.Key] += kvp.Value.damage + kvp.Value.minionDamage;
+            }
+            else
+            {
+                mastersTotalDamage.Add(kvp.Key, kvp.Value.damage + kvp.Value.minionDamage);
+            }
+        }
+
+        List<KeyValuePair<CharacterMaster, float>> test = mastersTotalDamage.ToList();
+        test.Sort((kvp, kvp2) => (kvp2.Value).CompareTo(kvp.Value));
+        
+        if (useCrown.Value && !butterscotchnroses.clientSide.Value)
+        {
+            test[0].Key.inventory.GiveItemPermanent(Crown.instance.ItemDef);
+        }
+
+        foreach (HUD hud in HUD.instancesList)
+        {
+            foreach (AllyCardController cardController in hud.allyCardManager.cardAllocator.elements)
+            {
+                cardController.InfoOverride();
+            }
+        }
+        
+        if (!printmvp) return;
+        Chat.SendBroadcastChat(new Chat.SimpleChatMessage() { baseToken = $"<color=#e5eefc><style=cIsUtility>{TryGetName(test[0].Key)}</style> is the highest stage damage dealer with <style=cIsDamage>{(test[0].Value):0} damage</style>!</color>"});
+    }
+
+    private static string TryGetName(CharacterMaster characterMaster)
+    {
+        if (characterMaster.playerCharacterMasterController)
+        {
+            return characterMaster.playerCharacterMasterController.GetDisplayName();
+        }
+        
+        string name = characterMaster.GetBody().baseNameToken;
+
+        name = Language.GetString(name ?? characterMaster.bodyPrefab.GetComponent<CharacterBody>().baseNameToken);
+
+        return name;
+
     }
 
     private void StartTracking(BossGroup bossGroup)
     {
-        //totalDamages = [];
+        if (Run.instance.participatingPlayerCount == 1 && onlyInMultiplayer.Value) return;
+        
         bossGroupsToDamages.Add(bossGroup, new Dictionary<CharacterMaster, DamageCredit>());
         GlobalEventManager.onServerDamageDealt += GlobalEventManagerOnonServerDamageDealt;
     }
@@ -214,7 +252,6 @@ public class whodiddamage : PatchBase<whodiddamage>
         {
             saved.Value.Add(damageReport.attackerMaster, new DamageCredit(damageReport.damageDealt, 0, damageReport.attackerOwnerMaster));
         }
-        
     }
 
     public override void Config(ConfigFile config)
@@ -242,10 +279,17 @@ public class whodiddamage : PatchBase<whodiddamage>
             "",
             "crown color overrides for specific players steamids, formatted \"STEAM_0:1:174533492,#F3D2F7\"");
         Utils.StringConfig(crownColorOverrides);
+        
+        onlyInMultiplayer = config.Bind("BNR - whodiddamage",
+            "disable in singleplayer",
+            true,
+            "whether to only enable in multiplayer or not .,.,");
+        Utils.CheckboxConfig(onlyInMultiplayer);
     }
 
     private ConfigEntry<bool> enabled;
     private ConfigEntry<bool> useCrown;
     private ConfigEntry<bool> crownColorBasedOffBody;
+    private ConfigEntry<bool> onlyInMultiplayer;
     private ConfigEntry<string> crownColorOverrides;
 }

@@ -21,6 +21,12 @@ public class oldconfigs
         {
             coolereclipse.whitelistStages.Value = (string)coolereclipse.whitelistStages.DefaultValue;
         }
+        
+        string oldSkinRecolor = "skinCommandoAlt,CommandoBody,100,0,0,Test Skin;;skinCommandoAlt,CommandoBody,200,0,0,Test Skin 2;;skinCommandoDefault,CommandoBody,290,-40,-10,Awesome Skin !!!!";
+        if (skinrecolors.skinRecolors.Value == oldSkinRecolor)
+        {
+            skinrecolors.skinRecolors.Value = (string)skinrecolors.skinRecolors.DefaultValue;
+        }
 
         string olderCoolerEclipseBlacklist = "goldshores,bazaar,solutionalhaunt,ss2_voidshop,goldshores";
         if (coolereclipse.blacklistStages.Value == olderCoolerEclipseBlacklist)

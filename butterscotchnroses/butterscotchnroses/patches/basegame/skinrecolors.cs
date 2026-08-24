@@ -80,25 +80,6 @@ public class skinrecolors : PatchBase<skinrecolors>
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            /*using UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(texture);
-            
-            yield return uwr.SendWebRequest();
-
-            if (uwr.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log(uwr.error);
-            }
-            else
-            {
-                // Get downloaded asset bundle
-                var returnTexture = DownloadHandlerTexture.GetContent(uwr);
-                    
-                Log.Debug($"loaded {texture.Split("\\")[^1]} in {stopwatch.ElapsedMilliseconds}ms !! adding to recoloredTextures ,.,.");
-                recoloredTextures.Add(texture.Split("\\")[^1], returnTexture);
-                totalTime += stopwatch.ElapsedMilliseconds;
-                yield return null;
-            }*/
-
             byte[] bytes = File.ReadAllBytes(texture);
             Texture2D returnTexture = new Texture2D(2, 2);
             returnTexture.LoadImage(bytes);
@@ -302,7 +283,7 @@ public class skinrecolors : PatchBase<skinrecolors>
     
     private static void CheckConsoleKey()
     {
-        if (Input.GetKeyDown(KeyCode.F3))
+        /*if (Input.GetKeyDown(KeyCode.F3))
         {
             if (window)
             {
@@ -320,7 +301,7 @@ public class skinrecolors : PatchBase<skinrecolors>
         if (Input.GetKeyDown(KeyCode.Escape) && window)
         {
             Object.Destroy(window.gameObject);
-        }
+        }*/
     }
 
     public class skinrecolorui
@@ -470,7 +451,7 @@ public class skinrecolors : PatchBase<skinrecolors>
         
         private static void CreateSkinHGButtonListner()
         {
-            string skinName = !newSkinName.IsNullOrWhiteSpace() ? newSkinName : "Generated Skin";
+            string skinName = !string.IsNullOrEmpty(newSkinName) ? newSkinName : "Generated Skin";
             skinRecolors.Value += $";;{baseSkinName.name},{currentBody.name[..^7]},{hsv[0]},{hsv[1]},{hsv[2]},{skinName},{multiplySat}";
             Log.Debug($"added ;;{baseSkinName.name},{currentBody.name[..^7]},{hsv[0]},{hsv[1]},{hsv[2]},{skinName},{multiplySat} to the config !!! restart your game to see it in lobby .,,.");
         }
@@ -609,7 +590,7 @@ public class skinrecolors : PatchBase<skinrecolors>
         
         skinRecolors = config.Bind("BNR - skinrecolors",
             "skin recolors",
-            "skinCommandoAlt,CommandoBody,100,0,0,Test Skin;;skinCommandoAlt,CommandoBody,200,0,0,Test Skin 2;;skinCommandoDefault,CommandoBody,290,-40,-10,Awesome Skin !!!!",
+            "",
             "follows \"string baseSkinDefName, string bodyName, float hue, float saturation, float value, string skinName, string prefix\" where prefix is optional (used for like ,., Red on wolfo qol merc.,., use list_skins to get internal names or prodz debugging mod ,., split with ;; ..,,. you can temporarily try out recolors with recolor_skin hue saturation value ,.,,.");
         
         fileType = config.Bind("BNR - skinrecolors",

@@ -82,7 +82,7 @@ public class postprocessing : PatchBase<postprocessing>
         PPVEdit = config.Bind("BNR - postprocessing",
             "stage edits",
             @"RoR2/Base/title/PostProcessing/ppSceneGolemplainsFoggy.asset,titanic plains,[AmbientOcclusion];RoR2/DLC3/nest/ppSceneNest.asset,pretenders,[AmbientOcclusion]",
-            "");
+            "(assetpathtopostprocessingvolume),(config name),[(postprocessingtypename),(postprocessingtypename)]");
         Utils.StringConfig(PPVEdit);
     }
 

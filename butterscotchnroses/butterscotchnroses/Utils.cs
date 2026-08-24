@@ -106,7 +106,13 @@ public class Utils
     {
         Texture2D returnTexture;
 
-        string fileType = Enum.GetName(typeof(skinrecolors.fileTypes), skinrecolors.fileType.Value);
+        string fileType = skinrecolors.fileType.Value switch
+        {
+            skinrecolors.fileTypes.png => "png",
+            skinrecolors.fileTypes.jpg => "jpg",
+            skinrecolors.fileTypes.tga => "tga",
+            _ => "png"
+        };
         string testFileName = $"{texture.name}_RecolorH{hueShift}S{saturation}V{value}.{fileType}";
         string testPath = $"{skinrecolors.textureDirs}\\{testFileName}";
         if (skinrecolors.recoloredTextures.TryGetValue($"{testFileName}", out Texture2D texture2D))

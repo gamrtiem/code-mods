@@ -19,8 +19,6 @@ using ShaderSwapper;
 
 namespace BNR
 {
-    [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
-    [BepInDependency(NetworkingAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency("com.Viliger.EnemiesReturns", BepInDependency.DependencyFlags.SoftDependency)]
     public class butterscotchnroses : BaseUnityPlugin
@@ -29,7 +27,7 @@ namespace BNR
 
         private const string PluginAuthor = "icebro";
         private const string PluginName = "BNR";
-        private const string PluginVersion = "0.2.1";
+        private const string PluginVersion = "0.3.0";
 
         public static AssetBundle carvingKitBundle;
         public static AssetBundle redmanBundle;

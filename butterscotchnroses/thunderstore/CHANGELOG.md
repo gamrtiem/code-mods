@@ -1,3 +1,13 @@
+## 0.3.0
+- added who did damage (prints damage count for each player after a boss is killed in multiplayer).,,. 
+- added color catalog editor .,,. 
+- added a 1/200 chance for the loading screen to display random numbers instead of actual loading percent ,. 
+- added post processing editor ,. ,.
+- added team health color editor ,.,. 
+- added ukulele pronouns ,.,.
+- added client side config (disables content that would cause desyncs automatically ),.,. .
+- mightve broken something hsv skins related um ,.., if i did tell me ,.. .,
+
 ## 0.2.1
 - now is a release build so shouldnt need unityhotreload to stop constant log spam TT .,,.
 - added a try catch to skin recolors so an empty config for it wont cause the game to hang .,,.,
