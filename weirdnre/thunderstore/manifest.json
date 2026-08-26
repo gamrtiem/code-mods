@@ -1,0 +1,9 @@
+﻿{
+	"name": "weirdroutejingleonerror",
+	"version_number": "1.0.0",
+	"website_url": "https://github.com/kinaclipse101/code-mods/tree/main/weirdnre",
+	"description": "makes the weird route jingle play whenever an exception (or other type of log) occurs .,.,,. configurable .,.,",
+	"dependencies": [
+		"RiskofThunder-R2API_Sound-1.0.3"
+	]
+}
